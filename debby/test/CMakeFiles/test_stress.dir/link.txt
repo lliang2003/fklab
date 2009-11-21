@@ -1,0 +1,1 @@
+/usr/bin/c++   -g -Wall -Wextra -Wno-sign-compare -Wno-unused-parameter   CMakeFiles/test_stress.dir/blackbox/TestStress.o  -o test_stress -rdynamic -L/home/fankai/tplatform/debby/../thirdparty/lib/gcc-4.2 -L/home/fankai/tplatform/debby ../libdebby_client.a ../libdebby_ice.a -llog4cplus -lrudeconfig -lIce -Wl,-rpath,/home/fankai/tplatform/debby/../thirdparty/lib/gcc-4.2 

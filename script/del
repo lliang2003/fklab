@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import getopt, sys, os, time, random
+
+usage='Usage: del [FILE] ...\nMove the FILE(s) to trash directory.'
+trash_path = os.path.expanduser('~/.trash')
+opts, args = getopt.getopt(sys.argv[1:], 'h')
+if '-h' in dict(opts):
+    print usage
+    sys.exit(0)
+
+if not os.path.isdir(trash_path):
+    print 'Initializing ~/.trash directory ...'
+    os.mkdir(trash_path)
+
+timestamp = time.strftime(".%y%m%d%H%M%S", time.localtime())
+for file in args:
+    if (not os.path.exists(file)):
+        print file, "not exists"
+        continue
+    src = os.path.abspath(file)
+    dst = trash_path + '/' + os.path.basename(src) + timestamp
+    print "deleting %s ..." % file 
+    os.rename(src, dst)
+    
+

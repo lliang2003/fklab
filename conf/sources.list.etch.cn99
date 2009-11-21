@@ -1,0 +1,9 @@
+
+deb http://debian.cn99.com/debian etch main non-free contrib
+deb http://debian.cn99.com/debian etch-proposed-updates main contrib non-free
+deb http://debian.cn99.com/debian-security etch/updates main contrib non-free 
+
+deb-src http://debian.cn99.com/debian etch main non-free contrib
+deb-src http://debian.cn99.com/debian etch-proposed-updates main contrib non-free
+deb-src http://debian.cn99.com/debian-security etch/updates main contrib non-free 
+

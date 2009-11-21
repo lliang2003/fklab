@@ -1,0 +1,10 @@
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+proc            /proc           proc    defaults        0       0
+/dev/cobd0      /               ext3    noatime,errors=remount-ro 0       1
+/dev/cobd2      /usr            ext3    defaults 0       0
+/dev/cobd1      none            swap    sw              0       0
+#cofs0          /mnt/d          cofs    defaults        0       0
+/dev/cobd3      /home    ext3    defaults 0 0
+#/dev/hdc        /media/cdrom0   udf,iso9660 user,noauto     0       0

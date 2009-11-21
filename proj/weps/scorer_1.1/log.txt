@@ -1,0 +1,690 @@
+Evaluating clustering answers (team fk) from ../result/fk
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Jude_Brown.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Marcy_Jackson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Thomas_Fraser.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/James_Hamilton.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/James_Curran.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Patrick_Killen.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/John_Nelson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Sharon_Goldwater.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Chris_Brockett.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Arthur_Morgan.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Robert_Moore.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Violet_Howard.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Stephen_Clark.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Stephan_Johnson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Neil_Clark.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Martha_Edwards.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Jerry_Hobbs.clust.xml
+setting all the scores to 0.0 for this topic
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Alvin_Cooper.clust.xml
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../result/fk/Alvin_Cooper.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (99) is not in the key file, will be removed.
+Checking errors in answer...
+	Doc (24) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (66) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/George_Foster.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Dekang_Lin.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Frank_Keller.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/James_Morehead.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Harry_Hughes.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Mark_Johnson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/James_Davidson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Karen_Peterson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/William_Dickson.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Thomas_Kirk.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Leon_Barrett.clust.xml
+setting all the scores to 0.0 for this topic
+fk has no answer for the clustering problem ../test/truth_files/official_annotation/Jonathan_Brooks.clust.xml
+setting all the scores to 0.0 for this topic
+Saving team evaluation to: ./fk.eval
+
+Evaluating clustering answers (baseline ALL_IN_ONE_BASELINE)
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Jude_Brown.clust.xml
+
+Checking errors in key...
+	Doc (58) is not in the key file, will be removed.
+	Doc (57) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (35) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (36) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (34) is not in the key file, will be removed.
+	Doc (12) is not in the key file, will be removed.
+	Doc (38) is not in the key file, will be removed.
+	Doc (21) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (42) is not in the key file, will be removed.
+	Doc (40) is not in the key file, will be removed.
+	Doc (62) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (61) is not in the key file, will be removed.
+	Doc (67) is not in the key file, will be removed.
+	Doc (97) is not in the key file, will be removed.
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (47) is not in the key file, will be removed.
+	Doc (46) is not in the key file, will be removed.
+	Doc (23) is not in the key file, will be removed.
+	Doc (27) is not in the key file, will be removed.
+	Doc (29) is not in the key file, will be removed.
+	Doc (3) is not in the key file, will be removed.
+	Doc (10) is not in the key file, will be removed.
+	Doc (1) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (5) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (51) is not in the key file, will be removed.
+	Doc (71) is not in the key file, will be removed.
+	Doc (53) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Marcy_Jackson.clust.xml
+
+Checking errors in key...
+	Doc (98) is not in the key file, will be removed.
+	Doc (96) is not in the key file, will be removed.
+	Doc (94) is not in the key file, will be removed.
+	Doc (47) is not in the key file, will be removed.
+	Doc (27) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Thomas_Fraser.clust.xml
+
+Checking errors in key...
+	Doc (97) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (44) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (56) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (16) is not in the key file, will be removed.
+	Doc (25) is not in the key file, will be removed.
+	Doc (12) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (88) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/James_Hamilton.clust.xml
+
+Checking errors in key...
+	Doc (19) is not in the key file, will be removed.
+	Doc (47) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (14) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (42) is not in the key file, will be removed.
+	Doc (41) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (53) is not in the key file, will be removed.
+	Doc (72) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (84) is not in the key file, will be removed.
+	Doc (75) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/James_Curran.clust.xml
+
+Checking errors in key...
+	Doc (98) is not in the key file, will be removed.
+	Doc (49) is not in the key file, will be removed.
+	Doc (35) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+	Doc (99) is not in the key file, will be removed.
+	Doc (76) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+	Doc (29) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Patrick_Killen.clust.xml
+
+Checking errors in key...
+	Doc (98) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/John_Nelson.clust.xml
+
+Checking errors in key...
+	Doc (77) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (57) is not in the key file, will be removed.
+	Doc (56) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (13) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (12) is not in the key file, will be removed.
+	Doc (40) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (60) is not in the key file, will be removed.
+	Doc (86) is not in the key file, will be removed.
+	Doc (99) is not in the key file, will be removed.
+	Doc (98) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (94) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (90) is not in the key file, will be removed.
+	Doc (25) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (53) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Sharon_Goldwater.clust.xml
+
+Checking errors in key...
+	Doc (2) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Chris_Brockett.clust.xml
+
+Checking errors in key...
+	Doc (69) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (23) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (39) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Arthur_Morgan.clust.xml
+
+Checking errors in key...
+	Doc (79) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (34) is not in the key file, will be removed.
+	Doc (37) is not in the key file, will be removed.
+	Doc (38) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (42) is not in the key file, will be removed.
+	Doc (41) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (86) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (69) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (26) is not in the key file, will be removed.
+	Doc (27) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (29) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (72) is not in the key file, will be removed.
+	Doc (73) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (75) is not in the key file, will be removed.
+	Doc (76) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (17) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+	Doc (13) is not in the key file, will be removed.
+	Doc (14) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (12) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (49) is not in the key file, will be removed.
+	Doc (97) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (95) is not in the key file, will be removed.
+	Doc (94) is not in the key file, will be removed.
+	Doc (44) is not in the key file, will be removed.
+	Doc (93) is not in the key file, will be removed.
+	Doc (47) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Robert_Moore.clust.xml
+
+Checking errors in key...
+	Doc (79) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (36) is not in the key file, will be removed.
+	Doc (14) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (41) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (62) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (99) is not in the key file, will be removed.
+	Doc (61) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (67) is not in the key file, will be removed.
+	Doc (96) is not in the key file, will be removed.
+	Doc (68) is not in the key file, will be removed.
+	Doc (45) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (3) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (4) is not in the key file, will be removed.
+	Doc (71) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (76) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Violet_Howard.clust.xml
+
+Checking errors in key...
+	Doc (77) is not in the key file, will be removed.
+	Doc (57) is not in the key file, will be removed.
+	Doc (56) is not in the key file, will be removed.
+	Doc (36) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (21) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (60) is not in the key file, will be removed.
+	Doc (61) is not in the key file, will be removed.
+	Doc (84) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+	Doc (98) is not in the key file, will be removed.
+	Doc (97) is not in the key file, will be removed.
+	Doc (96) is not in the key file, will be removed.
+	Doc (68) is not in the key file, will be removed.
+	Doc (93) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (90) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (26) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (10) is not in the key file, will be removed.
+	Doc (7) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Stephen_Clark.clust.xml
+
+Checking errors in key...
+	Doc (79) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (57) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (35) is not in the key file, will be removed.
+	Doc (17) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (36) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+	Doc (34) is not in the key file, will be removed.
+	Doc (39) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (41) is not in the key file, will be removed.
+	Doc (40) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+	Doc (98) is not in the key file, will be removed.
+	Doc (67) is not in the key file, will be removed.
+	Doc (94) is not in the key file, will be removed.
+	Doc (44) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (25) is not in the key file, will be removed.
+	Doc (26) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (7) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (4) is not in the key file, will be removed.
+	Doc (51) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (71) is not in the key file, will be removed.
+	Doc (72) is not in the key file, will be removed.
+	Doc (75) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+	Doc (76) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Stephan_Johnson.clust.xml
+
+Checking errors in key...
+	Doc (96) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (68) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (56) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (46) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (17) is not in the key file, will be removed.
+	Doc (27) is not in the key file, will be removed.
+	Doc (29) is not in the key file, will be removed.
+	Doc (3) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (5) is not in the key file, will be removed.
+	Doc (41) is not in the key file, will be removed.
+	Doc (40) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (51) is not in the key file, will be removed.
+	Doc (54) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Neil_Clark.clust.xml
+
+Checking errors in key...
+	Doc (69) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (46) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (37) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Martha_Edwards.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (90) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (62) is not in the key file, will be removed.
+	Doc (60) is not in the key file, will be removed.
+	Doc (11) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Jerry_Hobbs.clust.xml
+
+Checking errors in key...
+	Doc (68) is not in the key file, will be removed.
+	Doc (93) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (60) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Alvin_Cooper.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (20) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (24) is not in the key file, will be removed.
+	Doc (99) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/George_Foster.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (2) is not in the key file, will be removed.
+	Doc (93) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+	Doc (16) is not in the key file, will be removed.
+	Doc (14) is not in the key file, will be removed.
+	Doc (89) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Dekang_Lin.clust.xml
+
+Checking errors in key...
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Frank_Keller.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (95) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (56) is not in the key file, will be removed.
+	Doc (55) is not in the key file, will be removed.
+	Doc (17) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (23) is not in the key file, will be removed.
+	Doc (25) is not in the key file, will be removed.
+	Doc (13) is not in the key file, will be removed.
+	Doc (14) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/James_Morehead.clust.xml
+
+Checking errors in key...
+	Doc (20) is not in the key file, will be removed.
+	Doc (1) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (51) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+	Doc (34) is not in the key file, will be removed.
+	Doc (8) is not in the key file, will be removed.
+	Doc (86) is not in the key file, will be removed.
+	Doc (87) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Harry_Hughes.clust.xml
+
+Checking errors in key...
+	Doc (67) is not in the key file, will be removed.
+	Doc (3) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (59) is not in the key file, will be removed.
+	Doc (42) is not in the key file, will be removed.
+	Doc (15) is not in the key file, will be removed.
+	Doc (39) is not in the key file, will be removed.
+	Doc (84) is not in the key file, will be removed.
+	Doc (38) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Mark_Johnson.clust.xml
+
+Checking errors in key...
+	Doc (45) is not in the key file, will be removed.
+	Doc (19) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (22) is not in the key file, will be removed.
+	Doc (36) is not in the key file, will be removed.
+	Doc (18) is not in the key file, will be removed.
+	Doc (86) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/James_Davidson.clust.xml
+
+Checking errors in key...
+	Doc (67) is not in the key file, will be removed.
+	Doc (79) is not in the key file, will be removed.
+	Doc (66) is not in the key file, will be removed.
+	Doc (48) is not in the key file, will be removed.
+	Doc (59) is not in the key file, will be removed.
+	Doc (58) is not in the key file, will be removed.
+	Doc (44) is not in the key file, will be removed.
+	Doc (23) is not in the key file, will be removed.
+	Doc (26) is not in the key file, will be removed.
+	Doc (12) is not in the key file, will be removed.
+	Doc (0) is not in the key file, will be removed.
+	Doc (7) is not in the key file, will be removed.
+	Doc (6) is not in the key file, will be removed.
+	Doc (4) is not in the key file, will be removed.
+	Doc (31) is not in the key file, will be removed.
+	Doc (63) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Karen_Peterson.clust.xml
+
+Checking errors in key...
+	Doc (67) is not in the key file, will be removed.
+	Doc (79) is not in the key file, will be removed.
+	Doc (95) is not in the key file, will be removed.
+	Doc (94) is not in the key file, will be removed.
+	Doc (45) is not in the key file, will be removed.
+	Doc (91) is not in the key file, will be removed.
+	Doc (35) is not in the key file, will be removed.
+	Doc (13) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (2) is not in the key file, will be removed.
+	Doc (7) is not in the key file, will be removed.
+	Doc (5) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (81) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/William_Dickson.clust.xml
+
+Checking errors in key...
+	Doc (3) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (93) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (52) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (13) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Thomas_Kirk.clust.xml
+
+Checking errors in key...
+	Doc (49) is not in the key file, will be removed.
+	Doc (96) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (57) is not in the key file, will be removed.
+	Doc (92) is not in the key file, will be removed.
+	Doc (46) is not in the key file, will be removed.
+	Doc (33) is not in the key file, will be removed.
+	Doc (34) is not in the key file, will be removed.
+	Doc (1) is not in the key file, will be removed.
+	Doc (30) is not in the key file, will be removed.
+	Doc (43) is not in the key file, will be removed.
+	Doc (82) is not in the key file, will be removed.
+	Doc (51) is not in the key file, will be removed.
+	Doc (83) is not in the key file, will be removed.
+	Doc (80) is not in the key file, will be removed.
+	Doc (61) is not in the key file, will be removed.
+	Doc (74) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+	Doc (50) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Leon_Barrett.clust.xml
+
+Checking errors in key...
+	Doc (66) is not in the key file, will be removed.
+	Doc (2) is not in the key file, will be removed.
+	Doc (78) is not in the key file, will be removed.
+	Doc (68) is not in the key file, will be removed.
+	Doc (32) is not in the key file, will be removed.
+	Doc (35) is not in the key file, will be removed.
+	Doc (64) is not in the key file, will be removed.
+	Doc (28) is not in the key file, will be removed.
+	Doc (85) is not in the key file, will be removed.
+
+Checking errors in answer...
+Parsing clustering file: /home/fankai/weps/scorer_1.1/../test/truth_files/official_annotation/Jonathan_Brooks.clust.xml
+
+Checking errors in key...
+	Doc (78) is not in the key file, will be removed.
+	Doc (77) is not in the key file, will be removed.
+	Doc (68) is not in the key file, will be removed.
+	Doc (65) is not in the key file, will be removed.
+	Doc (9) is not in the key file, will be removed.
+	Doc (8) is not in the key file, will be removed.
+	Doc (60) is not in the key file, will be removed.
+	Doc (75) is not in the key file, will be removed.
+
+Checking errors in answer...
+Saving team evaluation to: ./ALL_IN_ONE_BASELINE.eval
+

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# This script is used to clean files created by cmake
+echo Cleaning cmake files ...
+cmd='rm CMakeFiles -rf'
+echo $cmd
+$cmd
+cmd='rm Testing -rf'
+echo $cmd
+$cmd
+cmd='rm CMakeCache.txt -f'
+echo $cmd
+$cmd
+cmd='rm CTestTestfile.cmake -f'
+echo $cmd
+$cmd
+cmd='rm install_manifest.txt -f'
+echo $cmd
+$cmd
+cmd='rm Makefile -f'
+echo $cmd
+$cmd
+
