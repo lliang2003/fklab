@@ -1,0 +1,1965 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE corpus SYSTEM "lexical-sample.dtd">
+
+<corpus lang="Chinese">
+
+<lexelt item="中医">
+
+<instance id="中医.1">
+<answer instance="中医.1" senseid=""/>
+<context>
+
+围绕《指导意见》的贯彻落实，结合中医药工作的实际，各地要加大力度，积极而稳妥地推进<head>中医</head>医疗机构改革。
+
+</context>
+<postagging>
+<word id="0" pos="v">
+<token>围绕</token>
+</word>
+<word id="1" pos="w">
+<token>《</token>
+</word>
+<word id="2" pos="vn">
+<token>指导</token>
+</word>
+<word id="3" pos="n">
+<token>意见</token>
+</word>
+<word id="4" pos="w">
+<token>》</token>
+</word>
+<word id="5" pos="u">
+<token>的</token>
+</word>
+<word id="6" pos="v">
+<token>贯彻</token>
+</word>
+<word id="7" pos="v">
+<token>落实</token>
+</word>
+<word id="8" pos="w">
+<token>，</token>
+</word>
+<word id="9" pos="v">
+<token>结合</token>
+</word>
+<word id="10" pos="n">
+<token>中医药</token>
+</word>
+<word id="11" pos="vn">
+<token>工作</token>
+</word>
+<word id="12" pos="u">
+<token>的</token>
+</word>
+<word id="13" pos="n">
+<token>实际</token>
+</word>
+<word id="14" pos="w">
+<token>，</token>
+</word>
+<word id="15" pos="r">
+<token>各地</token>
+</word>
+<word id="16" pos="v">
+<token>要</token>
+</word>
+<word id="17" pos="v">
+<token>加大</token>
+</word>
+<word id="18" pos="n">
+<token>力度</token>
+</word>
+<word id="19" pos="w">
+<token>，</token>
+</word>
+<word id="20" pos="a">
+<token>积极</token>
+</word>
+<word id="21" pos="c">
+<token>而</token>
+</word>
+<word id="22" pos="a">
+<token>稳妥</token>
+</word>
+<word id="23" pos="u">
+<token>地</token>
+</word>
+<word id="24" pos="v">
+<token>推进</token>
+</word>
+<word id="25" pos="n">
+<token>中医</token>
+</word>
+<word id="26" pos="n">
+<token>医疗</token>
+</word>
+<word id="27" pos="n">
+<token>机构</token>
+</word>
+<word id="28" pos="vn">
+<token>改革</token>
+</word>
+<word id="29" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.2">
+<answer instance="中医.2" senseid=""/>
+<context>
+
+全国人大代表、原北京<head>中医</head>医院院长李乾构对此深有感触：
+
+</context>
+<postagging>
+<word id="0" pos="n">
+<token>全国</token>
+</word>
+<word id="1" pos="n">
+<token>人大代表</token>
+</word>
+<word id="2" pos="w">
+<token>、</token>
+</word>
+<word id="3" pos="b">
+<token>原</token>
+</word>
+<word id="4" pos="nt">
+<token>
+北京中医医院
+</token>
+<subword id="0" pos="ns">
+<token>北京</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医</token>
+</subword>
+<subword id="2" pos="n">
+<token>医院</token>
+</subword>
+</word>
+<word id="5" pos="n">
+<token>院长</token>
+</word>
+<word id="6" pos="nr">
+<token>李</token>
+</word>
+<word id="7" pos="nr">
+<token>乾构</token>
+</word>
+<word id="8" pos="l">
+<token>对此</token>
+</word>
+<word id="9" pos="d">
+<token>深</token>
+</word>
+<word id="10" pos="v">
+<token>有</token>
+</word>
+<word id="11" pos="n">
+<token>感触</token>
+</word>
+<word id="12" pos="w">
+<token>：</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.3">
+<answer instance="中医.3" senseid=""/>
+<context>
+
+在我国，新中国成立以来政府一贯重视传统医药学的发展与应用，以<head>中医</head>药学为主体的传统医学同现代医学享有同等的法律地位。
+
+</context>
+<postagging>
+<word id="0" pos="p">
+<token>在</token>
+</word>
+<word id="1" pos="r">
+<token>我国</token>
+</word>
+<word id="2" pos="w">
+<token>，</token>
+</word>
+<word id="3" pos="a">
+<token>新</token>
+</word>
+<word id="4" pos="ns">
+<token>中国</token>
+</word>
+<word id="5" pos="v">
+<token>成立</token>
+</word>
+<word id="6" pos="f">
+<token>以来</token>
+</word>
+<word id="7" pos="n">
+<token>政府</token>
+</word>
+<word id="8" pos="d">
+<token>一贯</token>
+</word>
+<word id="9" pos="v">
+<token>重视</token>
+</word>
+<word id="10" pos="a">
+<token>传统</token>
+</word>
+<word id="11" pos="n">
+<token>医药学</token>
+</word>
+<word id="12" pos="u">
+<token>的</token>
+</word>
+<word id="13" pos="vn">
+<token>发展</token>
+</word>
+<word id="14" pos="c">
+<token>与</token>
+</word>
+<word id="15" pos="vn">
+<token>应用</token>
+</word>
+<word id="16" pos="w">
+<token>，</token>
+</word>
+<word id="17" pos="p">
+<token>以</token>
+</word>
+<word id="18" pos="n">
+<token>中医</token>
+</word>
+<word id="19" pos="n">
+<token>药学</token>
+</word>
+<word id="20" pos="v">
+<token>为</token>
+</word>
+<word id="21" pos="n">
+<token>主体</token>
+</word>
+<word id="22" pos="u">
+<token>的</token>
+</word>
+<word id="23" pos="a">
+<token>传统</token>
+</word>
+<word id="24" pos="n">
+<token>医学</token>
+</word>
+<word id="25" pos="p">
+<token>同</token>
+</word>
+<word id="26" pos="t">
+<token>现代</token>
+</word>
+<word id="27" pos="n">
+<token>医学</token>
+</word>
+<word id="28" pos="v">
+<token>享有</token>
+</word>
+<word id="29" pos="b">
+<token>同等</token>
+</word>
+<word id="30" pos="u">
+<token>的</token>
+</word>
+<word id="31" pos="n">
+<token>法律</token>
+</word>
+<word id="32" pos="n">
+<token>地位</token>
+</word>
+<word id="33" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.4">
+<answer instance="中医.4" senseid=""/>
+<context>
+
+统计显示，<head>中医</head>针灸已在120多个国家和地区得到应用。
+
+</context>
+<postagging>
+<word id="0" pos="v">
+<token>统计</token>
+</word>
+<word id="1" pos="v">
+<token>显示</token>
+</word>
+<word id="2" pos="w">
+<token>，</token>
+</word>
+<word id="3" pos="n">
+<token>中医</token>
+</word>
+<word id="4" pos="n">
+<token>针灸</token>
+</word>
+<word id="5" pos="d">
+<token>已</token>
+</word>
+<word id="6" pos="p">
+<token>在</token>
+</word>
+<word id="7" pos="m">
+<token>120</token>
+</word>
+<word id="8" pos="m">
+<token>多</token>
+</word>
+<word id="9" pos="q">
+<token>个</token>
+</word>
+<word id="10" pos="n">
+<token>国家</token>
+</word>
+<word id="11" pos="c">
+<token>和</token>
+</word>
+<word id="12" pos="n">
+<token>地区</token>
+</word>
+<word id="13" pos="v">
+<token>得到</token>
+</word>
+<word id="14" pos="vn">
+<token>应用</token>
+</word>
+<word id="15" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.5">
+<answer instance="中医.5" senseid=""/>
+<context>
+
+广州中医药大学第一附属医院以其鲜明的<head>中医</head>特色和对多种难治病症的独特疗效吸引了众多的病人。
+
+</context>
+<postagging>
+<word id="0" pos="nt">
+<token>
+广州中医药大学第一附属医院
+</token>
+<subword id="0" pos="ns">
+<token>广州</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医药</token>
+</subword>
+<subword id="2" pos="n">
+<token>大学</token>
+</subword>
+<subword id="3" pos="m">
+<token>第一</token>
+</subword>
+<subword id="4" pos="vn">
+<token>附属</token>
+</subword>
+<subword id="5" pos="n">
+<token>医院</token>
+</subword>
+</word>
+<word id="1" pos="p">
+<token>以</token>
+</word>
+<word id="2" pos="r">
+<token>其</token>
+</word>
+<word id="3" pos="a">
+<token>鲜明</token>
+</word>
+<word id="4" pos="u">
+<token>的</token>
+</word>
+<word id="5" pos="n">
+<token>中医</token>
+</word>
+<word id="6" pos="n">
+<token>特色</token>
+</word>
+<word id="7" pos="c">
+<token>和</token>
+</word>
+<word id="8" pos="p">
+<token>对</token>
+</word>
+<word id="9" pos="m">
+<token>多种</token>
+</word>
+<word id="10" pos="a">
+<token>难</token>
+</word>
+<word id="11" pos="v">
+<token>治</token>
+</word>
+<word id="12" pos="n">
+<token>病症</token>
+</word>
+<word id="13" pos="u">
+<token>的</token>
+</word>
+<word id="14" pos="a">
+<token>独特</token>
+</word>
+<word id="15" pos="n">
+<token>疗效</token>
+</word>
+<word id="16" pos="v">
+<token>吸引</token>
+</word>
+<word id="17" pos="u">
+<token>了</token>
+</word>
+<word id="18" pos="m">
+<token>众多</token>
+</word>
+<word id="19" pos="u">
+<token>的</token>
+</word>
+<word id="20" pos="n">
+<token>病人</token>
+</word>
+<word id="21" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.6">
+<answer instance="中医.6" senseid=""/>
+<context>
+
+该诊疗仪可以为患者进行全身综合检查、定向检查、电定穴治疗等，是<head>中医</head>现代化的一项成果，对于调治现代人的亚健康状态有效。
+
+</context>
+<postagging>
+<word id="0" pos="r">
+<token>该</token>
+</word>
+<word id="1" pos="n">
+<token>诊疗仪</token>
+</word>
+<word id="2" pos="v">
+<token>可以</token>
+</word>
+<word id="3" pos="p">
+<token>为</token>
+</word>
+<word id="4" pos="n">
+<token>患者</token>
+</word>
+<word id="5" pos="v">
+<token>进行</token>
+</word>
+<word id="6" pos="n">
+<token>全身</token>
+</word>
+<word id="7" pos="vn">
+<token>综合</token>
+</word>
+<word id="8" pos="vn">
+<token>检查</token>
+</word>
+<word id="9" pos="w">
+<token>、</token>
+</word>
+<word id="10" pos="d">
+<token>定向</token>
+</word>
+<word id="11" pos="v">
+<token>检查</token>
+</word>
+<word id="12" pos="w">
+<token>、</token>
+</word>
+<word id="13" pos="n">
+<token>电</token>
+</word>
+<word id="14" pos="v">
+<token>定</token>
+</word>
+<word id="15" pos="Ng">
+<token>穴</token>
+</word>
+<word id="16" pos="v">
+<token>治疗</token>
+</word>
+<word id="17" pos="u">
+<token>等</token>
+</word>
+<word id="18" pos="w">
+<token>，</token>
+</word>
+<word id="19" pos="v">
+<token>是</token>
+</word>
+<word id="20" pos="n">
+<token>中医</token>
+</word>
+<word id="21" pos="v">
+<token>现代化</token>
+</word>
+<word id="22" pos="u">
+<token>的</token>
+</word>
+<word id="23" pos="m">
+<token>一</token>
+</word>
+<word id="24" pos="q">
+<token>项</token>
+</word>
+<word id="25" pos="n">
+<token>成果</token>
+</word>
+<word id="26" pos="w">
+<token>，</token>
+</word>
+<word id="27" pos="p">
+<token>对于</token>
+</word>
+<word id="28" pos="v">
+<token>调治</token>
+</word>
+<word id="29" pos="n">
+<token>现代人</token>
+</word>
+<word id="30" pos="u">
+<token>的</token>
+</word>
+<word id="31" pos="h">
+<token>亚</token>
+</word>
+<word id="32" pos="a">
+<token>健康</token>
+</word>
+<word id="33" pos="n">
+<token>状态</token>
+</word>
+<word id="34" pos="a">
+<token>有效</token>
+</word>
+<word id="35" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.7">
+<answer instance="中医.7" senseid=""/>
+<context>
+
+届时，将聘请国内一流医学专家前来进行<head>中医</head>康复服务并将我国珍贵的养生法宝传播给与会者。
+
+</context>
+<postagging>
+<word id="0" pos="d">
+<token>届时</token>
+</word>
+<word id="1" pos="w">
+<token>，</token>
+</word>
+<word id="2" pos="d">
+<token>将</token>
+</word>
+<word id="3" pos="v">
+<token>聘请</token>
+</word>
+<word id="4" pos="s">
+<token>国内</token>
+</word>
+<word id="5" pos="b">
+<token>一流</token>
+</word>
+<word id="6" pos="n">
+<token>医学</token>
+</word>
+<word id="7" pos="n">
+<token>专家</token>
+</word>
+<word id="8" pos="v">
+<token>前来</token>
+</word>
+<word id="9" pos="v">
+<token>进行</token>
+</word>
+<word id="10" pos="n">
+<token>中医</token>
+</word>
+<word id="11" pos="vn">
+<token>康复</token>
+</word>
+<word id="12" pos="vn">
+<token>服务</token>
+</word>
+<word id="13" pos="c">
+<token>并</token>
+</word>
+<word id="14" pos="p">
+<token>将</token>
+</word>
+<word id="15" pos="r">
+<token>我国</token>
+</word>
+<word id="16" pos="a">
+<token>珍贵</token>
+</word>
+<word id="17" pos="u">
+<token>的</token>
+</word>
+<word id="18" pos="vn">
+<token>养生</token>
+</word>
+<word id="19" pos="n">
+<token>法宝</token>
+</word>
+<word id="20" pos="v">
+<token>传播</token>
+</word>
+<word id="21" pos="v">
+<token>给</token>
+</word>
+<word id="22" pos="n">
+<token>与会者</token>
+</word>
+<word id="23" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.8">
+<answer instance="中医.8" senseid=""/>
+<context>
+
+一个个专业技术人才从北京<head>中医</head>大学、华东理工学院、中南财经大学等慕名而来，成为科技创新的生力军。
+
+</context>
+<postagging>
+<word id="0" pos="m">
+<token>一个个</token>
+</word>
+<word id="1" pos="n">
+<token>专业</token>
+</word>
+<word id="2" pos="n">
+<token>技术</token>
+</word>
+<word id="3" pos="n">
+<token>人才</token>
+</word>
+<word id="4" pos="p">
+<token>从</token>
+</word>
+<word id="5" pos="nt">
+<token>
+北京中医大学
+</token>
+<subword id="0" pos="ns">
+<token>北京</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医</token>
+</subword>
+<subword id="2" pos="na">
+<token>大学</token>
+</subword>
+</word>
+<word id="6" pos="w">
+<token>、</token>
+</word>
+<word id="7" pos="nt">
+<token>
+华东理工学院
+</token>
+<subword id="0" pos="n">
+<token>华东</token>
+</subword>
+<subword id="1" pos="n">
+<token>理工学院</token>
+</subword>
+</word>
+<word id="8" pos="w">
+<token>、</token>
+</word>
+<word id="9" pos="nt">
+<token>
+中南财经大学
+</token>
+<subword id="0" pos="ns">
+<token>中南</token>
+</subword>
+<subword id="1" pos="n">
+<token>财经</token>
+</subword>
+<subword id="2" pos="na">
+<token>大学</token>
+</subword>
+</word>
+<word id="10" pos="u">
+<token>等</token>
+</word>
+<word id="11" pos="i">
+<token>慕名而来</token>
+</word>
+<word id="12" pos="w">
+<token>，</token>
+</word>
+<word id="13" pos="v">
+<token>成为</token>
+</word>
+<word id="14" pos="n">
+<token>科技</token>
+</word>
+<word id="15" pos="vn">
+<token>创新</token>
+</word>
+<word id="16" pos="u">
+<token>的</token>
+</word>
+<word id="17" pos="n">
+<token>生力军</token>
+</word>
+<word id="18" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.9">
+<answer instance="中医.9" senseid=""/>
+<context>
+
+在羚锐，每个职工每月都要抽出16个小时，集中学习药学专业知识、微机应用；每年都有一批职工被选送到河南<head>中医</head>学院等大专院校深造进修。
+
+</context>
+<postagging>
+<word id="0" pos="p">
+<token>在</token>
+</word>
+<word id="1" pos="nz">
+<token>羚锐</token>
+</word>
+<word id="2" pos="w">
+<token>，</token>
+</word>
+<word id="3" pos="r">
+<token>每个</token>
+</word>
+<word id="4" pos="n">
+<token>职工</token>
+</word>
+<word id="5" pos="r">
+<token>每月</token>
+</word>
+<word id="6" pos="d">
+<token>都</token>
+</word>
+<word id="7" pos="v">
+<token>要</token>
+</word>
+<word id="8" pos="v">
+<token>抽出</token>
+</word>
+<word id="9" pos="m">
+<token>16</token>
+</word>
+<word id="10" pos="q">
+<token>个</token>
+</word>
+<word id="11" pos="n">
+<token>小时</token>
+</word>
+<word id="12" pos="w">
+<token>，</token>
+</word>
+<word id="13" pos="v">
+<token>集中</token>
+</word>
+<word id="14" pos="v">
+<token>学习</token>
+</word>
+<word id="15" pos="n">
+<token>药学</token>
+</word>
+<word id="16" pos="n">
+<token>专业</token>
+</word>
+<word id="17" pos="n">
+<token>知识</token>
+</word>
+<word id="18" pos="w">
+<token>、</token>
+</word>
+<word id="19" pos="n">
+<token>微机</token>
+</word>
+<word id="20" pos="vn">
+<token>应用</token>
+</word>
+<word id="21" pos="w">
+<token>；</token>
+</word>
+<word id="22" pos="r">
+<token>每年</token>
+</word>
+<word id="23" pos="d">
+<token>都</token>
+</word>
+<word id="24" pos="v">
+<token>有</token>
+</word>
+<word id="25" pos="m">
+<token>一</token>
+</word>
+<word id="26" pos="q">
+<token>批</token>
+</word>
+<word id="27" pos="n">
+<token>职工</token>
+</word>
+<word id="28" pos="p">
+<token>被</token>
+</word>
+<word id="29" pos="v">
+<token>选送</token>
+</word>
+<word id="30" pos="v">
+<token>到</token>
+</word>
+<word id="31" pos="nt">
+<token>
+河南中医学院
+</token>
+<subword id="0" pos="ns">
+<token>河南</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医</token>
+</subword>
+<subword id="2" pos="na">
+<token>学院</token>
+</subword>
+</word>
+<word id="32" pos="u">
+<token>等</token>
+</word>
+<word id="33" pos="j">
+<token>大专院校</token>
+</word>
+<word id="34" pos="v">
+<token>深造</token>
+</word>
+<word id="35" pos="v">
+<token>进修</token>
+</word>
+<word id="36" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.10">
+<answer instance="中医.10" senseid=""/>
+<context>
+
+他在听取了天津市第三中心医院、天津市第一中心医院、天津<head>中医</head>学院第一附属医院等医院管理体制改革的汇报后，充分肯定了他们改革取得的成果。
+
+</context>
+<postagging>
+<word id="0" pos="r">
+<token>他</token>
+</word>
+<word id="1" pos="p">
+<token>在</token>
+</word>
+<word id="2" pos="v">
+<token>听取</token>
+</word>
+<word id="3" pos="u">
+<token>了</token>
+</word>
+<word id="4" pos="nt">
+<token>
+天津市第三中心医院
+</token>
+<subword id="0" pos="ns">
+<token>天津市</token>
+</subword>
+<subword id="1" pos="m">
+<token>第三</token>
+</subword>
+<subword id="2" pos="n">
+<token>中心</token>
+</subword>
+<subword id="3" pos="n">
+<token>医院</token>
+</subword>
+</word>
+<word id="5" pos="w">
+<token>、</token>
+</word>
+<word id="6" pos="nt">
+<token>
+天津市第一中心医院
+</token>
+<subword id="0" pos="ns">
+<token>天津市</token>
+</subword>
+<subword id="1" pos="m">
+<token>第一</token>
+</subword>
+<subword id="2" pos="n">
+<token>中心</token>
+</subword>
+<subword id="3" pos="n">
+<token>医院</token>
+</subword>
+</word>
+<word id="7" pos="w">
+<token>、</token>
+</word>
+<word id="8" pos="nt">
+<token>
+天津中医学院第一附属医院
+</token>
+<subword id="0" pos="ns">
+<token>天津</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医</token>
+</subword>
+<subword id="2" pos="n">
+<token>学院</token>
+</subword>
+<subword id="3" pos="m">
+<token>第一</token>
+</subword>
+<subword id="4" pos="vn">
+<token>附属</token>
+</subword>
+<subword id="5" pos="n">
+<token>医院</token>
+</subword>
+</word>
+<word id="9" pos="u">
+<token>等</token>
+</word>
+<word id="10" pos="n">
+<token>医院</token>
+</word>
+<word id="11" pos="vn">
+<token>管理</token>
+</word>
+<word id="12" pos="n">
+<token>体制</token>
+</word>
+<word id="13" pos="vn">
+<token>改革</token>
+</word>
+<word id="14" pos="u">
+<token>的</token>
+</word>
+<word id="15" pos="v">
+<token>汇报</token>
+</word>
+<word id="16" pos="f">
+<token>后</token>
+</word>
+<word id="17" pos="w">
+<token>，</token>
+</word>
+<word id="18" pos="ad">
+<token>充分</token>
+</word>
+<word id="19" pos="v">
+<token>肯定</token>
+</word>
+<word id="20" pos="u">
+<token>了</token>
+</word>
+<word id="21" pos="r">
+<token>他们</token>
+</word>
+<word id="22" pos="v">
+<token>改革</token>
+</word>
+<word id="23" pos="v">
+<token>取得</token>
+</word>
+<word id="24" pos="u">
+<token>的</token>
+</word>
+<word id="25" pos="n">
+<token>成果</token>
+</word>
+<word id="26" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.11">
+<answer instance="中医.11" senseid=""/>
+<context>
+
+为了贯彻人事部、卫生部、国家中医药管理局于一九九○年六月作出的《关于采取紧急措施做好老<head>中医</head>专家学术经验继承工作的决定》，抢救著名老中医药专家的生平资料，他们在极其简陋困难的工作条件下，经过两年多的努力，终于完成了我国中医史上第一部著名医学家画册———《当代名老中医风采》，为现代医史文献研究提供了一份不可多得的珍贵资料。
+
+</context>
+<postagging>
+<word id="0" pos="p">
+<token>为了</token>
+</word>
+<word id="1" pos="v">
+<token>贯彻</token>
+</word>
+<word id="2" pos="nt">
+<token>人事部</token>
+</word>
+<word id="3" pos="w">
+<token>、</token>
+</word>
+<word id="4" pos="nt">
+<token>卫生部</token>
+</word>
+<word id="5" pos="w">
+<token>、</token>
+</word>
+<word id="6" pos="nt">
+<token>
+国家中医药管理局
+</token>
+<subword id="0" pos="n">
+<token>国家</token>
+</subword>
+<subword id="1" pos="n">
+<token>中医药</token>
+</subword>
+<subword id="2" pos="n">
+<token>管理局</token>
+</subword>
+</word>
+<word id="7" pos="p">
+<token>于</token>
+</word>
+<word id="8" pos="t">
+<token>一九九○年</token>
+</word>
+<word id="9" pos="t">
+<token>六月</token>
+</word>
+<word id="10" pos="v">
+<token>作出</token>
+</word>
+<word id="11" pos="u">
+<token>的</token>
+</word>
+<word id="12" pos="w">
+<token>《</token>
+</word>
+<word id="13" pos="p">
+<token>关于</token>
+</word>
+<word id="14" pos="v">
+<token>采取</token>
+</word>
+<word id="15" pos="a">
+<token>紧急</token>
+</word>
+<word id="16" pos="n">
+<token>措施</token>
+</word>
+<word id="17" pos="v">
+<token>做好</token>
+</word>
+<word id="18" pos="a">
+<token>老</token>
+</word>
+<word id="19" pos="n">
+<token>中医</token>
+</word>
+<word id="20" pos="n">
+<token>专家</token>
+</word>
+<word id="21" pos="n">
+<token>学术</token>
+</word>
+<word id="22" pos="n">
+<token>经验</token>
+</word>
+<word id="23" pos="vn">
+<token>继承</token>
+</word>
+<word id="24" pos="vn">
+<token>工作</token>
+</word>
+<word id="25" pos="u">
+<token>的</token>
+</word>
+<word id="26" pos="n">
+<token>决定</token>
+</word>
+<word id="27" pos="w">
+<token>》</token>
+</word>
+<word id="28" pos="w">
+<token>，</token>
+</word>
+<word id="29" pos="v">
+<token>抢救</token>
+</word>
+<word id="30" pos="a">
+<token>著名</token>
+</word>
+<word id="31" pos="a">
+<token>老</token>
+</word>
+<word id="32" pos="n">
+<token>中医药</token>
+</word>
+<word id="33" pos="n">
+<token>专家</token>
+</word>
+<word id="34" pos="u">
+<token>的</token>
+</word>
+<word id="35" pos="n">
+<token>生平</token>
+</word>
+<word id="36" pos="n">
+<token>资料</token>
+</word>
+<word id="37" pos="w">
+<token>，</token>
+</word>
+<word id="38" pos="r">
+<token>他们</token>
+</word>
+<word id="39" pos="p">
+<token>在</token>
+</word>
+<word id="40" pos="d">
+<token>极其</token>
+</word>
+<word id="41" pos="a">
+<token>简陋</token>
+</word>
+<word id="42" pos="a">
+<token>困难</token>
+</word>
+<word id="43" pos="u">
+<token>的</token>
+</word>
+<word id="44" pos="vn">
+<token>工作</token>
+</word>
+<word id="45" pos="n">
+<token>条件</token>
+</word>
+<word id="46" pos="f">
+<token>下</token>
+</word>
+<word id="47" pos="w">
+<token>，</token>
+</word>
+<word id="48" pos="p">
+<token>经过</token>
+</word>
+<word id="49" pos="m">
+<token>两</token>
+</word>
+<word id="50" pos="q">
+<token>年</token>
+</word>
+<word id="51" pos="m">
+<token>多</token>
+</word>
+<word id="52" pos="u">
+<token>的</token>
+</word>
+<word id="53" pos="a">
+<token>努力</token>
+</word>
+<word id="54" pos="w">
+<token>，</token>
+</word>
+<word id="55" pos="d">
+<token>终于</token>
+</word>
+<word id="56" pos="v">
+<token>完成</token>
+</word>
+<word id="57" pos="u">
+<token>了</token>
+</word>
+<word id="58" pos="r">
+<token>我国</token>
+</word>
+<word id="59" pos="n">
+<token>中医史</token>
+</word>
+<word id="60" pos="f">
+<token>上</token>
+</word>
+<word id="61" pos="m">
+<token>第一</token>
+</word>
+<word id="62" pos="q">
+<token>部</token>
+</word>
+<word id="63" pos="a">
+<token>著名</token>
+</word>
+<word id="64" pos="n">
+<token>医学家</token>
+</word>
+<word id="65" pos="n">
+<token>画册</token>
+</word>
+<word id="66" pos="w">
+<token>———</token>
+</word>
+<word id="67" pos="w">
+<token>《</token>
+</word>
+<word id="68" pos="t">
+<token>当代</token>
+</word>
+<word id="69" pos="Ng">
+<token>名</token>
+</word>
+<word id="70" pos="a">
+<token>老</token>
+</word>
+<word id="71" pos="n">
+<token>中医</token>
+</word>
+<word id="72" pos="n">
+<token>风采</token>
+</word>
+<word id="73" pos="w">
+<token>》</token>
+</word>
+<word id="74" pos="w">
+<token>，</token>
+</word>
+<word id="75" pos="p">
+<token>为</token>
+</word>
+<word id="76" pos="t">
+<token>现代</token>
+</word>
+<word id="77" pos="n">
+<token>医史</token>
+</word>
+<word id="78" pos="n">
+<token>文献</token>
+</word>
+<word id="79" pos="vn">
+<token>研究</token>
+</word>
+<word id="80" pos="v">
+<token>提供</token>
+</word>
+<word id="81" pos="u">
+<token>了</token>
+</word>
+<word id="82" pos="m">
+<token>一</token>
+</word>
+<word id="83" pos="q">
+<token>份</token>
+</word>
+<word id="84" pos="i">
+<token>不可多得</token>
+</word>
+<word id="85" pos="u">
+<token>的</token>
+</word>
+<word id="86" pos="a">
+<token>珍贵</token>
+</word>
+<word id="87" pos="n">
+<token>资料</token>
+</word>
+<word id="88" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.12">
+<answer instance="中医.12" senseid=""/>
+<context>
+
+走了不远，就遇到“老<head>中医</head>”的孙女，说“爷爷”知道你们的情况，都有灾。
+
+</context>
+<postagging>
+<word id="0" pos="v">
+<token>走</token>
+</word>
+<word id="1" pos="u">
+<token>了</token>
+</word>
+<word id="2" pos="d">
+<token>不</token>
+</word>
+<word id="3" pos="a">
+<token>远</token>
+</word>
+<word id="4" pos="w">
+<token>，</token>
+</word>
+<word id="5" pos="d">
+<token>就</token>
+</word>
+<word id="6" pos="v">
+<token>遇到</token>
+</word>
+<word id="7" pos="w">
+<token>“</token>
+</word>
+<word id="8" pos="a">
+<token>老</token>
+</word>
+<word id="9" pos="n">
+<token>中医</token>
+</word>
+<word id="10" pos="w">
+<token>”</token>
+</word>
+<word id="11" pos="u">
+<token>的</token>
+</word>
+<word id="12" pos="n">
+<token>孙女</token>
+</word>
+<word id="13" pos="w">
+<token>，</token>
+</word>
+<word id="14" pos="v">
+<token>说</token>
+</word>
+<word id="15" pos="w">
+<token>“</token>
+</word>
+<word id="16" pos="n">
+<token>爷爷</token>
+</word>
+<word id="17" pos="w">
+<token>”</token>
+</word>
+<word id="18" pos="v">
+<token>知道</token>
+</word>
+<word id="19" pos="r">
+<token>你们</token>
+</word>
+<word id="20" pos="u">
+<token>的</token>
+</word>
+<word id="21" pos="n">
+<token>情况</token>
+</word>
+<word id="22" pos="w">
+<token>，</token>
+</word>
+<word id="23" pos="d">
+<token>都</token>
+</word>
+<word id="24" pos="v">
+<token>有</token>
+</word>
+<word id="25" pos="n">
+<token>灾</token>
+</word>
+<word id="26" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.13">
+<answer instance="中医.13" senseid=""/>
+<context>
+
+“痔瘘舒丸”是河南老<head>中医</head>马寿仁凭借自己掌握的中医学理论，运用现代医学知识，应用中草药“活血化淤、消积软坚、化腐生肌、扶正祛邪”之功能研制而成，用于治疗混合痔、肛瘘等疾患。
+
+</context>
+<postagging>
+<word id="0" pos="w">
+<token>“</token>
+</word>
+<word id="1" pos="nz">
+<token>痔瘘舒丸</token>
+</word>
+<word id="2" pos="w">
+<token>”</token>
+</word>
+<word id="3" pos="v">
+<token>是</token>
+</word>
+<word id="4" pos="ns">
+<token>河南</token>
+</word>
+<word id="5" pos="a">
+<token>老</token>
+</word>
+<word id="6" pos="n">
+<token>中医</token>
+</word>
+<word id="7" pos="nr">
+<token>马</token>
+</word>
+<word id="8" pos="nr">
+<token>寿仁</token>
+</word>
+<word id="9" pos="p">
+<token>凭借</token>
+</word>
+<word id="10" pos="r">
+<token>自己</token>
+</word>
+<word id="11" pos="v">
+<token>掌握</token>
+</word>
+<word id="12" pos="u">
+<token>的</token>
+</word>
+<word id="13" pos="n">
+<token>中医学</token>
+</word>
+<word id="14" pos="n">
+<token>理论</token>
+</word>
+<word id="15" pos="w">
+<token>，</token>
+</word>
+<word id="16" pos="v">
+<token>运用</token>
+</word>
+<word id="17" pos="t">
+<token>现代</token>
+</word>
+<word id="18" pos="n">
+<token>医学</token>
+</word>
+<word id="19" pos="n">
+<token>知识</token>
+</word>
+<word id="20" pos="w">
+<token>，</token>
+</word>
+<word id="21" pos="v">
+<token>应用</token>
+</word>
+<word id="22" pos="n">
+<token>中草药</token>
+</word>
+<word id="23" pos="w">
+<token>“</token>
+</word>
+<word id="24" pos="l">
+<token>活血化淤</token>
+</word>
+<word id="25" pos="w">
+<token>、</token>
+</word>
+<word id="26" pos="v">
+<token>消</token>
+</word>
+<word id="27" pos="n">
+<token>积</token>
+</word>
+<word id="28" pos="a">
+<token>软</token>
+</word>
+<word id="29" pos="a">
+<token>坚</token>
+</word>
+<word id="30" pos="w">
+<token>、</token>
+</word>
+<word id="31" pos="v">
+<token>化</token>
+</word>
+<word id="32" pos="Vg">
+<token>腐</token>
+</word>
+<word id="33" pos="v">
+<token>生</token>
+</word>
+<word id="34" pos="Ng">
+<token>肌</token>
+</word>
+<word id="35" pos="w">
+<token>、</token>
+</word>
+<word id="36" pos="i">
+<token>扶正祛邪</token>
+</word>
+<word id="37" pos="w">
+<token>”</token>
+</word>
+<word id="38" pos="u">
+<token>之</token>
+</word>
+<word id="39" pos="n">
+<token>功能</token>
+</word>
+<word id="40" pos="v">
+<token>研制</token>
+</word>
+<word id="41" pos="c">
+<token>而</token>
+</word>
+<word id="42" pos="v">
+<token>成</token>
+</word>
+<word id="43" pos="w">
+<token>，</token>
+</word>
+<word id="44" pos="v">
+<token>用于</token>
+</word>
+<word id="45" pos="v">
+<token>治疗</token>
+</word>
+<word id="46" pos="vn">
+<token>混合</token>
+</word>
+<word id="47" pos="Ng">
+<token>痔</token>
+</word>
+<word id="48" pos="w">
+<token>、</token>
+</word>
+<word id="49" pos="n">
+<token>肛瘘</token>
+</word>
+<word id="50" pos="u">
+<token>等</token>
+</word>
+<word id="51" pos="n">
+<token>疾患</token>
+</word>
+<word id="52" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.14">
+<answer instance="中医.14" senseid=""/>
+<context>
+
+由鸡血藤、黄连、虎杖等中药复方组成的“烧伤止痛膏”，是浙江老<head>中医</head>郑元叨的发明专利。
+
+</context>
+<postagging>
+<word id="0" pos="p">
+<token>由</token>
+</word>
+<word id="1" pos="n">
+<token>鸡血藤</token>
+</word>
+<word id="2" pos="w">
+<token>、</token>
+</word>
+<word id="3" pos="n">
+<token>黄连</token>
+</word>
+<word id="4" pos="w">
+<token>、</token>
+</word>
+<word id="5" pos="n">
+<token>虎杖</token>
+</word>
+<word id="6" pos="u">
+<token>等</token>
+</word>
+<word id="7" pos="n">
+<token>中药</token>
+</word>
+<word id="8" pos="b">
+<token>复方</token>
+</word>
+<word id="9" pos="v">
+<token>组成</token>
+</word>
+<word id="10" pos="u">
+<token>的</token>
+</word>
+<word id="11" pos="w">
+<token>“</token>
+</word>
+<word id="12" pos="vn">
+<token>烧伤</token>
+</word>
+<word id="13" pos="vn">
+<token>止痛</token>
+</word>
+<word id="14" pos="Ng">
+<token>膏</token>
+</word>
+<word id="15" pos="w">
+<token>”</token>
+</word>
+<word id="16" pos="w">
+<token>，</token>
+</word>
+<word id="17" pos="v">
+<token>是</token>
+</word>
+<word id="18" pos="ns">
+<token>浙江</token>
+</word>
+<word id="19" pos="a">
+<token>老</token>
+</word>
+<word id="20" pos="n">
+<token>中医</token>
+</word>
+<word id="21" pos="nr">
+<token>郑</token>
+</word>
+<word id="22" pos="nr">
+<token>元叨</token>
+</word>
+<word id="23" pos="u">
+<token>的</token>
+</word>
+<word id="24" pos="vn">
+<token>发明</token>
+</word>
+<word id="25" pos="n">
+<token>专利</token>
+</word>
+<word id="26" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.15">
+<answer instance="中医.15" senseid=""/>
+<context>
+
+从1992年冰岛国的某杂志把和士秀的银须笑脸作为十英寸的封面并作数万字的报道开始，如今，丽江纳西族老<head>中医</head>和士秀与他的小诊所的稀奇事迹，被各种“特镜”和大小“剧照”，用几十种语言，在一些国家的报纸杂志、电台电视上反复传颂。
+
+</context>
+<postagging>
+<word id="0" pos="p">
+<token>从</token>
+</word>
+<word id="1" pos="t">
+<token>1992年</token>
+</word>
+<word id="2" pos="ns">
+<token>冰岛国</token>
+</word>
+<word id="3" pos="u">
+<token>的</token>
+</word>
+<word id="4" pos="r">
+<token>某</token>
+</word>
+<word id="5" pos="n">
+<token>杂志</token>
+</word>
+<word id="6" pos="p">
+<token>把</token>
+</word>
+<word id="7" pos="nr">
+<token>和士秀</token>
+</word>
+<word id="8" pos="u">
+<token>的</token>
+</word>
+<word id="9" pos="b">
+<token>银</token>
+</word>
+<word id="10" pos="Ng">
+<token>须</token>
+</word>
+<word id="11" pos="n">
+<token>笑脸</token>
+</word>
+<word id="12" pos="v">
+<token>作为</token>
+</word>
+<word id="13" pos="m">
+<token>十</token>
+</word>
+<word id="14" pos="q">
+<token>英寸</token>
+</word>
+<word id="15" pos="u">
+<token>的</token>
+</word>
+<word id="16" pos="n">
+<token>封面</token>
+</word>
+<word id="17" pos="c">
+<token>并</token>
+</word>
+<word id="18" pos="v">
+<token>作</token>
+</word>
+<word id="19" pos="m">
+<token>数万</token>
+</word>
+<word id="20" pos="n">
+<token>字</token>
+</word>
+<word id="21" pos="u">
+<token>的</token>
+</word>
+<word id="22" pos="n">
+<token>报道</token>
+</word>
+<word id="23" pos="v">
+<token>开始</token>
+</word>
+<word id="24" pos="w">
+<token>，</token>
+</word>
+<word id="25" pos="t">
+<token>如今</token>
+</word>
+<word id="26" pos="w">
+<token>，</token>
+</word>
+<word id="27" pos="ns">
+<token>丽江</token>
+</word>
+<word id="28" pos="nz">
+<token>纳西族</token>
+</word>
+<word id="29" pos="a">
+<token>老</token>
+</word>
+<word id="30" pos="n">
+<token>中医</token>
+</word>
+<word id="31" pos="nr">
+<token>和士秀</token>
+</word>
+<word id="32" pos="c">
+<token>与</token>
+</word>
+<word id="33" pos="r">
+<token>他</token>
+</word>
+<word id="34" pos="u">
+<token>的</token>
+</word>
+<word id="35" pos="a">
+<token>小</token>
+</word>
+<word id="36" pos="n">
+<token>诊所</token>
+</word>
+<word id="37" pos="u">
+<token>的</token>
+</word>
+<word id="38" pos="a">
+<token>稀奇</token>
+</word>
+<word id="39" pos="n">
+<token>事迹</token>
+</word>
+<word id="40" pos="w">
+<token>，</token>
+</word>
+<word id="41" pos="p">
+<token>被</token>
+</word>
+<word id="42" pos="r">
+<token>各种</token>
+</word>
+<word id="43" pos="w">
+<token>“</token>
+</word>
+<word id="44" pos="Ag">
+<token>特</token>
+</word>
+<word id="45" pos="Ng">
+<token>镜</token>
+</word>
+<word id="46" pos="w">
+<token>”</token>
+</word>
+<word id="47" pos="c">
+<token>和</token>
+</word>
+<word id="48" pos="n">
+<token>大小</token>
+</word>
+<word id="49" pos="w">
+<token>“</token>
+</word>
+<word id="50" pos="n">
+<token>剧照</token>
+</word>
+<word id="51" pos="w">
+<token>”</token>
+</word>
+<word id="52" pos="w">
+<token>，</token>
+</word>
+<word id="53" pos="p">
+<token>用</token>
+</word>
+<word id="54" pos="m">
+<token>几十</token>
+</word>
+<word id="55" pos="q">
+<token>种</token>
+</word>
+<word id="56" pos="n">
+<token>语言</token>
+</word>
+<word id="57" pos="w">
+<token>，</token>
+</word>
+<word id="58" pos="p">
+<token>在</token>
+</word>
+<word id="59" pos="m">
+<token>一些</token>
+</word>
+<word id="60" pos="n">
+<token>国家</token>
+</word>
+<word id="61" pos="u">
+<token>的</token>
+</word>
+<word id="62" pos="n">
+<token>报纸</token>
+</word>
+<word id="63" pos="n">
+<token>杂志</token>
+</word>
+<word id="64" pos="w">
+<token>、</token>
+</word>
+<word id="65" pos="n">
+<token>电台</token>
+</word>
+<word id="66" pos="n">
+<token>电视</token>
+</word>
+<word id="67" pos="f">
+<token>上</token>
+</word>
+<word id="68" pos="d">
+<token>反复</token>
+</word>
+<word id="69" pos="v">
+<token>传颂</token>
+</word>
+<word id="70" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+<instance id="中医.16">
+<answer instance="中医.16" senseid=""/>
+<context>
+
+教材由几名当地<head>中医</head>和一位兼通中西医的洋人从中医教课书中编译，最后经中国权威的中医院校审定。
+
+</context>
+<postagging>
+<word id="0" pos="n">
+<token>教材</token>
+</word>
+<word id="1" pos="p">
+<token>由</token>
+</word>
+<word id="2" pos="m">
+<token>几</token>
+</word>
+<word id="3" pos="q">
+<token>名</token>
+</word>
+<word id="4" pos="s">
+<token>当地</token>
+</word>
+<word id="5" pos="n">
+<token>中医</token>
+</word>
+<word id="6" pos="c">
+<token>和</token>
+</word>
+<word id="7" pos="m">
+<token>一</token>
+</word>
+<word id="8" pos="q">
+<token>位</token>
+</word>
+<word id="9" pos="v">
+<token>兼</token>
+</word>
+<word id="10" pos="v">
+<token>通</token>
+</word>
+<word id="11" pos="j">
+<token>中西医</token>
+</word>
+<word id="12" pos="u">
+<token>的</token>
+</word>
+<word id="13" pos="n">
+<token>洋人</token>
+</word>
+<word id="14" pos="p">
+<token>从</token>
+</word>
+<word id="15" pos="n">
+<token>中医</token>
+</word>
+<word id="16" pos="vn">
+<token>教课</token>
+</word>
+<word id="17" pos="n">
+<token>书</token>
+</word>
+<word id="18" pos="f">
+<token>中</token>
+</word>
+<word id="19" pos="v">
+<token>编译</token>
+</word>
+<word id="20" pos="w">
+<token>，</token>
+</word>
+<word id="21" pos="f">
+<token>最后</token>
+</word>
+<word id="22" pos="p">
+<token>经</token>
+</word>
+<word id="23" pos="ns">
+<token>中国</token>
+</word>
+<word id="24" pos="a">
+<token>权威</token>
+</word>
+<word id="25" pos="u">
+<token>的</token>
+</word>
+<word id="26" pos="n">
+<token>中医</token>
+</word>
+<word id="27" pos="n">
+<token>院校</token>
+</word>
+<word id="28" pos="v">
+<token>审定</token>
+</word>
+<word id="29" pos="w">
+<token>。</token>
+</word>
+</postagging></instance>
+
+</lexelt>
+</corpus>

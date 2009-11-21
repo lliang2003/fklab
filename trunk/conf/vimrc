@@ -1,0 +1,199 @@
+" All system-wide defaults are set in $VIMRUNTIME/debian.vim (usually just
+" /usr/share/vim/vimcurrent/debian.vim) and sourced by the call to :runtime
+" you can find below.  If you wish to change any of those settings, you should
+" do it in this file (/etc/vim/vimrc), since debian.vim will be overwritten
+" everytime an upgrade of the vim packages is performed.  It is recommended to
+" make changes after sourcing debian.vim since it alters the value of the
+" 'compatible' option.
+
+" This line should not be removed as it ensures that various options are
+" properly set to work with the Vim-related packages available in Debian.
+runtime! debian.vim
+
+" Uncomment the next line to make Vim more Vi-compatible
+" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
+" options, so any other options should be set AFTER setting 'compatible'.
+set nocp 
+
+" Vim5 and later versions support syntax highlighting. Uncommenting the next
+" line enables syntax highlighting by default.
+syntax on
+
+" If using a dark background within the editing area and syntax highlighting
+" turn on this option as well
+set background=dark
+
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+    \| exe "normal g'\"" | endif
+endif
+
+" Uncomment the following to have Vim load indentation rules according to the
+" detected filetype. Per default Debian Vim only load filetype specific
+" plugins.
+if has("autocmd")
+  filetype indent on
+endif
+
+" The following are commented out as they cause vim to behave a lot
+" differently from regular Vi. They are highly recommended though.
+set showcmd		" Show (partial) command in status line.
+set showmatch		" Show matching brackets.
+set ignorecase		" Do case insensitive matching
+set smartcase		" Do smart case matching
+set incsearch		" Incremental search
+set autowrite		" Automatically save before commands like :next and :make
+set hidden             " Hide buffers when they are abandoned
+set mouse=a		" Enable mouse usage (all modes) in terminals
+
+
+" add by kevin
+set autoread
+set softtabstop=4
+set tabstop=4 expandtab
+set shiftwidth=4
+set tags=/tags,./TAGS,tags,TAGS,./tags
+set fileencodings=ucs-bom,utf-8,latin-1,cp936
+"set backup
+
+au BufRead *.c,*.cpp,*.cc,*.h,*.hpp set foldmethod=syntax
+au Bufread *.py set foldmethod=indent
+set foldlevel=2
+ia inc #include
+ia inci #include <iostream><CR>using std::cout;<CR>using std::endl;
+ia uns using namespace std;
+ia imain int main()<CR>{
+ia r0 return 0;
+
+ca mktag !ctags -R --fields=+iaS --c++-kinds=+p --extra=+q .
+ca sefm set foldmethod=manual
+ca sefs set foldmethod=syntax
+ca sefi set foldmethod=indent
+ca makes make %:t:r
+ca runs !./%:t:r
+ca makesr !make %:t:r;./%:t:r
+ca sets set makeprg=make\ %:t:r
+
+nmap <Tab> :bn<CR>
+nmap <S-Tab> :bp<CR>
+nmap <C-c> :call AutoComment()<cr>
+
+imap <C-h> <left>
+imap <C-j> <down>
+imap <C-k> <up>
+imap <C-l> <right>
+"imap <C-w> <ESC>wa
+"imap <C-x> <del>
+imap <C-u> <ESC>ua
+imap <C-r> <ESC><C-r>a
+imap <C-c> <ESC><C-c>a
+imap <F7> <ESC><F7>
+imap <C-e> <ESC>$a
+imap <C-b> <ESC>^i
+
+let g:CommentStr = '#'
+au BufNewFile *.h   call FillHeader('h-file-header')
+au BufNewFile *.c,*.cpp,*.cc    call FillHeader('c-file-header')
+au BufNewFile *.py,*.tcl   call FillHeader('py-file-header')
+au BufNewFile *.sh   call FillHeader('sh-file-header')
+au BufEnter *.h,*.cpp,*.cc,*.c  call CMode()
+au BufEnter *.py    call PyMode()
+au BufEnter *.vimrc call VMode()
+au BufEnter *.txt   call NMode()
+au BufEnter *.sh    call ShMode()
+au BufEnter *.tex   call TexMode()
+au BufEnter *.tcl   call TclMode()
+au BufEnter *.erl   call ErlMode()
+au BufEnter *.java  call JavaMode()
+
+function! NMode()
+    let g:CommentStr = '#'
+    nmap <F7> :make<CR>
+endfunction
+
+function! VMode()
+    let g:CommentStr = '"'
+    nmap <F7> :w<cr>:so %<cr>
+endfunction
+
+function! CMode() 
+    let g:CommentStr = '//'
+    nmap <F5> :runs<CR>
+    nmap <F7> :make<CR>
+    nmap <F6> <F7><F5>
+    imap <F7> <esc><F7>
+    imap <F6> <esc><F6>
+    imap <F5> <esc><F5>
+endfunction
+
+function! JavaMode() 
+    ca runs !java -cp . %:t:r
+    let g:CommentStr = '//'
+    nmap <F5> :runs<CR>
+    nmap <F7> :make<CR>
+    nmap <F6> <F7><F5>
+    imap <F7> <esc><F7>
+    imap <F6> <esc><F6>
+    imap <F5> <esc><F5>
+    set makeprg=./vimant
+    set efm=\ %#[javac]\ %#%f:%l:%c:%*\\d:%*\\d:\ %t%[%^:]%#:%m,
+           \%A\ %#[javac]\ %f:%l:\ %m,%-Z\ %#[javac]\ %p^,%-C%.%#
+endfunction
+
+function! TclMode() 
+    let g:CommentStr = '#'
+    nmap <F7> :make<CR>
+    set makeprg=tclsh\ %
+endfunction
+
+function! PyMode() 
+    let g:CommentStr = '#'
+    nmap <F7> :make<CR>
+    set makeprg=python\ %
+    set efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+endfunction
+
+function! TexMode() 
+    let g:CommentStr = '%'
+    nmap <F7> :make<CR>
+    set makeprg=pdflatex\ %
+    imap <F8> \begin{frame}<cr><cr>\end{frame}<up><up><end>{
+    imap <F9> \begin{itemize}<cr>\item <cr>\end{itemize}<up>
+endfunction
+
+function! ErlMode() 
+    let g:CommentStr = '%'
+endfunction
+
+function! ShMode() 
+    let g:CommentStr = '#'
+    nmap <F7> :make<CR>
+    set makeprg=bash\ %
+endfunction
+
+function! SubstituteTag(tag, replacement)
+    exe '%s/'.a:tag.'/'.a:replacement.'/eg'
+endfunction   
+
+function! FillHeader(template_file)
+    exe '0read '.$HOME.'/.vim/'.a:template_file
+    call SubstituteTag('|FILENAME|', expand("%:t"))
+    call SubstituteTag('|BASENAME|', toupper(expand("%:t:r")))
+    call SubstituteTag('|DATE|', strftime("%b %d %X %Z %Y"))
+    call SubstituteTag('|CURSOR|', "")
+endfunction
+
+function! AutoComment()
+    let line = getline(line("."))
+    let lb = substitute(line, "[^ ].*", "", "")
+    let ab = substitute(line, "^ *", "", "")
+    if strpart(ab, 0, strlen(g:CommentStr)) == g:CommentStr
+        call setline(line("."), lb.substitute(ab, g:CommentStr, "", ""))
+    else
+        call setline(line("."), lb.substitute(ab, "[^ ]", g:CommentStr.'&', ""))
+    endif
+endfunction
+
+

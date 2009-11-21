@@ -1,0 +1,16 @@
+#
+# 2008-08-15
+#
+This is administrator's toolkits.
+
+system
+  |____scripts     ;admin scripts 
+  |____conf        ;configuration templates
+  |____bin         ;servers and utilities
+  |____clusters    ;clusters configured in system
+  |____release     ;release share directory
+  |____bin         ;server programs and toolkits
+
+An example of installation is on an globle share directory: /homeX/tfs/share/system
+
+c3 is used in cluster management.   

@@ -1,0 +1,285 @@
+\documentclass{article}
+\usepackage{CJKutf8}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\title{算法设计与复杂性理论 作业二}
+\author{10848194  樊锴}
+\date{2008-11-14}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+
+\maketitle
+\section{}
+本题与0/1背包问题类似。用S(k,y)表示只放前k个货柜，且占用长度不超过y时的最大收益，则递推方程与边界条件为:
+\begin{align*}
+& S(k,y)=\max\{S(k-1,y), S(k-1, y-L_k)+v_k\}	\\
+& S(k,0)=0, 	\quad 0\le k\le n	\\
+& S(0,y)=0, 	\quad 0\le y\le D	\\
+& S(k,y)=-\infty, 	\quad y<0	
+\end{align*}
+
+\begin{algorithm}
+\caption{Storage}
+\begin{algorithmic}[1]
+\STATE INIT $S(k,0) \gets 0,\quad0 \le k\le n$
+\STATE INIT $S(0,y) \gets 0,\quad0 \le y\le D$
+\FOR    {$k=1$ to $n$}
+\FOR    {$y=1$ to $D$}
+    \IF     {$y<L_k$ OR $S(k-1,y)>S(k-1,y-L_k)+v_k$}
+    \STATE  {$S(k,y) \gets S(k-1,y)$}
+    \ELSE
+    \STATE  {$S(k,y) \gets S(k-1,y-L_k)+v_k$ }
+    \ENDIF
+\ENDFOR
+\ENDFOR
+\RETURN $S(n,D)$
+\end{algorithmic}
+\end{algorithm}
+
+算法的时间复杂度和空间复杂度都为$\Theta(n*D)$。
+
+\section{}
+以T(k,y)表示只用前k种硬币时支付y的最小重量，则递推函数和边界条件为：
+\begin{align*}
+& T(k,y)=\min\{T(k-1,y),T(k,y-v_k)+w_k\} \\
+& T(1,y)=y*w_k,\quad y>0    \\
+& T(k,0)=0,\quad 0 \le k\le n
+\end{align*}
+
+\begin{algorithm}
+\caption{Coins}
+\begin{algorithmic}[1]
+\STATE INIT $T(k,0) \gets 0,\quad0 \le k\le n$
+\STATE INIT $T(1,y) \gets y*w_1,\quad0 \le y\le Y$
+\FOR    {$k=2$ to $n$}
+\FOR    {$y=1$ to $Y$}
+    \IF     {$y<v_k$ OR $T(k-1,y)<T(k-1,y-v_k)+w_k$}
+    \STATE  {$T(k,y) \gets T(k-1,j)$}
+    \ELSE
+    \STATE  {$T(k,y) \gets T(k,y-v_k)+w_k$ }
+    \ENDIF
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+算法时间和空间复杂度都为$\Theta(n*Y)$。
+
+备忘录表为：
+\begin{tabular}[t]{l|c|c|c|c|c|c|c|c|c|c|c|c}
+\hline
+k\&y & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12  \\
+\hline
+1   & 1  & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12  \\
+\hline
+2   & 1  & 2 & 3 & 2 & 3 & 4 & 5 & 4 & 5 & 6 & 7 & 6  \\
+\hline
+3   & 1  & 2 & 3 & 2 & 3 & 4 & 5 & 4 & 5 & 6 & 7 & 6  \\
+\hline
+4   & 1  & 2 & 3 & 2 & 3 & 4 & 5 & 4 & 5 & 6 & 7 & 6  \\
+\hline
+\end{tabular}
+
+标记函数的递推公式为：
+\begin{displaymath}
+i(k,y)=\left\{
+\begin{array}{ll}
+i(k-1,y),   & y<v_k\ OR\ T(k-1,y) > T(k,y-v_k)+w_k \\
+k,          & T(k-1,y) \le T(k,y-v_k)+w_k 
+\end{array} \right.
+\end{displaymath}
+
+标记函数表为：
+\begin{tabular}[t]{l|c|c|c|c|c|c|c|c|c|c|c|c}
+\hline
+k\&y & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12  \\
+\hline
+1   & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+\hline
+2   & 1 & 1 & 1 & 2 & 1 & 1 & 1 & 2 & 1 & 1 & 1 & 2 \\
+\hline
+3   & 1 & 1 & 1 & 2 & 1 & 3 & 1 & 2 & 1 & 1 & 1 & 2 \\
+\hline
+4   & 1 & 1 & 1 & 2 & 1 & 3 & 1 & 2 & 1 & 1 & 1 & 2 \\
+\hline
+\end{tabular}
+
+所以最后应付3枚第二种硬币，总重量为6。
+
+\section{}
+用T(k,y,d)表示只放前k个物品，重量不超过y且体积不超过d的最大价值，则递推函数和边界条件为：
+\begin{align*}
+& T(k,y,d)=\min\{T(k-1,y,d),T(k,y-w_k,d-c_k)+v_k\} \\
+& T(0,y,d)=0, \quad y>0,d>0    \\
+& T(k,y,0)=0, \quad 0 \le k\le n    \\
+& T(k,0,d)=0, \quad 0 \le k\le n    \\
+& T(k,y,d)=-\infty, \quad y<0\ OR\ d<0
+\end{align*}
+
+\begin{algorithm}
+\caption{Package}
+\begin{algorithmic}[1]
+\STATE INIT $T(0,y,d) \gets 0,\quad0 \le y\le W,0\le d\le V$
+\STATE INIT $T(k,0,0) \gets 0,\quad0 \le k\le n$
+\FOR    {$k=1$ to $n$}
+\FOR    {$y=1$ to $W$}
+\FOR    {$d=1$ to $V$}
+    \IF     {$y<w_k$ OR $d<c_k$ OR $T(k-1,y,d)>T(k-1,y-w_k,d-c_k)+v_k$}
+    \STATE  {$T(k,y,d) \gets T(k-1,y,d)$}
+    \ELSE
+    \STATE  {$T(k,y,d) \gets T(k,y-w_k,d-c_k)+v_k$ }
+    \ENDIF
+\ENDFOR
+\ENDFOR
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+算法时间复杂度和空间复杂度都为$\Theta(n*W*V)$。
+
+\section{}
+每次合并的比较次数为两个数组的规模之和。
+用D(i,j)表示从i到j的数组的总规模，T(i,j)来表示合并从i到j的数组所需的代价，i可以大于j。
+\begin{align*}
+& T(i,j)=\min_{i\le k\le j}{\{T(i,k)+T(k,j)+D(i,j)\}} \\
+& T(i,i)=D(i,i), \quad0\le i <n
+\end{align*}
+使用$\Theta(n)$的预处理后，D(i,j)可以用$\Theta(1)$时间求解，方法为：
+记S(i)表示从0到i的数组的总规模，显然可在$\Theta(n)$的时间求出，
+则对任意的i,j，
+\[  D(i,j)=\left\{
+\begin{array}{ll}
+S[j],   & i=0 \\
+S[j]-S[i-1], & i>0\ AND\ i\le j \\
+S[n-1]-S[i-1]+S[j], & j\ge0\ AND\ i>j
+\end{array} \right.
+\]
+因此合并算法的时间复杂度为$\Theta(n^3)$。
+
+本题也可以用贪心法求解，即每次选择规模之和最小的相邻数组合并，直至只剩一个数组即可。
+这样算法时间复杂度为$\Theta(n^2)$，若采用堆来保存相邻数组的规模和，可以进一步把时间复杂度减至$\Theta(nlogn)$。
+
+\section{}
+用$T_k$表示以第k个元素结尾的最长子序列的长度,$I$为标记函数。
+\begin{align*}
+& T_k=\max_{0<j<k\land A[k]>A[j]}{T_j+1} \\
+& I_k=\left\{
+\begin{array}{ll}
+arg\max_{0<j<k\land A[k]>A[j]}{T_j},   & T_k>1 \\
+k,                                      & T_k=1 
+\end{array} \right.
+\end{align*}
+
+\begin{algorithm}
+\caption{LIS}
+\begin{algorithmic}[1]
+\STATE INIT $T(k) \gets 1,\quad 0<k\le n$
+\STATE INIT $I(k) \gets k,\quad 0<k\le n$
+\STATE $maxlen \gets 1$
+\FOR    {$i=2$ TO $n$}
+    \FOR    {$j=1$ TO $i-1$}
+        \IF     {$A[i]>A[j]$ AND $T[i]<T[j]+1$}
+        \STATE  {$T[i] \gets T[j]+1, I[i] \gets j$}
+        \ENDIF
+    \ENDFOR
+    \IF     {$T[i]>maxlen$}
+    \STATE  {$maxlen \gets T[i]$}
+    \ENDIF
+\ENDFOR
+\FOR    {$i=1$ TO $n$}
+    \IF     {$T[i]=maxlen$}
+    \STATE  OUTPUTLIS(I, i)
+    \STATE  print(';')
+    \ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{OUTPUTLIS(I, i)}
+\begin{algorithmic}[1]
+\IF     {$I[i] \ne i$}
+\STATE  OUTPUTLIS(I, I(i))
+\ENDIF
+\STATE  print(i)
+\end{algorithmic}
+\end{algorithm}
+
+算法的时间复杂度为$\Theta(n^2)$,空间复杂度为$\Theta(n)$。
+
+\section{}
+满足多米诺性质，可以用回溯法求解，采用深度优先搜索。
+用$T_k$表示第k种配件的选择，解向量为$<T_1,T_2,T_3,T_4>$。
+约束条件为
+\[V_1+V_2+V_3+V_4 \le 120  \]
+记$B_k$为第k种配件中最轻的，则对于一个部分解$<T_1,\dots,T_k>$，代价函数为
+\[  \sum_{i=1}^{k}{V[T_k]}+\sum_{i=k+1}^{4}{V[B_k]} \]
+一旦在搜索中不满足约束条件或者代价函数大于已知最优解，即可回溯。
+
+本题最小重量为31，四种配件分别选择第3,1,2,3个供应商，总价值为119。
+
+\section{}
+把问题拓展为求$\sum_{0<k\le n}{A_k*x_k}\le S$的所有非负整数解，
+其解向量为$<x_1,x_2,\dots,x_n>$，对于$x_k$的可行范围为$[0,S/A_k]$。
+
+\begin{algorithm}
+\caption{CALC(A[n],S)}
+\begin{algorithmic}[1]
+\STATE INIT $X_k \gets 0, \quad 0<k\le n$
+\STATE $k \gets 1$
+\WHILE {$k>1$}
+    \IF     {$k=n\ AND\ S\ge 0$}
+        \STATE  OUTPUT X
+    \ENDIF
+    \IF {$S<0\ OR\ k>n$}
+        \STATE  $S \gets S+A_k*X_k$
+        \STATE  $X_k \gets 0$
+        \STATE  $k  \gets k-1$
+        \STATE  $X_k \gets X_k+1$
+        \STATE  $S \gets S-A_k*X_k$
+    \ELSE 
+        \STATE  $k \gets k+1$
+    \ENDIF
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+对于此题中的实例，解为
+0 0 0;
+0 0 1;
+0 0 2;
+0 0 3;
+0 0 4;
+0 0 5;
+0 0 6;
+0 1 0;
+0 1 1;
+0 1 2;
+0 1 3;
+0 1 4;
+0 2 0;
+0 2 1;
+0 2 2;
+0 3 0;
+1 0 0;
+1 0 1;
+1 0 2;
+1 0 3;
+1 0 4;
+1 1 0;
+1 1 1;
+1 1 2;
+1 2 0;
+2 0 0;
+2 0 1;
+2 0 2;
+2 0 3;
+2 1 0;
+2 1 1;
+3 0 0;
+3 0 1;
+4 0 0;
+
+\end{CJK}
+\end{document}

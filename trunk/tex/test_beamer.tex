@@ -1,0 +1,81 @@
+\documentclass{beamer}
+\usepackage{CJKutf8}
+\usetheme{Warsaw}
+\usecolortheme{lily}
+\title[Test Presentation]{Intro\\How}
+\author{FAN Kai}
+\institute{CNDS, Peking University}
+\date{April 22, 2009}
+\begin{document}
+
+\begin{frame}[label=title]
+\titlepage
+\end{frame}
+
+\section{S1}
+
+\subsection{SS1}
+
+\begin{frame}{Intro}
+just a test ...
+\begin{itemize}
+\item i1
+\item i2
+\pause \item i3
+\item<2-3> item23
+\item<4> item4
+\item<1-5> item15
+\end{itemize}
+\begin{itemize}[<+->]
+\item T
+\item E
+\item X
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Intro}[label=t2]
+test 2
+\uncover<2-> {U2-...\\}
+\uncover<3> {U3...\\}
+\uncover<2-3> {U23...\\}
+\begin{itemize}
+\item \uncover<4> {U4...\\}
+\item \only<4-> {O4-...\\}
+\end{itemize}
+\invisible<5>{I5...}
+\end{frame}
+\subsection{SS2}
+\begin{frame}{Intro}
+test 3 ...
+\begin{itemize}
+\item \alert<1>i1
+\item \alert<2>i2
+\item \alert<3>i3
+\end{itemize}
+\begin{itemize}
+\item <+-| alert@+> a
+\item <+-| alert@+> a
+\item <+-| alert@+> a
+\end{itemize}
+\end{frame}
+
+\section{S2}
+\begin{frame}
+ok ... \\
+\hyperlink{t2}{goto t2} \\
+\hyperlink{title}{goto title} \\
+\hyperlink{title}{\beamergotobutton{goto title}} \\
+\begin{block}{bbb}
+abc
+\end{block}
+\begin{alertblock}{bbb}
+abc
+\end{alertblock}
+\end{frame}
+
+
+\begin{frame} {joke}
+\end{frame}
+
+
+\end{document}

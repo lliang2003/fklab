@@ -1,0 +1,66 @@
+\documentclass{beamer}
+\usetheme{Warsaw}
+\usecolortheme{lily}
+
+\title{Hadoop Code Reading: HDFS Client}
+\author{FAN Kai   fankai@net.pku.edu.cn}
+\institute{Computer Networks and Distritued Systems Laboratory\\Peking University}
+\date{2009}
+
+\begin{document}
+
+\begin{frame}[label=titlepage]
+\titlepage
+\end{frame}
+
+\begin{frame} {Questions?}
+\begin{itemize}
+\item How does HDFS cope with block boundary?
+\item How does HDFS implement padding?
+\item How does HDFS implement flush?
+\item How does HDFS client transmit data?
+\item How does HDFS client fetch metadata?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Classes}
+\begin{itemize}
+\item hadoop.hdfs.DistributedFileSystem
+\item hadoop.hdfs.DFSClient
+\item hadoop.hdfs.DFSClient.DFSOutputStream
+\item hadoop.hdfs.DFSClient.DFSInputStream
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Operations}
+\begin{itemize}[<+->]
+\item HDFS support create, append, and open operation.
+\item HDFS does not support atomic append, so there is no padding.
+\item create() and append() return DFSOutputStream, each contains a LeaseChecker, so no writing concurrency is allowed. 
+\item However, DFSInputStream does not have a LeaseChecker.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data Trasmission of DFSOutputStream}
+\begin{itemize}[<+->]
+\item Each block consists of several packets, each packet consists of several chunks, each chunk has a checksum.
+\item DFSOutputStream implement write() method, which may call write1() many times. Each write1() flush data at most once(when buffer is full).
+\item flush() just means writing data to packets, while sync() will send data to datanodes and update metadata in namenode.
+\item Each DFSOutputStream contains a DataStremer instance which run as daemon,  contineously sending packets.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data Trasmission of DFSInputStream}
+\begin{itemize}[<+->]
+\item DFSInputStream employ BlockReader to read block conetent.
+\item Fetch several block information each time(within a certain offset range).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{More Questions?}
+Thanks!
+\end{frame}
+
+\end{document}
+
+
