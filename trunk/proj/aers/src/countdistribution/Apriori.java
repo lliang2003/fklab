@@ -1,4 +1,4 @@
-package apriori;
+package countdistribution;
 
 import java.net.URI;
 
