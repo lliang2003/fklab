@@ -6,7 +6,7 @@ def echo_exe(cmd):
     os.system(cmd)
 
 def create_links():
-    conf_path = os.path.abspath('../conf')
+    conf_path = os.path.abspath('.')
     if not os.path.exists(conf_path):
         print 'Please execute in fklab dir.'
         sys.exit(1)
