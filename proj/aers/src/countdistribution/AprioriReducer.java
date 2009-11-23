@@ -1,4 +1,4 @@
-package apriori;
+package countdistribution;
 
 import java.io.IOException;
 import java.util.Iterator;

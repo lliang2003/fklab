@@ -1,4 +1,4 @@
-package apriori;
+package countdistribution;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,6 +15,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import apriori.Tree;
 
 public class InitTree {
 
