@@ -1,57 +1,62 @@
 package apriori;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class TreeNode {
-	public String item;
+public class ATree {
+	public String item = null;
 	public int count = 0;
 	public int depth = -1;
-	public TreeNode parent = null;
-	Map<String, TreeNode> children = new TreeMap<String, TreeNode>();
-	TreeNode(String s, TreeNode parent_node) {
+	public ATree parent = null;
+	Map<String, ATree> children = null;
+	
+
+	public ATree() {
+	}
+
+	private ATree(String s, ATree parent_node) {
 		item = s;
 		parent = parent_node;
 		if (parent != null)
 			depth = parent.depth + 1;
 	}
 
-	public void add(String[] items, int start, int end) {
+	public void addPath(String[] items, int start, int end) {
 		addChild(items[start]);
-		if (start < end-1)
-			children.get(items[start]).add(items, start+1, end);
+		if (start < end - 1)
+			children.get(items[start]).addPath(items, start + 1, end);
 	}
-	
+
 	public void addChild(String item) {
 		if (children == null)
-			children = new TreeMap<String, TreeNode>();
+			children = new TreeMap<String, ATree>();
 
 		if (!children.containsKey(item))
-			children.put(item, new TreeNode(item, this));
+			children.put(item, new ATree(item, this));
 	}
 
-	public TreeNode getChild(String item) {
+	public ATree getChild(String item) {
 		assert hasChild(item);
 		return children.get(item);
 	}
 
 	boolean hasChild(String item) {
-		return children.containsKey(item);
+		return children!=null && children.containsKey(item);
 	}
 
-	void incrCount(String[] items, int start) {
-		if (children == null || children.isEmpty())
-			count++;
-		else {
-			for (int i = start; i < items.length; ++i) {
-				if (children.containsKey(items[i]))
-					children.get(items[i]).incrCount(items, i + 1);
-			}
+	void incrPathCount(String[] items, int start, int end) {
+		count++;
+		if (leaf()) return;
+		for (int i = start; i < end; ++i) {
+			if (hasChild(items[i]))
+				getChild(items[i]).incrPathCount(items, i + 1, end);
 		}
 	}
 
@@ -65,11 +70,11 @@ public class TreeNode {
 		}
 	}
 
-	int getCount(String[] items, int start) {
-		if (start >= items.length)
+	int getPathCount(String[] items, int start) {
+		if (leaf())
 			return count;
 		else
-			return children.get(items[start]).getCount(items, start + 1);
+			return children.get(items[start]).getPathCount(items, start + 1);
 	}
 
 	// 对于具有相同parent的叶节点两两连接生成新的候选项集，并测试新候选项集的子项集是否都是频繁项集
@@ -119,31 +124,34 @@ public class TreeNode {
 	}
 
 	boolean checkValid(String[] itemArray) {
-		if (true) return true;
+		if (true)
+			return true;
+		// 不含该节点则不检查
+		if (!hasChild(itemArray[depth+2])) return true;
 		// 第depth+1个必然是当前节点的子节点
+		//TODO: 有错误
 		if (!contain(itemArray, depth + 2))
 			return false;
 		// 已经是根节点，已检查所有情况
-		if (depth <= 0)
+		if (depth < 0)
 			return true;
 		itemArray[depth] = item;
 		return parent.checkValid(itemArray);
 	}
-	
-	boolean isleaf() {
+
+	boolean leaf() {
 		return children == null || children.size() == 0;
 	}
-	
+
 	int getDepth() {
-		if (isleaf())
+		if (leaf())
 			return 1;
-		else 
-			return children.entrySet().iterator().next().getValue().getDepth()+1;
+		else
+			return children.entrySet().iterator().next().getValue().getDepth() + 1;
 	}
 
-
-	int checkFrequency(String[] pattern, int minsup, int treeDepth, Writer writer)
-			throws IOException {
+	int checkFrequency(String[] pattern, int minsup, int treeDepth,
+			Writer writer) throws IOException {
 		if (depth >= 0)
 			pattern[depth] = item;
 		if (depth < treeDepth - 1) {
@@ -151,8 +159,8 @@ public class TreeNode {
 			Iterator<String> iter = children.keySet().iterator();
 			while (iter.hasNext()) {
 				String sitem = iter.next();
-				int r = getChild(sitem).checkFrequency(pattern, minsup, treeDepth,
-						writer);
+				int r = getChild(sitem).checkFrequency(pattern, minsup,
+						treeDepth, writer);
 				if (r == 0)
 					iter.remove();
 				else
@@ -169,7 +177,7 @@ public class TreeNode {
 					for (int i = 0; i < pattern.length; ++i)
 						writer.write(pattern[i] + " ");
 					writer.write(count + "\n");
-					 writer.flush();
+					writer.flush();
 				}
 				return 1;
 			}
@@ -196,14 +204,54 @@ public class TreeNode {
 		}
 	}
 
-	void mergeCount(TreeNode node) throws IOException {
+	void mergeCount(ATree node) throws IOException {
 		if (children.size() != node.children.size())
-			throw new IOException(children.keySet()+" "+node.children.keySet());
-		if (children==null || children.isEmpty())
+			throw new IOException(children.keySet() + " "
+					+ node.children.keySet());
+		if (children == null || children.isEmpty())
 			count += node.count;
 		else {
 			for (String item : children.keySet())
-			getChild(item).mergeCount(node.getChild(item));
+				getChild(item).mergeCount(node.getChild(item));
 		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		int minsup = 10;
+		DataBase db = new DataBase("f:/data/aers.dat");
+		ATree root = new ATree("root", null);
+
+		Map<String, Integer> item_count = new HashMap<String, Integer>();
+		for (ItemSet transaction : db.transactions) {
+			if (transaction.items.length > 16)
+				continue;
+			for (String item : transaction.items) {
+				int cnt = item_count.containsKey(item) ? item_count.get(item)
+						: 0;
+				item_count.put(item, cnt + 1);
+			}
+		}
+		for (String item : item_count.keySet()) {
+			if (item_count.get(item) >= minsup) {
+				root.addChild(item);
+				root.getChild(item).count = item_count.get(item);
+			}
+		}
+		FileWriter fw = new FileWriter("patterns.txt");
+		int depth = 1;
+		int cnt;
+		do {
+			System.out.println("growing depth=" + depth);
+			if ((cnt = root.grow(depth)) == 0)
+				break;
+			System.out.println(cnt);
+			depth += 1;
+			System.out.println("scaning depth=" + depth);
+			for (ItemSet transaction : db.transactions) {
+				root.incrPathCount(transaction.items, 0, transaction.items.length);
+			}
+			cnt = root.checkFrequency(new String[depth], depth, minsup, fw);
+			System.out.println(cnt);
+		} while (cnt > 1);
 	}
 }

@@ -1,11 +1,10 @@
-package auto;
+package distribution;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.Date;
 import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
@@ -16,7 +15,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
 public class TreeScanMapper extends Mapper<Object, Text, Text, IntWritable> {
 	private static final Log logger = LogFactory.getLog(TreeScanMapper.class);
@@ -49,22 +47,22 @@ public class TreeScanMapper extends Mapper<Object, Text, Text, IntWritable> {
 			Scanner sc = new Scanner(new FileReader(path.toString()));
 			while (sc.hasNext()) {
 				String[] items = sc.nextLine().split(" +");
-				if (items.length > maxLength)
-					continue;
+//				if (items.length > maxLength)
+//					continue;
 				tree.scan(items);
 			}
 			logger.info("scaned " + path);
 			context.progress();
 		} 
 		logger.info("tree depth="+tree.depth());
-		tree.root.checkFrequency(new String[tree.depth()], AutoSplit.minsup,
+		tree.root.checkFrequency(new String[tree.depth()], DataDistribution.minsup,
 				context);
 		logger.info("check done");
 		if (tree.root.children.size() == 0) return;
 		FileSystem fs = FileSystem.get(context.getConfiguration());
-		String tmpTreeFile = AutoSplit.treePathRoot + (tree.depth() + 1) + "/"
+		String tmpTreeFile = DataDistribution.treePathRoot + (tree.depth() + 1) + "/"
 				+ context.getTaskAttemptID();
-		String finalTreeFile = AutoSplit.treePathRoot + (tree.depth() + 1)
+		String finalTreeFile = DataDistribution.treePathRoot + (tree.depth() + 1)
 		+ "/tree-" + tmpTreeFile.split("_")[4];
 		logger.info("tree file="+tmpTreeFile);
 		Writer treeWriter = new OutputStreamWriter(fs

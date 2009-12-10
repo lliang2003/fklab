@@ -22,7 +22,7 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class PRR extends Configured implements Tool {
+public class PRR {
 
 	public static class AggregationPartitioner implements Partitioner<Text, Text> {
 		public int getPartition(Text key, Text value, int numReduceTasks) {
@@ -146,7 +146,7 @@ public class PRR extends Configured implements Tool {
 	}
 
 	public void aggregate() throws IOException {
-		JobConf conf = new JobConf(getConf(), PRR.class);
+		JobConf conf = new JobConf(PRR.class);
 		conf.setJobName("aggregation");
 
 		conf.setOutputKeyClass(Text.class);
@@ -166,7 +166,7 @@ public class PRR extends Configured implements Tool {
 	}
 
 	public void calc() throws IOException {
-		JobConf conf = new JobConf(getConf(), PRR.class);
+		JobConf conf = new JobConf(PRR.class);
 		conf.setJobName("calculation");
 
 		conf.setOutputKeyClass(Text.class);
@@ -185,15 +185,14 @@ public class PRR extends Configured implements Tool {
 		JobClient.runJob(conf);
 	}
 	
-	public int run(String[] args) throws Exception {
+	public int run() throws Exception {
 		aggregate();
 		calc();
 		return 0;
 	}
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new PRR(), args);
-		System.exit(res);
+		new PRR().run();
 	}
 
 }

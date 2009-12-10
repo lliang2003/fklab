@@ -1,8 +1,7 @@
-package auto;
+package distribution;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,67 +90,9 @@ public class MTree {
 				children.get(item).print(indent + 8);
 			}
 		}
-
-		// // 对于具有相同parent的叶节点两两连接生成新的候选项集，并测试新候选项集的子项集是否都是频繁项集
-		// int grow(List<MTree> newTrees, LinkedList<String> prefix, Writer
-		// treeWriter)
-		// throws IOException {
-		// int cnt = 0;
-		// int max = 100;
-		// List<String> toBeDeleted = new ArrayList<String>();
-		// List<String> scanned = new ArrayList<String>();
-		// if (isLeaf()) {
-		// children = new TreeMap<String, Node>();
-		// for (String sib: parent.children.keySet()) {
-		// if (item.compareTo(sib) >= 0) continue;
-		// addChild(sib);
-		// cnt += 1;
-		// }
-		// } else {
-		// Iterator<String> iter = children.keySet().iterator();
-		// while (iter.hasNext()) {
-		// String sitem = iter.next();
-		// prefix.add(sitem);
-		// int r = getChild(sitem).grow(newTrees, prefix, treeWriter);
-		// prefix.removeLast();
-		// if (r == 0)
-		// iter.remove();
-		// else {
-		// if (cnt > max) { //split
-		// MTree t = new MTree();
-		// Node node = t.root;
-		// for (String item: prefix) {
-		// node.addChild(item);
-		// node = node.getChild(item);
-		// }
-		// node.children = new TreeMap<String, Node>();
-		// for (String item : scanned)
-		// node.children.put(item, children.get(item));
-		// t.leafCount = cnt;
-		// cnt = 0;
-		// toBeDeleted.addAll(scanned);
-		// scanned.clear();
-		// if (newTrees != null)
-		// newTrees.add(t);
-		// if (treeWriter != null) {
-		// t.write(treeWriter);
-		// treeWriter.write("\n");
-		// }
-		// }
-		// cnt += r;
-		// scanned.add(sitem);
-		// }
-		// }
-		// for (String item:toBeDeleted)
-		// children.remove(item);
-		// }
-		// return cnt;
-		// }
-
-		// 对于具有相同parent的叶节点两两连接生成新的候选项集，并测试新候选项集的子项集是否都是频繁项集
-		// 重用了count，目前可以，但如果要分布数据库的话不可以。
-
-		int growWrite(List<MTree> newTrees, LinkedList<String> prefix,
+		
+		// grow 会改变原来的count tree
+		int grow(List<MTree> newTrees, LinkedList<String> prefix,
 				Writer treeWriter) throws IOException {
 			int max = 10000;
 			count = 0;
@@ -169,7 +110,7 @@ public class MTree {
 				while (iter.hasNext()) {
 					Node node = iter.next();
 					prefix.add(node.item);
-					int r = node.growWrite(newTrees, prefix, treeWriter);
+					int r = node.grow(newTrees, prefix, treeWriter);
 					prefix.removeLast();
 					if (r > 0) {
 						if (count > max) { // split
@@ -179,7 +120,7 @@ public class MTree {
 								treeWriter.write(" ");
 							}
 							for (Node n : scanned) {
-								n.writeg(treeWriter);
+								n.writeGrow(treeWriter);
 							}
 							for (String p : prefix) {
 								treeWriter.write("^ ");
@@ -238,22 +179,7 @@ public class MTree {
 			}
 		}
 
-		// void write(Writer writer) throws IOException {
-		// writer.write(item);
-		// writer.write(" ");
-		// if (isLeaf()) {
-		// writer.write("leaf ");
-		// writer.write(count + " ");
-		// } else {
-		// for (String item : children.keySet()) {
-		// children.get(item).write(writer);
-		// }
-		// if (parent != null)
-		// writer.write("up ");
-		// }
-		// }
-
-		void writeg(Writer writer) throws IOException {
+		void writeGrow(Writer writer) throws IOException {
 			if (count == 0) return;
 			writer.write(item);
 			writer.write(" ");
@@ -273,7 +199,7 @@ public class MTree {
 			} else {
 				for (Node node : children.values()) {
 					if (node.count > 0)
-						node.writeg(writer);
+						node.writeGrow(writer);
 				}
 				if (parent != null)
 					writer.write("^ ");
@@ -352,30 +278,15 @@ public class MTree {
 		root.print(4);
 	}
 
-	// public void write(Writer writer) throws IOException {
-	// writer.write(uuid+" ");
-	// writer.write(leafCount + " ");
-	// root.write(writer);
-	// }
 	public void writeg(Writer writer) throws IOException {
 		// writer.write(uuid + " ");
 		writer.write(leafCount + " ");
-		root.writeg(writer);
+		root.writeGrow(writer);
 	}
 
-	// public int grow(List<MTree> trees, Writer treeWriter) throws IOException
-	// {
-	// leafCount = root.grow(trees, new LinkedList<String>(), treeWriter);
-	// if (trees == null) return -1;
-	// int cnt = leafCount;
-	// for (MTree t: trees) {
-	// cnt += t.leafCount;
-	// }
-	// return cnt;
-	// }
 	public int growWrite(List<MTree> trees, Writer treeWriter)
 			throws IOException {
-		leafCount = root.growWrite(trees, new LinkedList<String>(), treeWriter);
+		leafCount = root.grow(trees, new LinkedList<String>(), treeWriter);
 		if (trees == null)
 			return -1;
 		int cnt = leafCount;
@@ -428,23 +339,5 @@ public class MTree {
 			scan(tran.items);
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		DataBase db = new DataBase("f:/data/aers.dat");
-		MTree tree = new MTree();
-		int minsup = 100;
-		tree.init(db, minsup);
-
-		// tree.grow();
-		// tree.scan(db);
-		// tree.checkFrequent(minsup, null);
-		//
-		// tree.grow();
-		// System.out.println(tree);
-		// tree.scan(db);
-		// tree.checkFrequent(minsup, new OutputStreamWriter(System.out));
-	}
 
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package auto;
+package distribution;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
@@ -52,7 +52,7 @@ public class NTreeInputFormat extends FileInputFormat<LongWritable, Text> {
 
 	@Override
 	protected long computeSplitSize(long blockSize, long minSize, long maxSize) {
-		return 16*1024*1024;
+		return 4*1024*1024;
 	}
 
 }
