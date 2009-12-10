@@ -8,6 +8,8 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -17,6 +19,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import apriori.Tree;
 
 public class ScanReducer extends Reducer<IntWritable, Text, Text, Text> {
+	private static final Log logger = LogFactory.getLog(ScanReducer.class);
+
 	Tree tree;
 	OutputStreamWriter patternWriter;
 	boolean inited = false;
@@ -41,17 +45,21 @@ public class ScanReducer extends Reducer<IntWritable, Text, Text, Text> {
 			StringReader sr = new StringReader(iter.next().toString());
 			Tree nt = new Tree(sr);
 			sr.close();
+			
 			if (tree == null)
 				tree = nt;
 			else
 				tree.mergeCount(nt);
 		}
+		logger.info("leaf count="+tree.activeNodeCount);
+		logger.info("depth="+tree.treeDepth);
 	}
 
 	protected void cleanup(Context context) throws IOException,
 			InterruptedException {
 		StringWriter sw = new StringWriter();
 		tree.checkFrequent(FullDistribution.minsup, sw );
+		logger.info(""+sw.toString().length());
 		context.write(new Text(sw.toString()), null);
 
 //		StringWriter sw = new StringWriter();

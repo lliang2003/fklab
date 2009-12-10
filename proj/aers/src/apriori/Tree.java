@@ -31,7 +31,8 @@ public class Tree {
 				depth = parent.depth + 1;
 		}
 
-		public void add(String[] items, int start, int end) {
+		public void add(String[] items, int start, int end) throws IOException {
+			if (items[start].length()==0) throw new IOException();
 			addChild(items[start]);
 			if (start < end-1)
 				children.get(items[start]).add(items, start+1, end);
@@ -45,34 +46,63 @@ public class Tree {
 				children.put(item, new TreeNode(item, this));
 		}
 
-		public TreeNode getChild(String item) {
-			assert hasChild(item);
-			return children.get(item);
-		}
+		int checkFrequency(String[] pattern, int minsup, Writer writer)
+				throws IOException {
+			if (depth >= 0)
+				pattern[depth] = item;
+			if (depth < treeDepth - 1) {
+				int cnt = 0;
+				Iterator<String> iter = children.keySet().iterator();
+				while (iter.hasNext()) {
+					String sitem = iter.next();
+					int r = getChild(sitem).checkFrequency(pattern, minsup,
+							writer);
+					if (r == 0)
+						iter.remove();
+					else
+						cnt += r;
+				}
+				return cnt;
+			} else {
+				if (count < minsup) {
 
-		boolean hasChild(String item) {
-			return children.containsKey(item);
-		}
-
-		void incrCount(String[] items, int start) {
-			if (children == null || children.isEmpty())
-				count++;
-			else {
-				for (int i = start; i < items.length; ++i) {
-					if (children.containsKey(items[i]))
-						children.get(items[i]).incrCount(items, i + 1);
+					return 0;
+				} else {
+					// fk.util.out.printArray(pattern);
+					if (writer != null) {
+						for (int i = 0; i < pattern.length; ++i)
+							writer.write(pattern[i] + " ");
+						writer.write(count + "\n");
+						 writer.flush();
+					}
+					return 1;
 				}
 			}
 		}
 
-		void print(int indent) {
-			System.out.println("(" + count + ")");
-			for (String item : children.keySet()) {
-				for (int i = 0; i < indent; ++i)
-					System.out.print(" ");
-				System.out.print(item);
-				children.get(item).print(indent + 8);
-			}
+		boolean checkValid(String[] itemArray) {
+			if (Apriori.flag) return true;
+			// 第depth+1个必然是当前节点的子节点
+			if (!contain(itemArray, depth + 2))
+				return false;
+			// 已经是根节点，已检查所有情况
+			if (depth <= 0)
+				return true;
+			itemArray[depth] = item;
+			return parent.checkValid(itemArray);
+		}
+
+		boolean contain(String[] items, int start) {
+			if (!children.containsKey(items[start]))
+				return false;
+			if (start == items.length - 1)
+				return true;
+			return children.get(items[start]).contain(items, start + 1);
+		}
+
+		public TreeNode getChild(String item) {
+			assert hasChild(item);
+			return children.get(item);
 		}
 
 		int getCount(String[] items, int start) {
@@ -129,70 +159,19 @@ public class Tree {
 			return cnt;
 		}
 
-		boolean checkValid(String[] itemArray) {
-			if (true) return true;
-			// 第depth+1个必然是当前节点的子节点
-			if (!contain(itemArray, depth + 2))
-				return false;
-			// 已经是根节点，已检查所有情况
-			if (depth <= 0)
-				return true;
-			itemArray[depth] = item;
-			return parent.checkValid(itemArray);
+		boolean hasChild(String item) {
+			return children.containsKey(item);
 		}
 
 
-		int checkFrequency(String[] pattern, int minsup, Writer writer)
-				throws IOException {
-			if (depth >= 0)
-				pattern[depth] = item;
-			if (depth < treeDepth - 1) {
-				int cnt = 0;
-				Iterator<String> iter = children.keySet().iterator();
-				while (iter.hasNext()) {
-					String sitem = iter.next();
-					int r = getChild(sitem).checkFrequency(pattern, minsup,
-							writer);
-					if (r == 0)
-						iter.remove();
-					else
-						cnt += r;
-				}
-				return cnt;
-			} else {
-				if (count < minsup) {
-
-					return 0;
-				} else {
-					// fk.util.out.printArray(pattern);
-					if (writer != null) {
-						for (int i = 0; i < pattern.length; ++i)
-							writer.write(pattern[i] + " ");
-						writer.write(count + "\n");
-						 writer.flush();
-					}
-					return 1;
-				}
-			}
-		}
-
-		boolean contain(String[] items, int start) {
-			if (!children.containsKey(items[start]))
-				return false;
-			if (start == items.length - 1)
-				return true;
-			return children.get(items[start]).contain(items, start + 1);
-		}
-
-		void write(Writer writer) throws IOException {
-			if (children == null || children.size() == 0)
-				writer.write("leaf " + count + " ");
+		void incrCount(String[] items, int start) {
+			if (children == null || children.isEmpty())
+				count++;
 			else {
-				for (String item : children.keySet()) {
-					writer.write(item + " ");
-					children.get(item).write(writer);
+				for (int i = start; i < items.length; ++i) {
+					if (children.containsKey(items[i]))
+						children.get(items[i]).incrCount(items, i + 1);
 				}
-				writer.write("up ");
 			}
 		}
 
@@ -206,28 +185,73 @@ public class Tree {
 				getChild(item).mergeCount(node.getChild(item));
 			}
 		}
+
+		void print(int indent) {
+			System.out.println("(" + count + ")");
+			for (String item : children.keySet()) {
+				for (int i = 0; i < indent; ++i)
+					System.out.print(" ");
+				System.out.print(item);
+				children.get(item).print(indent + 8);
+			}
+		}
+
+		void write(Writer writer) throws IOException {
+			if (children == null || children.size() == 0)
+				writer.write("leaf " + count + " ");
+			else {
+				for (String item : children.keySet()) {
+					writer.write(item + " ");
+					children.get(item).write(writer);
+				}
+				writer.write("up ");
+			}
+		}
 	}
 
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) throws Exception {
+//		DataBase db = new DataBase("f:/data/aers.dat");
+//		Tree tree = new Tree();
+//		tree.init(db, 260);
+//		tree.grow();
+//		db.scan(tree);
+//		tree.checkFrequent(260, null);
+//		tree.toFile("tree.txt");
+//		Tree t = new Tree("tree.txt");
+//		tree.print();
+//		tree.mergeCount(t);
+//		tree.print();
+		Tree tree = new Tree("test.txt");
+		System.out.println(tree.activeNodeCount);
+	}
+
+	public TreeNode root = new TreeNode("", null);
+
+	public int treeDepth = 1;
+
+	public int activeNodeCount = 0;
 	public Tree() {
 	}
-
-	public Tree(String filename) throws IOException {
-		this(new FileReader(filename));
-	}
-
 	public Tree(Reader reader) throws IOException {
 		Scanner sc = new Scanner(reader);
 		TreeNode node = root;
 		int currentDepth = -1;
 		int cnt = 0;
-		activeNodeCount = Integer.parseInt(sc.next());
-		treeDepth = Integer.parseInt(sc.next());
+		activeNodeCount = sc.nextInt();
+		treeDepth = sc.nextInt();
+		String tmp = "";
 		while (sc.hasNext()) {
+			if (node == null) throw new IOException(tmp);
 			String token = sc.next();
+			tmp += " "+token;
 			if (token.equals("leaf")) {
-				node.count = Integer.parseInt(sc.next());
+				node.count = sc.nextInt();
 				node = node.parent;
 				currentDepth -= 1;
+				activeNodeCount += 1;
 			} else if (token.equals("up")) {
 				cnt += 1;
 				node = node.parent;
@@ -239,35 +263,18 @@ public class Tree {
 				node.depth = currentDepth;
 			}
 		}
-		assert cnt == activeNodeCount;
 	}
 
-	public TreeNode root = new TreeNode("", null);
-	public int treeDepth = 1;
-	public int activeNodeCount = 0;
-
-	public void scan(ItemSet transaction) {
-		root.incrCount(transaction.items, 0);
+	public Tree(String filename) throws IOException {
+		this(new FileReader(filename));
 	}
 
-	public void scan(String[] items) {
-		root.incrCount(items, 0);
-	}
-
-	void print() {
-		root.print(4);
-	}
-
-	void toFile(String filename) throws IOException {
-		FileWriter fw = new FileWriter(filename);
-		write(fw);
-		fw.close();
-	}
-
-	public void write(Writer writer) throws IOException {
-		writer.write(activeNodeCount + " ");
-		writer.write(treeDepth + " ");
-		root.write(writer);
+	public int checkFrequent(int minsup, Writer writer) throws IOException {
+		//System.out.print("depth=" + treeDepth + " checking ...");
+		int cnt = root.checkFrequency(new String[treeDepth], minsup, writer);
+		//System.out.println("\tfrequent node=" + cnt);
+		System.out.print(cnt+" ");
+		return cnt;
 	}
 
 	int getCount(String[] items) {
@@ -275,19 +282,12 @@ public class Tree {
 	}
 
 	public int grow() throws IOException {
-		System.out.printf("depth=%d growing ... %n", treeDepth);
+		//System.out.printf("depth=%d growing ... %n", treeDepth);
 		activeNodeCount = root.grow();
 		treeDepth++;
-		System.out.println("depth=" + treeDepth + "\tcandidate="
-				+ activeNodeCount);
+//		System.out.println("depth=" + treeDepth + "\tcandidate="+ activeNodeCount);
+		System.out.println(activeNodeCount);
 		return activeNodeCount;
-	}
-
-	public int checkFrequent(int minsup, Writer writer) throws IOException {
-		System.out.print("depth=" + treeDepth + " checking ...");
-		int cnt = root.checkFrequency(new String[treeDepth], minsup, writer);
-		System.out.println("\tfrequent node=" + cnt);
-		return cnt;
 	}
 
 	public void init(DataBase db, int minsup) {
@@ -312,22 +312,28 @@ public class Tree {
 		root.mergeCount(t.root);
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Exception {
-		DataBase db = new DataBase("f:/data/aers.dat");
-		Tree tree = new Tree();
-		tree.init(db, 260);
-		tree.grow();
-		db.scan(tree);
-		tree.checkFrequent(260, null);
-		tree.toFile("tree.txt");
-		Tree t = new Tree("tree.txt");
-		tree.print();
-		tree.mergeCount(t);
-		tree.print();
+	void print() {
+		root.print(4);
+	}
 
+	public void scan(ItemSet transaction) {
+		root.incrCount(transaction.items, 0);
+	}
+
+	public void scan(String[] items) {
+		root.incrCount(items, 0);
+	}
+
+	void toFile(String filename) throws IOException {
+		FileWriter fw = new FileWriter(filename);
+		write(fw);
+		fw.close();
+	}
+
+	public void write(Writer writer) throws IOException {
+		writer.write(activeNodeCount + " ");
+		writer.write(treeDepth + " ");
+		root.write(writer);
 	}
 
 }

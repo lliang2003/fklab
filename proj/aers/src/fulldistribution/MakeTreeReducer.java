@@ -22,8 +22,11 @@ public class MakeTreeReducer extends Reducer<Text, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		Iterator<Text> it = values.iterator();
 		while (it.hasNext()) {
-			String[] tokens = it.next().toString().split("[ \t]+");
+			Text value = it.next();
+			String[] tokens = value.toString().split("[ \t]+");
+			if (tokens.length < 2) return;
 			tree.root.add(tokens, 0, tokens.length-1);
+			//context.write(value, null);
 		}
 	}
 

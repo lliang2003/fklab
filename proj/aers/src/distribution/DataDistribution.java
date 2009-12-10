@@ -1,19 +1,18 @@
-package auto;
+package distribution;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class AutoSplit {
-	//public static String datPath = "/validaers";
-	public static String datPath = "/aers/aers";
+public class DataDistribution {
+	public static String datPath = "/allaers";
+	//public static String datPath = "/aers/aers";
 	public static String pathRoot = "/apriori3/";
 	public static String treePathRoot = pathRoot + "tree";
 	public static String fpPathRoot = pathRoot + "fp";
@@ -45,7 +44,6 @@ public class AutoSplit {
 							.startsWith("tree")) {
 				fs.delete(status.getPath(), true);
 			}
-
 		}
 		// System.out.println(cnt);
 		System.out.println("scan depth = " + depth);
@@ -56,44 +54,8 @@ public class AutoSplit {
 		return job.waitForCompletion(true);
 	}
 
-	public static void init() throws Exception {
-		Job job = new Job(new Configuration(), "apriori init");
-		Configuration conf = job.getConfiguration();
-		conf.setInt("apriori.maxLength", maxLength);
-		job.setMapperClass(PatternCountMapper.class);
-		job.setReducerClass(PatternCountReducer.class);
-		job.setNumReduceTasks(20);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
-
-		FileInputFormat.addInputPath(job, new Path(datPath));
-		// FileSystem.get(conf).delete(new Path(fpPathRoot + "2"), true);
-		FileSystem.get(conf).delete(new Path(pathRoot), true);
-		FileOutputFormat.setOutputPath(job, new Path(fpPathRoot + "2"));
-		job.waitForCompletion(true);
-	}
-
-	public static boolean makeTree(int depth) throws Exception {
-		System.out.println("make tree depth = " + depth);
-		Configuration conf = new Configuration();
-		FileSystem fs = FileSystem.get(conf);
-		Job job = new Job(conf, "apriori make tree depth=" + depth);
-		job.getConfiguration().setInt("olddepth", depth - 1);
-
-		job.setMapperClass(MakeTreeMapper.class);
-		job.setReducerClass(MakeTreeReducer.class);
-		job.setNumReduceTasks(10);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(Text.class);
-		FileInputFormat.addInputPath(job, new Path(fpPathRoot + (depth - 1)));
-		fs.delete(new Path(treePathRoot + depth), true);
-		FileOutputFormat.setOutputPath(job, new Path(treePathRoot + depth));
-		return job.waitForCompletion(true);
-	}
-
 	public static void main(String[] args) throws Exception {
-//		init();
-//		makeTree(3);
+		Init.init(2);
 		int depth = 3;
 		while (scan(depth))
 			depth++;

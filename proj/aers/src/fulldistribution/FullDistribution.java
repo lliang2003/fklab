@@ -17,9 +17,10 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 public class FullDistribution {
 
 	public static String pathRoot = "hdfs:/apriori2/";
-	public static int minsup = 10;
+	public static int minsup = 5;
 
 	public static boolean scan(int depth) throws Exception {
+		System.out.println("scan depth = "+depth);
 		//Configuration conf = new Configuration();
 		Job job = new Job(new Configuration(),
 				"apriori count distribution scan depth=" + depth);
@@ -66,7 +67,8 @@ public class FullDistribution {
 	}
 	
 
-	public static void makeTree(int depth, int nr) throws Exception {
+	public static boolean makeTree(int depth, int nr) throws Exception {
+		System.out.println("make tree depth = "+depth);
 		Configuration conf = new Configuration();
 		FileSystem fs = FileSystem.get(conf);
 		int space = 0;
@@ -74,23 +76,28 @@ public class FullDistribution {
 		for (FileStatus status:fss)
 			space += status.getLen();
 		System.out.println(space);
+		if (space < 1000) return false;
 		
 		Job job = new Job(conf, "apriori count distribution make tree depth="+depth);
 		job.getConfiguration().setInt("old tree depth", depth-1);
 		job.setMapperClass(MakeTreeMapper.class);
 		job.setReducerClass(MakeTreeReducer.class);
-		job.setNumReduceTasks(nr);
+		job.setNumReduceTasks(space/3000+1);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 		FileInputFormat.addInputPath(job, new Path(pathRoot+"fp"+(depth-1)));
 		FileSystem.get(conf).delete(new Path(pathRoot+"tree"+depth), true);
 		FileOutputFormat.setOutputPath(job, new Path(pathRoot+"tree"+depth));
 		job.waitForCompletion(true);
+		return true;
 	}
 
 	public static void main(String[] args) throws Exception {
-		//init();
-		//makeTree(3, 10);
-		scan(3);
+		init();
+		int depth = 3;
+		while (makeTree(depth, 20)) {
+			scan(depth);
+			depth += 1;
+		}
 	}
 }

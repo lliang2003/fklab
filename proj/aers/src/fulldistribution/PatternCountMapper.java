@@ -14,7 +14,7 @@ public class PatternCountMapper extends Mapper<Object, Text, Text, IntWritable> 
 	public void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 		String[] tokens = value.toString().split("[ \t]+");
-		// if (tokens.length > 16) return; // filter out long transactions
+		if (tokens.length > 16) return; // filter out long transactions
 		Arrays.sort(tokens);
 		for (String item : tokens) {
 			pattern.set(item);
