@@ -1,4 +1,4 @@
-package fk;
+package libtest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
