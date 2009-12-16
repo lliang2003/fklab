@@ -62,7 +62,7 @@ public class Apriori {
 //			test("f:/share/dataset/mushroom.dat", 2000);
 //			test("f:/share/dataset/mushroom.dat", 1500);
 //			test("f:/share/dataset/mushroom.dat", 1000);
-			test("f:/share/dataset/chess.dat", 2000);
+			test("f:/share/dataset/chess.dat", 3000);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

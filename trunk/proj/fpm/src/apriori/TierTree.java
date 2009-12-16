@@ -36,13 +36,6 @@ public class TierTree extends util.Util {
 		Item last() {
 			return get(size() - 1);
 		}
-
-		int cnt(int i, int vpos) {
-			if (vpos == 0)
-				return get(i).num;
-			else
-				return get(i).num - get(vpos - 1).num;
-		}
 	}
 
 	// depth+1层，最上层元素是没有用的，使代码更简洁
@@ -56,6 +49,10 @@ public class TierTree extends util.Util {
 			tiers[i] = new Tier();
 		}
 		tiers[0].add(new Item());
+
+		for (int d = 0; d <= depth; ++d) {
+			cpos[d] = new int[d + 1];
+		}
 	}
 
 	public int hashCode() {
@@ -68,9 +65,9 @@ public class TierTree extends util.Util {
 		}
 		return sb.toString().hashCode();
 	}
-	
+
 	int findInChildren(int tierIndex, int pos, int id) {
-		int left = pos == 0?0:get(tierIndex, pos-1).num;
+		int left = pos == 0 ? 0 : get(tierIndex, pos - 1).num;
 		int right = get(tierIndex, pos).num;
 		return binarySearch(tiers[tierIndex], left, right, id);
 	}
@@ -116,7 +113,11 @@ public class TierTree extends util.Util {
 		// println(tierIndex+" "+pos+" "+tiers[tierIndex].size());
 		return tiers[tierIndex].get(pos);
 	}
-	
+
+	public Item get(Path path, int tierIndex) {
+		return tiers[tierIndex].get(path.pos[tierIndex]);
+	}
+
 	public void set(int tierIndex, int pos, Item item) {
 		tiers[tierIndex].set(pos, item);
 	}
@@ -124,26 +125,29 @@ public class TierTree extends util.Util {
 	public class Path {
 		public int[] pos = new int[depth + 1];
 
-		public void forward() {
+		public void forward(int dp) {
 			// println("forward");
-			pos[depth]++;
-			assert pos[depth] < tiers[depth].size();
-			for (int d = depth; d > 0 && pos[d] >= get(d - 1, pos[d - 1]).num; --d) {
+			pos[dp]++;
+			assert pos[dp] < tiers[dp].size();
+			for (int d = dp; d < depth; ++dp) {
+				pos[d + 1] = get(d, pos[d] - 1).num;
+			}
+			for (int d = dp; d > 0 && pos[d] >= get(d - 1, pos[d - 1]).num; --d) {
 				pos[d - 1]++;
 			}
 		}
 
+		public void forward() {
+			forward(depth);
+		}
+
 		public Path clone() {
-			Path sec = new Path();
-			System.arraycopy(pos, 0, sec.pos, 0, pos.length);
-			return sec;
+			Path np = new Path();
+			System.arraycopy(pos, 0, np.pos, 0, pos.length);
+			return np;
 		}
 
-		public Item item(int d) {
-			return tiers[d].get(pos[d]);
-		}
-
-		public boolean endOfSection(int d) {
+		public boolean endOfSegment(int d) {
 			// System.out.println(get(depth - 2, pos[depth - 2]).num + " "
 			// + pos[depth - 1]);
 			return get(d - 1, pos[d - 1]).num == pos[d] + 1;
@@ -212,18 +216,79 @@ public class TierTree extends util.Util {
 		}
 
 	}
-	
-	public void grow() {
+
+	boolean checkValid(int dp, int id) {
+		for (int i = 0; i < cpos[dp - 1].length; ++i) {
+			int index = findInChildren(dp - 1, cpos[dp - 1][i], id);
+			if (index < 0)
+				return false;
+			if (dp < depth)
+				cpos[dp][i + 1] = index;
+		}
+		return true;
+	}
+
+	int threshold = 10;
+	int ccnt = 0;
+	int[] leaves = new int[threshold * 3 / 2];
+	int[][] cpos = new int[depth][];
+	Path left = new Path(), right = new Path();
+
+	public void writeg(Path left, Path right, Writer treeWriter) throws IOException {
+		for (int d = 0; d <=depth; ++d) {
+			for (int i = left.pos[d]; i <= right.pos[d]; ++i) {
+				if (get(d, i).id == -1) continue;
+			}
+			treeWriter.write("; ");
+		}
+		for (int i = 0; i < leaves.length; ++i) {
+			if (leaves[i]< 0)
+				treeWriter.write(", ");
+		}
+			
+	}
+
+	public void grow(int dp, Path left, Path right, Writer treeWriter) throws IOException {
+		Item item = get(right, dp);
+		if (dp < depth) {
+			cpos[dp][0] = right.pos[dp]; // current position
+			int start = right.pos[dp] > 0 ? get(dp, right.pos[dp] - 1).num : 0;
+			int end = item.num;
+			item.num = 0;
+			for (int p = start; p < end; ++p) {
+				Item child = get(dp + 1, p);
+				if (item.id == -1 || !checkValid(dp, child.id))
+					child.id = -1;
+				grow(dp + 1, left, right, treeWriter);
+			}
+		} else {
+			// last tier
+			item.num = 0; // use as candidate count
+			int start = right.pos[dp] + 1;
+			int end = get(right, dp - 1).num;
+			for (int p = start; p < end; ++p) {
+				Item sib = get(dp, p);
+				if (item.id != -1 && checkValid(dp, sib.id)) {
+					item.num++;
+					leaves[ccnt++] = sib.id;
+				}
+			}
+			if (item.num == 0)
+				item.id = -1;
+			if (ccnt > threshold) {
+				writeg(left, right, treeWriter);
+				left = right.clone();
+			}
+			right.forward();
+		}
 		
 	}
 
-	public void checkAndGrow(int minsup, Writer treeWriter, Writer fpWriter)
-			throws IOException {
+	public void check(int minsup, Writer fpWriter) throws IOException {
 		Path path = new Path();
-		final int threshold = 10;
 		int[] vpos = new int[depth + 1];
 		for (int pos = 0; pos < tiers[depth].size(); ++pos, path.forward()) {
-			println("pos="+pos);
+			println("pos=" + pos);
 			Item item = get(depth, pos);
 			if (item.num >= minsup) {
 				// output frequent pattern
@@ -231,36 +296,21 @@ public class TierTree extends util.Util {
 				for (int i = 0; i < depth; ++i)
 					fpWriter.write(get(i, path.pos[i]).id + " ");
 				fpWriter.write("\t" + get(depth, pos).num + "\n");
-				set(depth, vpos[depth], item);
-				vpos[depth]++;
+				set(depth, vpos[depth]++, item);
 			}
-			if (path.endOfSection(depth)) {
-				// 重新设置倒数第二层的指针
-				get(depth - 1, path.pos[depth - 1]).num = vpos[depth];
-				if (tiers[depth - 1].cnt(path.pos[depth - 1], vpos[depth-1]) > 1) {
-					set(depth-1, vpos[depth - 1], path.item(depth - 1));
-					vpos[depth - 1]++;
-				} else if (tiers[depth - 1].cnt(path.pos[depth - 1], vpos[depth-1]) == 1) {
-					vpos[depth]--;
-				}
-				// 
-				for (int d = depth - 1; d > 0; --d) {
-					if (path.endOfSection(d)) {
-						println("end of seg "+d);
-						path.item(d - 1).num = vpos[d];
-						if (tiers[d - 1].cnt(path.pos[d - 1], vpos[d-1]) > 0) {
-							set(d-1, vpos[d - 1], path.item(d - 1));
-							vpos[d - 1]++;
-						}
-
-					} else
-						break;
-				}
+			// set segments
+			for (int d = depth; d > 0 && path.endOfSegment(d); --d) {
+				println("end of seg " + d);
+				get(path, d - 1).num = vpos[d];
+				int left = vpos[d - 1] > 0 ? get(d - 1, vpos[d - 1] - 1).num
+						: 0;
+				if (get(path, d - 1).num - left > 0)
+					set(d - 1, vpos[d - 1]++, get(path, d - 1));
 			}
-			println(join(vpos," "));
+			println(join(vpos, " "));
 			printTree();
 		}
-		//trim
+		// trim
 		for (int d = 0; d <= depth; ++d)
 			while (tiers[d].size() > vpos[d])
 				tiers[d].remove(vpos[d]);
@@ -347,7 +397,7 @@ public class TierTree extends util.Util {
 			t.printTree();
 			Writer treeWriter = new StringWriter();
 			Writer fpWriter = new StringWriter();
-			t.checkAndGrow(3000, treeWriter, fpWriter);
+			t.check(3000, fpWriter);
 			print(treeWriter.toString());
 			// print(fpWriter.toString());
 
@@ -363,7 +413,7 @@ public class TierTree extends util.Util {
 		t.printTree();
 		// println(t.hashCode());
 		t.expand(new StringReader(
-				"0 ; 2 4 5 ; 5 6 , 5 8 , 7 8 9 : 1 2 9 3 4 4 9"));
+				"0 ; 2 4 5 ; 5 6 , 5 8 , 7 8 9 : 1 2 9 3 6 5 9"));
 		t.printTree();
 		// println(t.hashCode());
 		t.scan(new int[] { 0, 1, 2 });
@@ -372,7 +422,7 @@ public class TierTree extends util.Util {
 
 		Writer treeWriter = new StringWriter();
 		Writer fpWriter = new StringWriter();
-		t.checkAndGrow(5, treeWriter, fpWriter);
+		t.check(5, fpWriter);
 		t.printTree();
 		// print("joke");
 		// print(treeWriter.toString());
@@ -382,7 +432,7 @@ public class TierTree extends util.Util {
 
 	public static void main(String[] args) throws IOException {
 		test2();
-		//		test1();
+		// test1();
 	}
 
 }
