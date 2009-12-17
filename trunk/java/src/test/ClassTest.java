@@ -1,4 +1,4 @@
-package fk;
+package test;
 import static java.lang.System.out;
 
 class SuperClass {

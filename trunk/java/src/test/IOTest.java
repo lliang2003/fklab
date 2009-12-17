@@ -1,4 +1,4 @@
-package fk;
+package test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

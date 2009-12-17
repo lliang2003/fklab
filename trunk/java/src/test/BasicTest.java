@@ -1,7 +1,9 @@
-package fk;
+package test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class BasicTest {
 	void testDataType() {
@@ -156,6 +158,14 @@ public class BasicTest {
 		p2.setFirst(5);
 		System.out.println(p2.first());
 	}
+	
+	static <T extends List> void testGeneric(T t) {
+		System.out.println(t.getClass().getName());
+		List<Integer>[] lists = new List[1];
+		lists[0] = t;
+		t = (T) lists[0];
+	}
+	
 	/**
 	 * @param args
 	 */
@@ -182,6 +192,8 @@ public class BasicTest {
 		System.out.println(hs);
 		String s = "hello";
 		System.out.println(hs.contains(s));
+		
+		testGeneric(new ArrayList<Integer>());
 	}
 
 }
