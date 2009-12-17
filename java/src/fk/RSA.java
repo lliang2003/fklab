@@ -1,4 +1,4 @@
-package fk.util;
+package fk;
 import java.util.*;
 
 public class RSA

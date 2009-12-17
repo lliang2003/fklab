@@ -1,4 +1,4 @@
-package fk;
+package test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,23 +22,23 @@ public class ArrayTest {
 		for (int i = 0; i < 10; ++i) al.add(i);
 		System.out.println(al.size());
 		al.trimToSize();
-		fk.util.out.printArray(al);
+		fk.out.printArray(al);
 		
 		ArrayList<Integer>	ai = new ArrayList<Integer>();
 		for (int i = 0; i < 10; ++i) ai.add(i * i);
-		fk.util.out.printArray(ai);
+		fk.out.printArray(ai);
 		ai.addAll(al);
-		fk.util.out.printArray(ai);
+		fk.out.printArray(ai);
 		
 		al.addAll(ai);
-		fk.util.out.printArray(al);
+		fk.out.printArray(al);
 		
 		Integer[] a = new Integer[10];
 		a = ai.toArray(a);
 		System.out.println(a.length);
-		fk.util.out.printArray(a);
+		fk.out.printArray(a);
 		Arrays.sort(a);
-		fk.util.out.printArray(a);
+		fk.out.printArray(a);
 		
 		System.out.println("Test ArrayList over.");
 	}

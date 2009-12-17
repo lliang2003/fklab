@@ -1,4 +1,4 @@
-package fk.util;
+package fk;
 
 public class Number {
 	

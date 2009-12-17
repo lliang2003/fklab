@@ -1,6 +1,5 @@
 package test;
 import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
 
 public class Hello {
     static Logger logger = Logger.getLogger(Hello.class);
