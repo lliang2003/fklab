@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -27,6 +28,7 @@ public class TierTree extends util.Util {
 		}
 
 		public int id;
+
 		public int num;
 	}
 
@@ -38,8 +40,9 @@ public class TierTree extends util.Util {
 		}
 	}
 
-	// depth+1²ã£¬×îÉÏ²ãÔªËØÊÇÃ»ÓÐÓÃµÄ£¬Ê¹´úÂë¸ü¼ò½à
+	// depth+1ï¿½ã£¬ï¿½ï¿½ï¿½Ï²ï¿½Ôªï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ÃµÄ£ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	Tier[] tiers;
+
 	public int depth;
 
 	TierTree(int depth) {
@@ -50,6 +53,7 @@ public class TierTree extends util.Util {
 		}
 		tiers[0].add(new Item());
 
+		cpos = new int[depth + 1][];
 		for (int d = 0; d <= depth; ++d) {
 			cpos[d] = new int[d + 1];
 		}
@@ -60,8 +64,7 @@ public class TierTree extends util.Util {
 		for (int d = 1; d <= depth; ++d) {
 			sb.append(get(d, 0).id);
 			sb.append(",");
-			if (tiers[d].size() > 1)
-				break;
+			if (tiers[d].size() > 1) break;
 		}
 		return sb.toString().hashCode();
 	}
@@ -69,36 +72,34 @@ public class TierTree extends util.Util {
 	int findInChildren(int tierIndex, int pos, int id) {
 		int left = pos == 0 ? 0 : get(tierIndex, pos - 1).num;
 		int right = get(tierIndex, pos).num;
-		return binarySearch(tiers[tierIndex], left, right, id);
+		return binarySearch(tiers[tierIndex + 1], left, right, id);
 	}
 
 	int binarySearch(List<Item> a, int fromIndex, int toIndex, int key) {
+		// println("bs "+fromIndex+" "+toIndex+" "+key);
 		int low = fromIndex;
 		int high = toIndex - 1;
 		while (low <= high) {
 			int mid = (low + high) >>> 1;
 			int midVal = a.get(mid).id;
-			if (midVal < key)
-				low = mid + 1;
-			else if (midVal > key)
-				high = mid - 1;
-			else
-				return mid; // key found
+			if (midVal < key) low = mid + 1;
+			else if (midVal > key) high = mid - 1;
+			else return mid; // key found
 		}
 		return -(low + 1); // key not found.
 	}
 
 	public void scan(int[] tr) {
-		scan(tr, 0, 0, 1, tiers[0].size());
+		scan(tr, 0, 1, 0, tiers[0].size());
 	}
 
 	public void scan(int[] tr, int start, int d, int fromIndex, int toIndex) {
-		if (tr.length - start < depth - d + 1)
-			return;
-		for (int i = start; i <= tr.length - d + d; ++i) {
+		//println("scan "+Arrays.toString(tr)+" "+start+" "+d+" "+fromIndex+" "+
+		// toIndex);
+		if (tr.length - start <= depth - d) return;
+		for (int i = start; i < tr.length - depth + d; ++i) {
 			int index = binarySearch(tiers[d], fromIndex, toIndex, tr[i]);
-			if (index < 0)
-				continue;
+			if (index < 0) continue;
 			Item item = get(d, index);
 			if (d == depth) {
 				item.num += 1;
@@ -126,15 +127,19 @@ public class TierTree extends util.Util {
 		public int[] pos = new int[depth + 1];
 
 		public void forward(int dp) {
-			// println("forward");
+			// println(dp+" forward " + Arrays.toString(pos));
+			if (pos[dp] == tiers[dp].size() - 1) return;
 			pos[dp]++;
 			assert pos[dp] < tiers[dp].size();
 			for (int d = dp; d < depth; ++dp) {
 				pos[d + 1] = get(d, pos[d] - 1).num;
 			}
 			for (int d = dp; d > 0 && pos[d] >= get(d - 1, pos[d - 1]).num; --d) {
+				// println(d+" "+pos[d]+" "+pos[d-1]+" "+get(d - 1, pos[d -
+				// 1]).num);
 				pos[d - 1]++;
 			}
+			// println("forward done " + Arrays.toString(pos));
 		}
 
 		public void forward() {
@@ -147,6 +152,10 @@ public class TierTree extends util.Util {
 			return np;
 		}
 
+		public void clone(Path p) {
+			System.arraycopy(p.pos, 0, pos, 0, pos.length);
+		}
+
 		public boolean endOfSegment(int d) {
 			// System.out.println(get(depth - 2, pos[depth - 2]).num + " "
 			// + pos[depth - 1]);
@@ -154,145 +163,112 @@ public class TierTree extends util.Util {
 		}
 	}
 
-	// output [left, right]
-	public void writeGrow(Path left, Path right, Path seg, int minsup,
-			Writer treeWriter, int[][] cc) throws IOException {
-		println("grow part:" + join(left.pos, " ") + "," + join(right.pos, " ")
-				+ "," + join(seg.pos, " "));
-		for (int i = 0; i < depth; ++i) {
-			System.out.println(join(cc[i], " "));
-		}
-		// treeWriter.write((depth + 1) + " ");
-		for (int p = left.pos[0]; p <= right.pos[0]; ++p) {
-			if (cc[0][p] == 0)
-				continue;
-			treeWriter.write(get(0, p).id + " ");
-		}
-		treeWriter.write("; ");
-		for (int d = 1; d < depth; ++d) {
-			for (int p = left.pos[d], pp = left.pos[d - 1]; p <= right.pos[d]; ++p) {
-				treeWriter.write("(" + p + cc[d][p] + ") ");
-				if (get(d - 1, pp).num == p) {
-					pp++;
-					if (cc[d - 1][pp] > 0)
-						treeWriter.write("* ");
-
-				}
-
-				if (cc[d][p] == 0)
-					continue;
-				treeWriter.write(get(d, p).id + " ");
-			}
-			treeWriter.write("; ");
-		}
-		for (int p = left.pos[depth - 1]; p <= right.pos[depth - 1]; ++p) {
-			if (cc[depth - 1][p] == 0)
-				continue;
-			for (int pos = p, cnt = 0; cnt < cc[depth - 1][p]; ++pos) {
-				if (get(depth - 1, pos).num < minsup)
-					continue;
-				treeWriter.write(get(depth - 1, pos).id + " ");
-				cnt++;
-			}
-			if (p < right.pos[depth - 1])
-				treeWriter.write(", ");
-		}
-		treeWriter.write("\n");
-		treeWriter.flush();
-		for (int i = 0; i < depth; ++i) {
-			java.util.Arrays.fill(cc[i], 0);
-		}
-	}
-
-	public void trim() {
-		Path left = new Path();
-		Path right = new Path();
-		int vpos = 0;
-		for (int i = 0; i < tiers[depth - 1].size(); ++i) {
-			if ((i == 0 && get(depth - 1, i).num == 0)
-					|| get(depth - 1, i).num < get(depth - 1, i - 1).num + 2) {
-
-			}
-		}
-
-	}
-
 	boolean checkValid(int dp, int id) {
+		if (dp >= 0) return true;
+		// println("checkValid "+dp+" "+Arrays.toString(cpos[dp-1])+" "+id);
 		for (int i = 0; i < cpos[dp - 1].length; ++i) {
 			int index = findInChildren(dp - 1, cpos[dp - 1][i], id);
-			if (index < 0)
-				return false;
-			if (dp < depth)
-				cpos[dp][i + 1] = index;
+			if (index < 0) return false;
+			if (dp < depth) cpos[dp][i + 1] = index;
 		}
 		return true;
 	}
 
-	int threshold = 10;
-	int ccnt = 0;
-	int[] leaves = new int[threshold * 3 / 2];
-	int[][] cpos = new int[depth][];
+	int threshold = 5;
+
+	ArrayList<Integer> leaves = new ArrayList<Integer>(threshold * 3 / 2);
+
+	int[][] cpos;
+
 	Path left = new Path(), right = new Path();
 
 	public void writeg(Path left, Path right, Writer treeWriter) throws IOException {
-		for (int d = 0; d <=depth; ++d) {
-			for (int i = left.pos[d]; i <= right.pos[d]; ++i) {
-				if (get(d, i).id == -1) continue;
+		//printTree();
+		System.out.println("writeg " + Arrays.toString(left.pos) + Arrays.toString(right.pos) + leaves);
+		// left must be valid
+		for (int d = 1; d <= depth; ++d) {
+			boolean needComma = false;
+			for (int i = left.pos[d], pi = left.pos[d - 1]; i <= right.pos[d]; ++i) {
+				if (needComma && get(d - 1, pi).num == i) {
+					pi++;
+					treeWriter.write(", ");
+					needComma = false;
+				}
+				if (get(d, i).id >= 0) {
+					treeWriter.write(get(d, i).id + " ");
+					needComma = true;
+				}
 			}
 			treeWriter.write("; ");
 		}
-		for (int i = 0; i < leaves.length; ++i) {
-			if (leaves[i]< 0)
+		for (int i = 0, pi = left.pos[depth]; i < leaves.size(); ++i) {
+			//println(get(depth, pi).num + " " + pi + " " + i);
+			if (get(depth, pi).num == i) {
 				treeWriter.write(", ");
+				pi++;
+			}
+			while (get(depth, pi).id < 0)
+				pi++;
+			treeWriter.write(leaves.get(i) + " ");
+			// println(i+" "+pi+" "+get(depth,pi).num);
 		}
-			
+		treeWriter.write("\n");
+	}
+
+	public void grow(Writer treeWriter) throws IOException {
+		Path left = new Path(), right = new Path();
+		grow(0, left, right, treeWriter);
+		if (!leaves.isEmpty()) writeg(left, right, treeWriter);
 	}
 
 	public void grow(int dp, Path left, Path right, Writer treeWriter) throws IOException {
 		Item item = get(right, dp);
+		// println("grow "+dp+" "+Arrays.toString(left.pos)+" "+Arrays.toString(
+		// right.pos)+" "+ccnt+" "+item.id);
 		if (dp < depth) {
 			cpos[dp][0] = right.pos[dp]; // current position
 			int start = right.pos[dp] > 0 ? get(dp, right.pos[dp] - 1).num : 0;
 			int end = item.num;
-			item.num = 0;
+			int cnt = 0;
 			for (int p = start; p < end; ++p) {
 				Item child = get(dp + 1, p);
-				if (item.id == -1 || !checkValid(dp, child.id))
-					child.id = -1;
+				if (item.id == -2 || !checkValid(dp, child.id)) child.id = -2;
 				grow(dp + 1, left, right, treeWriter);
+				if (child.id >= 0) cnt++;
 			}
+			if (cnt == 0) item.id = -2;
 		} else {
 			// last tier
-			item.num = 0; // use as candidate count
+			item.num = leaves.size(); // use as candidate count
 			int start = right.pos[dp] + 1;
 			int end = get(right, dp - 1).num;
 			for (int p = start; p < end; ++p) {
 				Item sib = get(dp, p);
-				if (item.id != -1 && checkValid(dp, sib.id)) {
-					item.num++;
-					leaves[ccnt++] = sib.id;
+				if (item.id != -2 && checkValid(dp, sib.id)) {
+					leaves.add(sib.id);
 				}
 			}
-			if (item.num == 0)
-				item.id = -1;
-			if (ccnt > threshold) {
+			if (item.num == leaves.size()) item.id = -2;
+			else item.num = leaves.size();
+			if (leaves.size() > threshold) {
 				writeg(left, right, treeWriter);
-				left = right.clone();
+				left.clone(right);
+				leaves.clear();
 			}
+			if (leaves.isEmpty()) left.forward();
 			right.forward();
 		}
-		
 	}
 
 	public void check(int minsup, Writer fpWriter) throws IOException {
 		Path path = new Path();
 		int[] vpos = new int[depth + 1];
 		for (int pos = 0; pos < tiers[depth].size(); ++pos, path.forward()) {
-			println("pos=" + pos);
+			// println("pos=" + pos);
 			Item item = get(depth, pos);
 			if (item.num >= minsup) {
 				// output frequent pattern
-				fpWriter.write(join(path.pos, " ") + ")\t");
+				fpWriter.write(Arrays.toString(path.pos) + ")\t");
 				for (int i = 0; i < depth; ++i)
 					fpWriter.write(get(i, path.pos[i]).id + " ");
 				fpWriter.write("\t" + get(depth, pos).num + "\n");
@@ -300,15 +276,13 @@ public class TierTree extends util.Util {
 			}
 			// set segments
 			for (int d = depth; d > 0 && path.endOfSegment(d); --d) {
-				println("end of seg " + d);
+				// println("end of seg " + d);
 				get(path, d - 1).num = vpos[d];
-				int left = vpos[d - 1] > 0 ? get(d - 1, vpos[d - 1] - 1).num
-						: 0;
-				if (get(path, d - 1).num - left > 0)
-					set(d - 1, vpos[d - 1]++, get(path, d - 1));
+				int left = vpos[d - 1] > 0 ? get(d - 1, vpos[d - 1] - 1).num : 0;
+				if (get(path, d - 1).num - left > 0) set(d - 1, vpos[d - 1]++, get(path, d - 1));
 			}
-			println(join(vpos, " "));
-			printTree();
+			// println(Arrays.toString(vpos));
+			// printTree();
 		}
 		// trim
 		for (int d = 0; d <= depth; ++d)
@@ -376,16 +350,14 @@ public class TierTree extends util.Util {
 		try {
 			Map<Integer, Integer> count = new TreeMap<Integer, Integer>();
 			TierTree t = new TierTree(1);
-			Scanner sc = new Scanner(new FileReader(
-					"f:/share/dataset/chess.dat"));
+			Scanner sc = new Scanner(new FileReader("f:/share/dataset/chess.dat"));
 			while (sc.hasNext()) {
 				String line = sc.nextLine();
 				String[] parts = line.split(" +");
 				for (int i = 0; i < parts.length; ++i) {
 					int n = Integer.parseInt(parts[i]);
 					int c = 0;
-					if (count.containsKey(n))
-						c = count.get(n);
+					if (count.containsKey(n)) c = count.get(n);
 					count.put(n, c + 1);
 				}
 			}
@@ -409,24 +381,25 @@ public class TierTree extends util.Util {
 	public static void test2() throws IOException {
 		TierTree t = new TierTree(3);
 		// t.print();
-		t.expand(new StringReader("0 ; 1 2 ; 2 3 5 7 , 3 4 : 3 4 4 2 7 3"));
-		t.printTree();
+		t.expand(new StringReader("0 ; 1 2 ; 2 3 5 7 , 3 4 : 7 6 5 8 7 6"));
+		// t.printTree();
 		// println(t.hashCode());
-		t.expand(new StringReader(
-				"0 ; 2 4 5 ; 5 6 , 5 8 , 7 8 9 : 1 2 9 3 6 5 9"));
+		t.expand(new StringReader("1 ; 2 4 5 ; 3 6 , 5 8 , 7 8 9 : 5 6 9 3 6 5 9"));
 		t.printTree();
 		// println(t.hashCode());
 		t.scan(new int[] { 0, 1, 2 });
 		t.scan(new int[] { 0, 2, 5 });
+		System.out.println("after scan:");
 		t.printTree();
 
 		Writer treeWriter = new StringWriter();
 		Writer fpWriter = new StringWriter();
 		t.check(5, fpWriter);
+		System.out.println("after check:");
 		t.printTree();
-		// print("joke");
-		// print(treeWriter.toString());
-		print(fpWriter.toString());
+		t.grow(treeWriter);
+		print(treeWriter.toString());
+		// print(fpWriter.toString());
 		// t.serialize(new OutputStreamWriter(System.out));
 	}
 
