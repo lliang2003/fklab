@@ -81,9 +81,12 @@ alias unsetproxy='export http_proxy=""'
 alias starttomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
 alias stoptomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
 alias mountd='sudo mount -t cofs -o uid=kevin,gid=kevin cofs0 /mnt/d'
+alias mounte='sudo mount -t cofs -o uid=fankai,gid=fankai cofs1 /mnt/f'
+alias mountf='sudo mount -t cofs -o uid=fankai,gid=fankai cofs1 /mnt/f'
 
-alias hdfs='~/hadoop/bin/hadoop fs'
-alias hjar='~/hadoop/bin/hadoop jar'
+alias hdfs='bin/hadoop fs'
+alias hjar='bin/hadoop jar'
+alias hjob='bin/hadoop job'
 
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
 #export CLASSPATH=/usr/lib/jvm/java-1.5.0-sun/lib
