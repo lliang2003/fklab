@@ -135,9 +135,7 @@ public class BasicTest {
 			this.first = first;
 			this.second = second;
 		}
-		public static<V> V third(V a){
-			return a;
-		}
+
 		public T first() { return first; }
 		public U second() { return second; }
 		public void setFirst(T f) { first = f; }
@@ -146,11 +144,11 @@ public class BasicTest {
 		private U second;
 	}
 	
+	@SuppressWarnings({"unchecked", "unused"})
 	void testPair() {
 		Pair p = new Pair();
 		Pair pp = new Pair(2, "ok");
 		System.out.println(pp.first() + " " + pp.second());
-		System.out.println(pp.third(4));
 		Pair[] ps = new Pair[10]	;
 		ps[0] = new Pair(2, "ok");
 		Pair<? extends Comparable, Double> p1 = new Pair(2, "ok");
@@ -158,7 +156,7 @@ public class BasicTest {
 		p2.setFirst(5);
 		System.out.println(p2.first());
 	}
-	
+	@SuppressWarnings("unchecked")
 	static <T extends List> void testGeneric(T t) {
 		System.out.println(t.getClass().getName());
 		List<Integer>[] lists = new List[1];

@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
@@ -142,6 +141,7 @@ public class IOTest {
 	}
 	
 	static class OST implements Serializable {
+		private static final long serialVersionUID = 1L;
 		OST(int i, double d, String s) {
 			this.i = i;
 			this.d = d;
