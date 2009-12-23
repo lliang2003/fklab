@@ -7,7 +7,7 @@ public class NetworkTest {
 	
 	static void testSocket() throws UnknownHostException, IOException {
 		Socket s = new Socket("http://www.cppreference.com", 80);
-		URL url = new URL("http://www.cppreference.com");
+		//URL url = new URL("http://www.cppreference.com");
 		InputStream is = s.getInputStream();
 		//InputStream is = url.openStream();
 		Scanner in = new Scanner(is);
