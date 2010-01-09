@@ -24,7 +24,7 @@ public class Count {
 		public void map(Object key, Text value, Context context)
 				throws IOException, InterruptedException {
 			String[] tokens = value.toString().split("[ \t]+");
-			// filter out long transactions
+			// Filter long transactions.
 			if (tokens.length > maxLength)
 				return;
 			// Arrays.sort(tokens);

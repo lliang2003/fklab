@@ -3,8 +3,6 @@ package test;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -19,11 +17,10 @@ import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Partitioner;
 import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.util.Tool;
-import org.apache.hadoop.util.ToolRunner;
 
 public class PRR {
 
+	@SuppressWarnings("deprecation")
 	public static class AggregationPartitioner implements Partitioner<Text, Text> {
 		public int getPartition(Text key, Text value, int numReduceTasks) {
 			String kk = key.toString();
@@ -35,6 +32,7 @@ public class PRR {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public static class AggregationMapper extends MapReduceBase implements
 			Mapper<Object, Text, Text, Text> {
 		public void map(Object key, Text value,

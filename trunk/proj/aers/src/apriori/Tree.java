@@ -13,10 +13,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
-
 public class Tree {
 	public class TreeNode {
 		public String item;

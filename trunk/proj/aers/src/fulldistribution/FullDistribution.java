@@ -1,8 +1,5 @@
 package fulldistribution;
 
-import java.net.URI;
-import java.util.Scanner;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileStatus;
