@@ -16,6 +16,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+// Only process 1-item and 2-item.
+@Deprecated
 public class CountOld {
 	public static class PatternMapper extends
 			Mapper<Object, Text, Text, IntWritable> {

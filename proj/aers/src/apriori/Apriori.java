@@ -1,10 +1,10 @@
 package apriori;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.io.FileWriter;
 
 public class Apriori {
 

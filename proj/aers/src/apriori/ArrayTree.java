@@ -102,14 +102,14 @@ public class ArrayTree {
 			System.out.println();
 		}
 	}
-
-	public static void main(String[] args) throws IOException {
-		ArrayTree t = new ArrayTree(2);
-		t.print();
-		t.expand(new StringReader("; 1 2 ; 2 3 5 7 , 3 4 : 3 4 5 6 7 3"));
-		t.print();
-		t.expand(new StringReader("; 2 4 ; 5 6 , 5 8 :  7 8 9 3"));
-		t.print();
-		// t.serialize(new OutputStreamWriter(System.out));
+	public static void main(String[] args) {
+			ArrayTree t = new ArrayTree(2);
+			t.print();
+			t.expand(new StringReader("; 1 2 ; 2 3 5 7 , 3 4 : 3 4 5 6 7 3"));
+			t.print();
+			t.expand(new StringReader("; 2 4 ; 5 6 , 5 8 :  7 8 9 3"));
+			t.print();
+			// t.serialize(new OutputStreamWriter(System.out));
 	}
+
 }
