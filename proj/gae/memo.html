@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Memo{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block style%}
+.question {
+    margin: 2px;
+    border: 1px solid blue;
+    width: 300px;
+    overflow: hidden;
+    display: inline-block;
+}
+.hidden{
+    display: none;
+}
+.answer {
+    margin: 2px;
+    border: 1px solid green;
+    width: 500px;
+    display: none;
+}
+{% endblock %}
+
+{% block script%}
+    var passed_items = new Array();
+    var done_items = new Array();
+    function toggle_answer(id) {
+        abox=document.getElementById("answer-"+id);
+        if (abox.style.display=="block")
+            abox.style.display="none";
+        else
+            abox.style.display="block";
+    }
+    function fail(id) {
+        qbox=document.getElementById("question-"+id);
+        qbox.style.borderColor="red";
+    }
+    function pass(id) {
+        qbox=document.getElementById("question-"+id);
+        qbox.style.borderColor="green";
+        passed_items.push(id);
+    }
+    function done(id) {
+        qbox=document.getElementById("question-"+id);
+        qbox.style.borderColor="gray";
+        done_items.push(id);
+    }
+
+    function finish() {
+        ids=document.getElementById("ids");
+        ids.value = "joke";
+    }
+    
+
+{% endblock %}
+
+{% block content %}
+
+<form method="get" action="/memo">
+{% for item in items %}
+    <div class="question" id="question-{{item.id}}" >{{item.question}}</div>
+    <button onclick="toggle_answer({{item.id}})">Toggle</button>
+    <input type="radio" name="r{{item.id}}" onclick="pass({{item.id}})" value="pass" />
+    <input type="radio" name="r{{item.id}}" onclick="fail({{item.id}})" value="fail" />
+    <input type="radio" name="r{{item.id}}" onclick="done({{item.id}})" value="done" />
+    <a href="memo?action=delete&id={{item.id}}">del</a>
+    <br>
+    <div class="answer" id="answer-{{item.id}}" >{{item.answer}}</div>
+{% endfor %}
+<input type="hidden" name="action" value="finish" />
+<input type="hidden" name="ids" value="" />
+<input onclick="finish" type="submit" value="Finish this round" />
+</form>
+
+<form method="post" action="/memo">
+    Question:<br>
+    <textarea name="question" rows=2 cols=60></textarea> <br>
+    Answer:<br>
+    <textarea name="answer" rows=2 cols=60></textarea> <br>
+    <input type="submit" value="Add item"/>
+</form>
+{% endblock %}
