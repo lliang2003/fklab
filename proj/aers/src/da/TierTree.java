@@ -242,7 +242,8 @@ public class TierTree {
 		System.out.println("growing ... depth = "+treeDepth);
 		for (int i = 1; i <= treeDepth; ++i)
 			System.out.println("depth="+i+" count="+tiers[i].size());
-		int childrenThreshold = 10000;		// child trees with more candidates is outputed
+		// Child trees with more candidates is output.
+		int childrenThreshold = DA.getTreeThreshold(context.getConfiguration());
 		ArrayList<Integer> leaves = new ArrayList<Integer>(childrenThreshold * 3 / 2);
 		Path left = new Path(), right = new Path();
 		left.forward();
