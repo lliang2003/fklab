@@ -10,14 +10,31 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-// Generate patterns from original data.
+/**
+ * Generate item sets of limited length from original data.
+ * 
+ * @author fankai
+ */
 public class CountMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
 	public static Log log = LogFactory.getLog(SimpleCount.class);
-	private int maxItemSetLength;
+	private int initItemSetLength;
 	private int filterSize;
 
-	// Generate all item sets with limited length.
+	public void info(Context context) throws IOException {
+		log.info("working dir:" + context.getWorkingDirectory());
+		FileSplit split = (FileSplit) context.getInputSplit();
+		log.info("file:" + split.getPath());
+		log.info("length:" + split.getLength());
+		log.info("start:" + split.getStart());
+	}
+
+	/**
+	 * Generate all item sets with limited length from a transaction.
+	 * @param items	The transaction.
+	 * @param max	Maximum item set length.
+	 */
 	public static void gen(int[] items, int[] pos, int index, int max,
 			List<Integer> tmp, Context context) throws IOException,
 			InterruptedException {
@@ -38,10 +55,16 @@ public class CountMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
 
 	protected void setup(Context context) throws IOException,
 			InterruptedException {
-		maxItemSetLength = context.getConfiguration().getInt("count.max", 1);
-		filterSize = context.getConfiguration().getInt("apriori.filter", DA.defaultFilterSize);
+		info(context);
+		initItemSetLength = DA.getInitItemSetLength(context.getConfiguration());
+		filterSize = DA.getFilterSize(context.getConfiguration());
 	}
 
+	/**
+	 * Generate item sets from transactions no longer than FilterSize.
+	 * Each transaction consists of 1 or more items separated by spaces.
+	 * Items are positive integers sorted in numerical order. 
+	 */
 	protected void map(Object key, Text value, Context context)
 			throws IOException, InterruptedException {
 		String[] tokens = value.toString().split(" +");
@@ -49,11 +72,9 @@ public class CountMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
 			log.info("filter: "+value);
 			return;
 		}
-		int[] items = new int[tokens.length];
-		for (int i = 0; i < tokens.length; ++i)
-			items[i] = Integer.parseInt(tokens[i]);
+		int[] items = Util.intArray(tokens);
 		log.info("gen item sets from: "+Arrays.toString(items));
-		gen(items, new int[items.length], 0, maxItemSetLength,
+		gen(items, new int[items.length], 0, initItemSetLength,
 				new ArrayList<Integer>(), context);
 	}
 }

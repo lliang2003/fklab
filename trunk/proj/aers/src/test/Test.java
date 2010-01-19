@@ -23,20 +23,18 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class Test {
 	public static Log log = LogFactory.getLog(Test.class);
-	public static int num = 9;
 
 	public static class TestMapper extends Mapper<Object, Text, Text, Text> {
 		protected void setup(Context context) throws IOException,
 				InterruptedException {
-			log.info(context.getTaskAttemptID());
-			log.info(((FileSplit) context.getInputSplit()).getPath());
 			FileSplit split = (FileSplit) context.getInputSplit();
 //			context.write(new Text(context.getTaskAttemptID().toString()),
 //					new Text(split.getPath().toString() + " "
 //							+ split.getStart()));
 			context.write(new Text(context.getTaskAttemptID().toString()), new Text(context.getInputSplit().toString()));
-			context.write(new Text(""+num), new Text());
-			log.info(DistributedCache.getLocalCacheFiles(context.getConfiguration()));
+			for (Path p:DistributedCache.getLocalCacheFiles(context.getConfiguration())){
+				log.info("cache:"+p);
+			}
 		}
 
 		public void map(Object key, Text value, Context context)
@@ -62,8 +60,9 @@ public class Test {
 		job.setNumReduceTasks(1);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-		FileInputFormat.addInputPath(job, new Path("/tmp/fankai"));
-		FileInputFormat.addInputPath(job, new Path("/tmp/fankai"));
+		FileInputFormat.addInputPath(job, new Path("/dat/tmp"));
+		FileInputFormat.addInputPath(job, new Path("/dat/tmp"));
+		TextInputFormat.setMaxInputSplitSize(job, 256*1024);
 		for (Path p:FileInputFormat.getInputPaths(job))
 			System.out.println(p);
 		FileInputFormat f = new TextInputFormat();
@@ -71,12 +70,11 @@ public class Test {
 		for (InputSplit s: list) {
 			System.out.println(s);
 		}
-		num = new Date().hashCode();
-		System.out.println(num);
 		
 		FileSystem.get(conf).delete(new Path("/test-output"), true);
 		FileOutputFormat.setOutputPath(job, new Path("/test-output"));
-		DistributedCache.addCacheFile(new Path("/dat/tmp").toUri(), conf);
+		DistributedCache.addCacheFile(new Path("/dat/tmp").toUri(), job.getConfiguration());
+		DistributedCache.addCacheFile(new Path("/dat").toUri(), job.getConfiguration());
 		job.waitForCompletion(true);
 	}
 }

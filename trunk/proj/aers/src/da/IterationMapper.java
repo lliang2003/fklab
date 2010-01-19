@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -20,6 +21,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
 	public static Log log = LogFactory.getLog(IterationMapper.class);
 	TierTree tree;
+	int filterSize;
+	int depth;
 
 	public void info(Context context) throws IOException {
 		log.info("working dir:" + context.getWorkingDirectory());
@@ -27,14 +30,14 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 		log.info("file:" + split.getPath());
 		log.info("length:" + split.getLength());
 		log.info("start:" + split.getStart());
-
 	}
 
 	protected void setup(Context context) throws IOException,
 			InterruptedException {
 		info(context);
-		int depth = context.getConfiguration().getInt("depth", -1);
+		depth = context.getConfiguration().getInt("depth", -1);
 		tree = new TierTree(depth);
+		filterSize = DA.getFilterSize(context.getConfiguration());
 	}
 
 	protected void map(Object key, Text value, Context context)
@@ -49,7 +52,7 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 		int n = 0;
 		while (sc.hasNext()) {
 			String[] items = sc.nextLine().split(" +");
-			if (items.length > DA.defaultFilterSize)
+			if (items.length > filterSize)
 				continue;
 			// memInfo();
 			// log.info(n + "\tscan: " + Arrays.toString(items));
@@ -61,8 +64,9 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 
 	protected void cleanup(Context context) throws IOException,
 			InterruptedException {
-		int minsup = context.getConfiguration().getInt("minSupport", 3);
-		FileSystem fs = FileSystem.get(context.getConfiguration());
+		Configuration conf = context.getConfiguration();
+		int minsup = DA.getMinSupport(conf);
+		FileSystem fs = FileSystem.get(conf);
 
 		// for (Path path : DistributedCache.getLocalCacheFiles(context
 		// .getConfiguration())) {
@@ -70,7 +74,7 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 		// log.info("scaned " + path);
 		// }
 		log.info("begin scanning ...");
-		scan(new InputStreamReader(fs.open(new Path(DA.defaultInputPath))),
+		scan(new InputStreamReader(fs.open(new Path(DA.getInputPath(conf)))),
 				context);
 		// StringWriter sw = new StringWriter();
 		// tree.output(sw);
@@ -78,10 +82,10 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 		log.info("begin checking ...");
 		tree.check(minsup, context);
 		context.progress();
-		String tmpTreeFile = DA.treePathRoot + (tree.treeDepth + 1) + "/"
-				+ context.getTaskAttemptID();
-		String finalTreeFile = DA.treePathRoot + (tree.treeDepth + 1) + "/"
-				+ tmpTreeFile.split("_")[4];
+		if (depth >= DA.getMaxItemSetLength(conf)) return;
+		String treeDir = DA.getTreePath(conf, depth + 1);
+		String tmpTreeFile = treeDir + "/" + context.getTaskAttemptID();
+		String finalTreeFile = treeDir + "/" + tmpTreeFile.split("_")[4];
 		PrintWriter treeWriter = new PrintWriter(new OutputStreamWriter(fs
 				.create(new Path(tmpTreeFile))));
 		log.info("begin growing ...");

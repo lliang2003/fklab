@@ -1,11 +1,16 @@
 package da;
-
+/**
+ * Utility class.
+ * @author fankai
+ */
 public class Util {
-	public static int[] intArray(String[] items) {
-		int[] nums = new int[items.length];
+	/**
+	 * Convert a String array to a integer array.
+	 */
+	public static int[] intArray(String[] tokens) {
+		int[] nums = new int[tokens.length];
 		for (int i = 0; i < nums.length; ++i)
-			nums[i] = Integer.parseInt(items[i]);
+			nums[i] = Integer.parseInt(tokens[i]);
 		return nums;
 	}
-
 }
