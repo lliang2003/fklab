@@ -1,4 +1,5 @@
 package da;
+
 /**
  * Utility class.
  * @author fankai
@@ -13,4 +14,5 @@ public class Util {
 			nums[i] = Integer.parseInt(tokens[i]);
 		return nums;
 	}
+
 }

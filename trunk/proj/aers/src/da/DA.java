@@ -1,6 +1,6 @@
 package da;
 
-import java.util.Date;
+import java.util.Formatter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,33 +10,49 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-// Distributed Apriori.
+/**
+ * Main class of Distributed Apriori algorithm.
+ * 
+ * @author fankai
+ */
 public class DA {
 	public static Log log = LogFactory.getLog(DA.class);
 
-	public static String getInputPath(Configuration conf) {
-		return conf.get("input", "/dat/tmp");
+	public static String getDataPath(Configuration conf) {
+		return conf.get("input", "/dat/vaers.txt");
 	}
 
 	public static String getOutputPath(Configuration conf) {
-		return conf.get("output", "/apriori");
+		String root = conf.get("output", "/apriori");
+		int minsup = getMinSupport(conf), filter = getFilterSize(conf);
+		int nr = getCountReducerNum(conf);
+		Formatter fmt = new Formatter();
+		return root + fmt.format("-%d-%d-%d", minsup, filter, nr);
 	}
 
 	public static String getPatternPath(Configuration conf, int depth) {
-		return getOutputPath(conf) + "/fp/" + depth;
+		Formatter fmt = new Formatter();
+		return getOutputPath(conf) + fmt.format("/fp-%02d", depth);
 	}
 
 	public static String getTreePath(Configuration conf, int depth) {
-		return getOutputPath(conf) + "/tree/" + depth;
+		Formatter fmt = new Formatter();
+		return getOutputPath(conf) + fmt.format("/tree-%02d", depth);
+	}
+
+	public static int getMachineNum(Configuration conf) {
+		return conf.getInt("machine", 999);
 	}
 
 	public static int getMinSupport(Configuration conf) {
-		return conf.getInt("minsup", 9);
+		return conf.getInt("minsup", 3);
 	}
 
 	public static int getInitItemSetLength(Configuration conf) {
@@ -44,11 +60,17 @@ public class DA {
 	}
 
 	public static int getMaxItemSetLength(Configuration conf) {
-		return conf.getInt("max", 9);
+		return conf.getInt("maxlen", 99);
+	}
+
+	public static int getCountReducerNum(Configuration conf) {
+		if (getDataStartPoints(conf) == null)
+			return 1;
+		return conf.getInt("ncr", 49);
 	}
 
 	public static int getFilterSize(Configuration conf) {
-		return conf.getInt("filter", 9);
+		return conf.getInt("filter", 19);
 	}
 
 	public static int getTreeThreshold(Configuration conf) {
@@ -63,6 +85,21 @@ public class DA {
 		return conf.getInt("tsplit", 16);
 	}
 
+	public static String getDataStartPoints(Configuration conf) {
+		return conf.get("start");
+	}
+
+	public static String getDataEndPoints(Configuration conf) {
+		return conf.get("end");
+	}
+	
+	public static int getStartRound(Configuration conf) {
+		return conf.getInt("round", 0);
+	}
+
+	/**
+	 * Log information of memory.
+	 */
 	public static void memInfo() {
 		long fm = Runtime.getRuntime().freeMemory() / 1024 / 1024;
 		long tm = Runtime.getRuntime().totalMemory() / 1024 / 1024;
@@ -72,15 +109,17 @@ public class DA {
 	}
 
 	/**
-	 * Count and find item sets with limited length and generate candidate trees if needed.
-	 * @param conf	
+	 * Count and find item sets with limited length and generate candidate trees
+	 * if needed.
+	 * 
+	 * @param conf
 	 * @throws Exception
 	 */
 	public static void count(Configuration conf) throws Exception {
 		System.out.println("Count and initialization.");
 
 		int initLen = getInitItemSetLength(conf);
-		String input = getInputPath(conf);
+		String input = getDataPath(conf);
 		String output = getPatternPath(conf, initLen);
 		int csplit = getCountSplitSize(conf);
 
@@ -92,14 +131,26 @@ public class DA {
 		MaxInputFormat.setMaxInputSplitSize(job, csplit * 1024 * 1024);
 		job.setMapperClass(CountMapper.class);
 		job.setReducerClass(CountReducer.class);
-		job.setNumReduceTasks(1);
+		job.setPartitionerClass(CountPartitioner.class);
+		job.setNumReduceTasks(getCountReducerNum(conf));
 
 		FileInputFormat.addInputPath(job, new Path(input));
-		FileSystem.get(conf).delete(new Path(getOutputPath(conf)), true);
+		FileSystem.get(conf).delete(new Path(output), true);
 		FileOutputFormat.setOutputPath(job, new Path(output));
 		job.waitForCompletion(true);
 	}
 
+	/**
+	 * Do Apriori iteration at certain depth, generate frequent patterns of
+	 * length (depth) and candidate trees with depth of (depth+1).
+	 * 
+	 * Use map tasks only, no reduce task needed.
+	 * 
+	 * @param conf
+	 * @param depth
+	 * @return
+	 * @throws Exception
+	 */
 	public static boolean iterate(Configuration conf, int depth)
 			throws Exception {
 		System.out.println("Iteration depth = " + depth);
@@ -108,21 +159,6 @@ public class DA {
 		String output = getPatternPath(conf, depth);
 		int tsplit = getTreeSplitSize(conf);
 		conf.setInt("depth", depth);
-
-		if (fs.exists(new Path(input))) {
-			for (FileStatus status : fs.listStatus(new Path(input))) {
-				if (status.getLen() == 0
-						|| status.getPath().getName().toString().startsWith(
-								"attempt")) {
-					fs.delete(status.getPath(), true);
-				}
-			}
-		}
-		if (!fs.exists(new Path(input))
-				|| fs.listStatus(new Path(input)).length == 0) {
-			System.out.println("No more candidates.");
-			return false;
-		}
 
 		Job job = new Job(conf, "DA: Iteration depth = " + depth);
 		job.setJarByClass(DA.class);
@@ -134,8 +170,14 @@ public class DA {
 
 		MaxInputFormat.setMaxInputSplitSize(job, tsplit * 1024 * 1024);
 
-		DistributedCache.addCacheFile(new Path(getInputPath(conf)).toUri(),
-				conf);
+		if (fs.isFile(new Path(getDataPath(conf)))) {
+			DistributedCache.addCacheFile(new Path(getDataPath(conf)).toUri(),
+					job.getConfiguration());
+		} else {
+			for (FileStatus status : fs.listStatus(new Path(getDataPath(conf))))
+				DistributedCache.addCacheFile(status.getPath().toUri(), job
+						.getConfiguration());
+		}
 
 		FileInputFormat.addInputPath(job, new Path(input));
 		FileSystem.get(conf).delete(new Path(output), true);
@@ -143,33 +185,125 @@ public class DA {
 		return job.waitForCompletion(true);
 	}
 
-	public static void main(String[] args) throws Exception {
-		Configuration conf = new Configuration();
-		new GenericOptionsParser(conf, args);
-		
-		System.out.println("Distritubted Apriori");
-		System.out.println("input path:\t" + getInputPath(conf));
+	/**
+	 * Reorganize tree directory to reduce file numbers.
+	 */
+	public static boolean reorganize(Configuration conf, int depth)
+			throws Exception {
+		FileSystem fs = FileSystem.get(conf);
+		Path input = new Path(getTreePath(conf, depth));
+		System.out.println("Check tree directory:" + input);
+		long totalSize = 0;
+
+		for (FileStatus status : fs.listStatus(input)) {
+			if (!status.getPath().getName().toString().startsWith("tree-")
+					|| status.getLen() == 0) {
+				fs.delete(status.getPath(), true);
+			} else
+				totalSize += status.getLen();
+		}
+		if (fs.listStatus(input).length == 0) {
+			System.out.println("No more candidates.");
+			return false;
+		}
+		int fcnt = fs.listStatus(input).length;
+		System.out.println("file count:" + fcnt + "\tavg size:" + totalSize
+				/ fcnt + "\ttotal size:" + totalSize);
+
+		if (fcnt > getMachineNum(conf) * 4
+				&& totalSize / fcnt < getTreeSplitSize(conf) * 1024 * 1024 / 4) {
+
+			FileStatus[] fss = fs.listStatus(input);
+			StringBuilder sb = new StringBuilder(fss[0].getPath().getName());
+			long sum = fss[0].getLen();
+			for (int i = 1; i < fss.length; ++i) {
+				if (sum + fss[i].getLen() < getTreeSplitSize(conf) * 1024 * 1024) {
+					sum += fss[i].getLen();
+					sb.append(",");
+				} else {
+					sb.append(";");
+				}
+				sb.append(fss[i].getPath().getName());
+			}
+			conf.set("treefiles", sb.toString());
+
+			System.out.println("Reorganize tree directory");
+			Job job = new Job(conf, "DA: Reorganize tree directory depth = "
+					+ depth);
+			job.setJarByClass(DA.class);
+			job.setOutputKeyClass(Text.class);
+			job.setOutputValueClass(Text.class);
+			job.setInputFormatClass(TextInputFormat.class);
+			job.setMapperClass(ReorgnizeMapper.class);
+			job.setNumReduceTasks(0);
+
+			Path old = new Path(input + ".old");
+			fs.rename(input, old);
+			fs.mkdirs(input);
+			job.getConfiguration().set("oldtreedir", old.toString());
+			job.getConfiguration().set("newtreedir", input.toString());
+
+			FileInputFormat.addInputPath(job, old);
+			FileOutputFormat.setOutputPath(job, new Path(getOutputPath(conf)
+					+ "/tmp"));
+
+			return job.waitForCompletion(true);
+		}
+		return true;
+	}
+
+	public static void da(Configuration conf) throws Exception {
+
+		System.out.println("Distritubted Apriori " + getOutputPath(conf));
+		System.out.println("input path:\t" + getDataPath(conf));
 		System.out.println("output path:\t" + getOutputPath(conf));
+		System.out.println("machine count:\t" + getMachineNum(conf));
 		System.out.println("min support:\t" + getMinSupport(conf));
 		System.out.println("init itemset length:\t"
 				+ getInitItemSetLength(conf));
 		System.out.println("max itemset length:\t" + getMaxItemSetLength(conf));
-		System.out.println("filter size:\t" + getFilterSize(conf));
+		System.out.println("filter transaction size:\t" + getFilterSize(conf));
 		System.out.println("tree size threshold:\t" + getTreeThreshold(conf));
-		System.out.println("count split size(MB):\t" + getCountSplitSize(conf));
 		System.out.println("tree split size(MB):\t" + getTreeSplitSize(conf));
+		System.out.println("count split size(MB):\t" + getCountSplitSize(conf));
+		System.out
+				.println("count reducer number:\t" + getCountReducerNum(conf));
+		System.out.println("data start points:\t" + getDataStartPoints(conf));
+		System.out.println("data end points:\t" + getDataEndPoints(conf));
+		System.out.println("start round:\t" + getStartRound(conf));
 		System.out.println();
 
-		long start = new Date().getTime();
-		count(conf);
-		System.out.println("cost " + (new Date().getTime() - start) + " ms");
-		int depth = getInitItemSetLength(conf) + 1;
+
+		long start = System.currentTimeMillis();
+		if (getStartRound(conf) == 0) {
+			FileSystem.get(conf).delete(new Path(getOutputPath(conf)), true);
+			count(conf);
+		}
+		System.out.printf("cost %d ms\n", System.currentTimeMillis() - start);
+
+		int depth = Math.max(getInitItemSetLength(conf) + 1, getStartRound(conf));
 		for (; depth <= getMaxItemSetLength(conf); ++depth) {
-			start = new Date().getTime();
-			boolean success = iterate(conf, depth);
-			System.out.println("cost " + (new Date().getTime() - start) + " ms");
+			long istart = System.currentTimeMillis();
+			boolean success = reorganize(conf, depth) && iterate(conf, depth);
+			long iend = System.currentTimeMillis();
+			System.out.printf("cost %d ms\n", iend - istart);
 			if (!success)
 				break;
+		}
+		long end = System.currentTimeMillis();
+		System.out
+				.printf("cost %f minutes in total\n", (end - start) / 60000.0);
+
+	}
+
+	public static void main(String[] args) {
+		Configuration conf = new Configuration();
+		new GenericOptionsParser(conf, args);
+		try {
+			da(conf);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

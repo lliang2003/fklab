@@ -2,7 +2,6 @@ package da;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -18,7 +17,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
  * @author fankai
  */
 public class CountMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
-	public static Log log = LogFactory.getLog(SimpleCount.class);
+	public static Log log = LogFactory.getLog(CountMapper.class);
 	private int initItemSetLength;
 	private int filterSize;
 
@@ -73,7 +72,7 @@ public class CountMapper extends Mapper<Object, Text, ItemSet, IntWritable> {
 			return;
 		}
 		int[] items = Util.intArray(tokens);
-		log.info("gen item sets from: "+Arrays.toString(items));
+//		log.info("gen item sets from: "+Arrays.toString(items));
 		gen(items, new int[items.length], 0, initItemSetLength,
 				new ArrayList<Integer>(), context);
 	}

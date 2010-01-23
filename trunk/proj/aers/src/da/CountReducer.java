@@ -12,7 +12,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
 /**
- * Count occurence of item sets and output frequent ones, then 
+ * Count occurrence of item sets and output frequent ones, then 
  * generate candidate trees if needed(initLen < maxLen).
  * @author fankai
  */
@@ -34,12 +34,17 @@ public class CountReducer extends
 			tree = new TierTree(initLen);
 	}
 
+	/**
+	 * Aggregate count, Write out frequent patterns, and build count tree if needed.
+	 */
 	public void reduce(ItemSet key, Iterable<IntWritable> values,
 			Context context) throws IOException, InterruptedException {
 		int count = 0;
 		for (IntWritable cnt : values) {
 			count += cnt.get();
 		}
+//		log.info(key+"\t:\t"+count);
+		context.progress();
 		if (count < minSupport)
 			return;
 		context.write(key, new IntWritable(count));
@@ -48,10 +53,13 @@ public class CountReducer extends
 			return;
 		if (maxLen > initLen) {
 			tree.addPath(key, count);
-			log.info("add path " + key);
+//			log.info("add path " + key);
 		}
 	}
 
+	/**
+	 * Generate candidate trees if needed.
+	 */
 	protected void cleanup(Context context) throws IOException,
 			InterruptedException {
 		if (maxLen <= initLen)
@@ -60,7 +68,7 @@ public class CountReducer extends
 		String treeDir = DA.getTreePath(context.getConfiguration(),
 				initLen + 1);
 		String tmpTreeFile = treeDir + "/" + context.getTaskAttemptID();
-		String finalTreeFile = treeDir + "/" + tmpTreeFile.split("_")[4];
+		String finalTreeFile = treeDir + "/tree" + tree.getId()+"-"+tmpTreeFile.split("_")[4];
 		PrintWriter treeWriter = new PrintWriter(new OutputStreamWriter(fs
 				.create(new Path(tmpTreeFile))));
 		log.info("gen candidate trees ...");
