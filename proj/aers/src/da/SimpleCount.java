@@ -11,45 +11,22 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+/**
+ * This class calculate PRR for a data set using simple count methods.
+ * The first map-reduce round count patterns and aggregate them by drugs.
+ * The second map-reduce round aggregate them by reactions and calculate PRR values. 
+
+ * @author fankai
+ */
 public class SimpleCount {
 	public static Log log = LogFactory.getLog(SimpleCount.class);
 
-	public static class GenInputFormat extends TextInputFormat {
-		protected long computeSplitSize(long blockSize, long minSize, long maxSize) {
-			return 1024*1024;
-		}
-	}
-	
-	public static class DrugPartitioner extends
-			Partitioner<ItemSet, Object> {
-		public int getPartition(ItemSet key, Object value,
-				int numPartitions) {
-			int h = key.drugHashCode();
-			if (h == 0)
-				h = key.hashCode();
-			return (h & Integer.MAX_VALUE) % numPartitions;
-		}
-	}
-
-	public static class ReactionPartitioner extends
-			Partitioner<ItemSet, Object> {
-		public int getPartition(ItemSet key, Object value,
-				int numPartitions) {
-			int h = key.reactionHashCode();
-			if (h == 0)
-				h = key.hashCode();
-			return (h & Integer.MAX_VALUE) % numPartitions;
-		}
-	}
-
-	// Count occurence and aggregate drug pattern count.  
+	/** Count occurrence and aggregate drug pattern count. */  
 	public static class DrugAggReducer extends
 			Reducer<ItemSet, IntWritable, ItemSet, Text> {
 		int maxLength;
@@ -85,44 +62,6 @@ public class SimpleCount {
 		}
 	}
 
-	public static class AggMapper extends
-			Mapper<Object, Text, ItemSet, Text> {
-		protected void map(Object key, Text value, Context context)
-				throws IOException, InterruptedException {
-			String[] tokens = value.toString().split("\t");
-			context.write(new ItemSet(tokens[0]), new Text(tokens[1]));
-		}
-	}
-
-	// Aggregate reaction pattern count and calculate PRR value.
-	public static class AggAndCalcReducer extends
-			Reducer<ItemSet, Text, ItemSet, Text> {
-		int total;
-		HashMap<String, String> reactionCount = new HashMap<String, String>();
-
-		protected void setup(Context context) throws IOException,
-				InterruptedException {
-			total = context.getConfiguration().getInt("total", 1);
-		}
-
-		public void reduce(ItemSet key, Iterable<Text> values, Context context)
-				throws IOException, InterruptedException {
-			String val = values.iterator().next().toString();
-			if (!key.hasDrug()) {
-				// This is a reaction pattern, save its count in hashmap.
-				log.info("add " + reactionCount.size() + "th reaction pattern:" + key);
-				reactionCount.put(key.toString(), val);
-			} else {
-				ItemSet rset = key.reactionSet();
-				int rcnt = Integer.parseInt(reactionCount.get(rset.toString()));
-				int pcnt = Integer.parseInt(val.split(" ")[0]);
-				int dcnt = Integer.parseInt(val.split(" ")[1]);
-				double prr = (double)total*pcnt/dcnt/rcnt;
-				context.write(key, new Text(val+" "+rcnt+" "+prr));
-			}
-		}
-	}
-
 	public static void initAndDrugAgg() throws Exception {
 		Configuration conf = new Configuration();
 		conf.setInt("filterSize", 10);
@@ -132,7 +71,8 @@ public class SimpleCount {
 		job.setJarByClass(SimpleCount.class);
 		job.setOutputKeyClass(ItemSet.class);
 		job.setOutputValueClass(IntWritable.class);
-		job.setInputFormatClass(GenInputFormat.class);
+		job.setInputFormatClass(TextInputFormat.class);
+		TextInputFormat.setMaxInputSplitSize(job, 1024*1024);
 		job.setMapperClass(CountMapper.class);
 		job.setReducerClass(DrugAggReducer.class);
 		job.setPartitionerClass(DrugPartitioner.class);

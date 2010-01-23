@@ -10,11 +10,24 @@ import java.util.List;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
+/**
+ * This class represent an item set which can be serialized.
+ * 
+ * Items should be stored in numerical order.
+ * When compared to another item set, the length is first
+ * compared, then each numerical item is compared in order.
+ * 
+ * An item less than 1000000 represents a drug, in other case it represents a reaction.
+ *  
+ * @author fankai
+ *
+ */
 public class ItemSet implements WritableComparable<Object> {
 	public int[] _items = null;
 
+	// This construction function is used by hadoop.
 	public ItemSet() {
-	} // This construction function is used by hadoop.
+	} 
 
 	// Use items directly.
 	public ItemSet(int[] items) {
@@ -84,6 +97,7 @@ public class ItemSet implements WritableComparable<Object> {
 		return new ItemSet(drugs);
 	}
 
+	@Override
 	public void readFields(DataInput in) throws IOException {
 		int size = in.readInt();
 		_items = new int[size];
@@ -112,15 +126,14 @@ public class ItemSet implements WritableComparable<Object> {
 			out.writeInt(item);
 	}
 
+	@Override
 	public String toString() {
 		return Arrays.toString(_items);
 	}
 
 	public ItemSet(String str) {
 		String[] tokens = str.substring(1, str.length() - 1).split(", ");
-		_items = new int[tokens.length];
-		for (int i = 0; i < _items.length; ++i)
-			_items[i] = Integer.parseInt(tokens[i]);
+		_items = Util.intArray(tokens);
 	}
 
 	public int compareTo(Object o) {
