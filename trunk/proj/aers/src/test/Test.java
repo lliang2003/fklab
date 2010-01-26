@@ -1,8 +1,11 @@
 package test;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,12 +31,26 @@ public class Test {
 		protected void setup(Context context) throws IOException,
 				InterruptedException {
 			FileSplit split = (FileSplit) context.getInputSplit();
-//			context.write(new Text(context.getTaskAttemptID().toString()),
-//					new Text(split.getPath().toString() + " "
-//							+ split.getStart()));
-			context.write(new Text(context.getTaskAttemptID().toString()), new Text(context.getInputSplit().toString()));
-			for (Path p:DistributedCache.getLocalCacheFiles(context.getConfiguration())){
-				log.info("cache:"+p);
+			// context.write(new Text(context.getTaskAttemptID().toString()),
+			// new Text(split.getPath().toString() + " "
+			// + split.getStart()));
+			context.write(new Text(context.getTaskAttemptID().toString()),
+					new Text(context.getInputSplit().toString()));
+			for (Path p : DistributedCache.getLocalCacheFiles(context
+					.getConfiguration())) {
+				log.info("cache:" + p);
+				File f = new File(p.toString());
+				if (f.isDirectory()) {
+					log.info("dir:");
+					log.info(Arrays.toString(f.listFiles()));
+				} else {
+					log.info(f.length());
+					Scanner sc = new Scanner(new FileReader(p.toString()));
+					while (sc.hasNext()) {
+						log.info(sc.nextLine());
+						break;
+					}
+				}
 			}
 		}
 
@@ -62,19 +79,21 @@ public class Test {
 		job.setOutputValueClass(Text.class);
 		FileInputFormat.addInputPath(job, new Path("/dat/tmp"));
 		FileInputFormat.addInputPath(job, new Path("/dat/tmp"));
-		TextInputFormat.setMaxInputSplitSize(job, 256*1024);
-		for (Path p:FileInputFormat.getInputPaths(job))
+		TextInputFormat.setMaxInputSplitSize(job, 256 * 1024);
+		for (Path p : FileInputFormat.getInputPaths(job))
 			System.out.println(p);
 		FileInputFormat f = new TextInputFormat();
 		List<InputSplit> list = f.getSplits(job);
-		for (InputSplit s: list) {
+		for (InputSplit s : list) {
 			System.out.println(s);
 		}
-		
+
 		FileSystem.get(conf).delete(new Path("/test-output"), true);
 		FileOutputFormat.setOutputPath(job, new Path("/test-output"));
-		DistributedCache.addCacheFile(new Path("/dat/tmp").toUri(), job.getConfiguration());
-		DistributedCache.addCacheFile(new Path("/dat").toUri(), job.getConfiguration());
+		DistributedCache.addCacheFile(new Path("/dat/vaers.txt").toUri(), job
+				.getConfiguration());
+		DistributedCache.addCacheFile(new Path("/dat").toUri(), job
+				.getConfiguration());
 		job.waitForCompletion(true);
 	}
 }
