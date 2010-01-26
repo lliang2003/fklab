@@ -81,7 +81,6 @@ alias unsetproxy='export http_proxy=""'
 alias starttomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
 alias stoptomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
 alias mountd='sudo mount -t cofs -o uid=kevin,gid=kevin cofs0 /mnt/d'
-alias mounte='sudo mount -t cofs -o uid=fankai,gid=fankai cofs1 /mnt/f'
 alias mountf='sudo mount -t cofs -o uid=fankai,gid=fankai cofs1 /mnt/f'
 
 alias hdfs='bin/hadoop fs'
