@@ -1,11 +1,12 @@
 package apriori1;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.io.FileWriter;
 
+@SuppressWarnings("unused")
 public class Apriori {
 
 	public DataBase db;
@@ -46,13 +47,14 @@ public class Apriori {
 		Apriori.flag = true;
 		System.out.println(path+" minsup="+minsup+" flag="+flag);
 		new Apriori(db).run();
-		Apriori.flag = false;
-		System.out.println(path+" minsup="+minsup+" flag="+flag);
-		new Apriori(db).run();
+//		Apriori.flag = false;
+//		System.out.println(path+" minsup="+minsup+" flag="+flag);
+//		new Apriori(db).run();
 	}
 
 	public static void main(String[] args) {
 		try {
+			long start = System.currentTimeMillis();
 //			test("f:/share/dataset/T10I4D100K(From IBM Generator).dat", 100);
 //			test("f:/share/dataset/T10I4D100K(From IBM Generator).dat", 50);
 //			test("f:/share/dataset/T10I4D100K(From IBM Generator).dat", 20);
@@ -62,7 +64,8 @@ public class Apriori {
 //			test("f:/share/dataset/mushroom.dat", 2000);
 //			test("f:/share/dataset/mushroom.dat", 1500);
 //			test("f:/share/dataset/mushroom.dat", 1000);
-			test("f:/share/dataset/chess.dat", 3000);
+			test("f:/share/dataset/chess.dat", 2500);
+			System.out.println("cost:"+(System.currentTimeMillis()-start));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
