@@ -70,7 +70,7 @@ public class DA {
 	}
 
 	public static int getFilterSize(Configuration conf) {
-		return conf.getInt("filter", 19);
+		return conf.getInt("filter", 999);
 	}
 
 	public static int getTreeThreshold(Configuration conf) {
@@ -181,6 +181,7 @@ public class DA {
 
 		FileInputFormat.addInputPath(job, new Path(input));
 		FileSystem.get(conf).delete(new Path(output), true);
+		FileSystem.get(conf).delete(new Path(getTreePath(conf, depth+1)), true);
 		FileOutputFormat.setOutputPath(job, new Path(output));
 		return job.waitForCompletion(true);
 	}
@@ -199,8 +200,10 @@ public class DA {
 			if (!status.getPath().getName().toString().startsWith("tree-")
 					|| status.getLen() == 0) {
 				fs.delete(status.getPath(), true);
-			} else
+			} else {
+				fs.setReplication(status.getPath(), (short)1);
 				totalSize += status.getLen();
+			}
 		}
 		if (fs.listStatus(input).length == 0) {
 			System.out.println("No more candidates.");

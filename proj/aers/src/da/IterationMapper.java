@@ -42,6 +42,7 @@ public class IterationMapper extends Mapper<Object, Text, ItemSet, IntWritable> 
 	 * @throws IOException
 	 */
 	public void info(Context context) throws IOException {
+		DA.memInfo();
 		log.info("working dir:" + context.getWorkingDirectory());
 		FileSplit split = (FileSplit) context.getInputSplit();
 		log.info("file:" + split.getPath());
