@@ -10,35 +10,49 @@ import java.util.Scanner;
 
 // A special type of count tree storing each level in a array called tier. 
 public class TierTree {
+	public static int scount = 0;
+
+	public static int nfp = 0;
 	
+	public static boolean apruning = true;
+	public static boolean bpruning = false;
+
 	// Each item represents a node of the count tree.
 	public static class Item implements Comparable<Item> {
 		public Item(int id, int num) {
 			this.id = id;
 			this.num = num;
 		}
+
 		public Item(int id) {
 			this(id, 0);
 		}
+
 		public int compareTo(Item item) {
 			return id - item.id;
 		}
+
 		int id;
-		/* For leaves indicate the count of the pattern. 
-		 * For internal nodes indicate the tail index of children.
+
+		/*
+		 * For leaves indicate the count of the pattern. For internal nodes
+		 * indicate the tail index of children.
 		 */
 		int num;
+
 		public String toString() {
-			return id+"["+num+"]";
+			return id + "[" + num + "]";
 		}
 	}
 
 	// A tier represents a level of the TierTree.
 	public static class Tier extends ArrayList<Item> {
 		private static final long serialVersionUID = 8683452581122892189L;
+
 		public void trimToSize(int newsize) {
 			this.removeRange(newsize, this.size());
 		}
+
 		public Item last() {
 			return get(size() - 1);
 		}
@@ -46,21 +60,23 @@ public class TierTree {
 
 	public class Path {
 		public int[] pos = new int[treeDepth + 1];
+
 		public Item item(int dp) {
 			return get(dp, pos[dp]);
 		}
-		// Move the path forward on a certain depth. 
+
+		// Move the path forward on a certain depth.
 		public void forward(int dp) {
 			// Should not move the path out of the right tree border.
-			if (pos[dp] == tiers[dp].size() - 1)
-				return;
+			if (pos[dp] == tiers[dp].size() - 1) return;
 			pos[dp]++;
 			for (int d = dp; d < treeDepth; ++dp) {
 				pos[d + 1] = get(d, pos[d] - 1).num;
 			}
-			// Using >= instead of ==, because in check() function this segment may has
-			// been shrunk and thus make > possible. 
-			for (int d = dp; d > 0 && pos[d] >= item(d-1).num; --d) {
+			// Using >= instead of ==, because in check() function this segment
+			// may has
+			// been shrunk and thus make > possible.
+			for (int d = dp; d > 0 && pos[d] >= item(d - 1).num; --d) {
 				pos[d - 1]++;
 			}
 		}
@@ -74,13 +90,15 @@ public class TierTree {
 		}
 
 		public boolean endOfSegment(int dp) {
-			return item(dp-1).num == pos[dp] + 1;
+			return item(dp - 1).num == pos[dp] + 1;
 		}
 	}
 
-	public int treeDepth; 	// depth of the tree
-	int[][] cpos; 		// the check list for candidate
-	Tier[] tiers; 		// has depth+1 tiers, the top one is not used
+	public int treeDepth; // depth of the tree
+
+	int[][] cpos; // the check list for candidate
+
+	Tier[] tiers; // has depth+1 tiers, the top one is not used
 
 	// The first tier and the first item of each tier is not used for items.
 	TierTree(int depth) {
@@ -91,7 +109,7 @@ public class TierTree {
 			tiers[dp].add(new Item(-1, 1));
 		}
 		tiers[0].add(new Item(-1));
-		
+
 		cpos = new int[depth + 1][];
 		for (int d = 0; d <= depth; ++d) {
 			cpos[d] = new int[d + 1];
@@ -99,10 +117,8 @@ public class TierTree {
 	}
 
 	boolean checkValid(int dp, int childId) {
-		if (dp >= 0)
-			return true;
-		if (dp == 0)
-			return true;
+		if (!apruning) return true;
+		if (dp == 0) return true;
 		// println("checkValid "+dp+" "+Arrays.toString(cpos[dp-1])+" "+id);
 		for (int i = 0; i < dp; ++i) {
 			if (cpos[dp - 1][i] == -1) {
@@ -110,32 +126,31 @@ public class TierTree {
 				return true;
 			}
 			int index = findInChildren(dp - 1, cpos[dp - 1][i], childId);
+			TierTree.scount += 1;
 			if (index > 0) {
 				cpos[dp][i + 1] = index;
 			} else if ((i == dp - 1 || cpos[dp - 1][i + 1] == -1)
 					&& childId > get(dp, get(dp - 1, cpos[dp - 1][i]).num - 1).id) {
 				cpos[dp][i + 1] = -1;
 				return true;
-			} else
-				return false;
+			} else return false;
 		}
 		return true;
 	}
 
-	
 	// unique for all partial trees, defined by the items of the left border
 	public int hashCode() {
 		StringBuilder sb = new StringBuilder();
 		for (int d = 1; d <= treeDepth; ++d) {
 			sb.append(get(d, 1).id);
 			sb.append(",");
-			if (tiers[d].size() > 1)
-				break;
+			if (tiers[d].size() > 1) break;
 		}
 		return sb.toString().hashCode();
 	}
 
-	// Search a sorted segment for an item, return its index or minus number if not found.
+	// Search a sorted segment for an item, return its index or minus number if
+	// not found.
 	int binarySearch(Tier tier, int fromIndex, int toIndex, int key) {
 		// println("bs "+fromIndex+" "+toIndex+" "+key);
 		int low = fromIndex;
@@ -143,12 +158,9 @@ public class TierTree {
 		while (low <= high) {
 			int mid = (low + high) >>> 1;
 			int midVal = tier.get(mid).id;
-			if (midVal < key)
-				low = mid + 1;
-			else if (midVal > key)
-				high = mid - 1;
-			else
-				return mid; // key found
+			if (midVal < key) low = mid + 1;
+			else if (midVal > key) high = mid - 1;
+			else return mid; // key found
 		}
 		return -(low + 1); // key not found.
 	}
@@ -159,25 +171,23 @@ public class TierTree {
 		return binarySearch(tiers[tierIndex + 1], left, right, id);
 	}
 
-
 	// Scan a transaction in the database and add counts for the item sets.
 	public void scan(int[] tr) {
 		// println("scan: "+Arrays.toString(tr));
 		scan(tr, 0, 1, 1, tiers[1].size());
 	}
+
 	public void scan(int[] tr, int start, int dp, int fromIndex, int toIndex) {
 		// System.out.printf("scan %s start=%d depth=%d from:%d to:%d\n",
 		// Arrays.toString(tr), start, d, fromIndex, toIndex);
 		for (int i = start; i < tr.length - treeDepth + dp; ++i) {
 			int index = binarySearch(tiers[dp], fromIndex, toIndex, tr[i]);
 			if (index < 0) {
-				// The item in fromIndex is not larger than next item. 
-				fromIndex = -index-1;
-				if (fromIndex > toIndex)
-					break;
-				else
-					continue;
-			}				
+				// The item in fromIndex is not larger than next item.
+				fromIndex = -index - 1;
+				if (fromIndex > toIndex) break;
+				else continue;
+			}
 			Item item = get(dp, index);
 			if (dp == treeDepth) {
 				item.num += 1;
@@ -197,8 +207,7 @@ public class TierTree {
 	}
 
 	// Write the candidate tree which is not instantiated in memory.
-	public void writeCandidateTree(Path left, Path right, Writer treeWriter, List<Integer> leaves)
-			throws IOException {
+	public void writeCandidateTree(Path left, Path right, Writer treeWriter, List<Integer> leaves) throws IOException {
 		for (int dp = 1; dp <= treeDepth; ++dp) {
 			boolean newSegment = false;
 			for (int i = left.pos[dp], pi = left.pos[dp - 1]; i <= right.pos[dp]; ++i) {
@@ -230,14 +239,13 @@ public class TierTree {
 
 	// Grow new candidates, output multiple new trees.
 	public void grow(Writer treeWriter) throws IOException {
-		int threshold = 10;		// child trees with more candidates is outputed
+		int threshold = 10; // child trees with more candidates is outputed
 		ArrayList<Integer> leaves = new ArrayList<Integer>(threshold * 3 / 2);
 		Path left = new Path(), right = new Path();
 		left.forward();
 		right.forward();
 		grow(0, left, right, treeWriter, leaves, threshold);
-		if (!leaves.isEmpty())
-			writeCandidateTree(left, right, treeWriter, leaves);
+		if (!leaves.isEmpty()) writeCandidateTree(left, right, treeWriter, leaves);
 	}
 
 	public void grow(int dp, Path left, Path right, Writer treeWriter, List<Integer> leaves, int threshold)
@@ -253,14 +261,11 @@ public class TierTree {
 			// Process each child, invalid items is marked with -2.
 			for (int p = start; p < end; ++p) {
 				Item child = get(dp + 1, p);
-				if (item.id == -2 || !checkValid(dp, child.id))
-					child.id = -2;
+				if (item.id == -2 || !checkValid(dp, child.id)) child.id = -2;
 				grow(dp + 1, left, right, treeWriter, leaves, threshold);
-				if (child.id >= 0)
-					cnt++;
+				if (child.id >= 0) cnt++;
 			}
-			if (cnt == 0)
-				item.id = -2;
+			if (cnt == 0) item.id = -2;
 		} else {
 			// last tier
 			boolean hasCandidate = false;
@@ -269,25 +274,53 @@ public class TierTree {
 			for (int p = start; p < end; ++p) {
 				Item sib = get(dp, p);
 				if (item.id != -2 && checkValid(dp, sib.id)) {
-					leaves.add(sib.id);
-					hasCandidate = true;
+					int[] tmp = new int[treeDepth+1];
+					for (int i = 0; i < treeDepth; ++i) {
+						tmp[i] = right.item(i + 1).id;
+					}
+					tmp[treeDepth] = sib.id;
+					if (checkCandidate(tmp)) {
+						leaves.add(sib.id);
+						hasCandidate = true;
+					}
 				}
 			}
-			if (hasCandidate)
-				item.num = leaves.size(); // use as candidate count
-			else
-				item.id = -2;
-				
+			if (hasCandidate) item.num = leaves.size(); // use as candidate
+			// count
+			else item.id = -2;
+
 			if (leaves.size() > threshold) {
 				writeCandidateTree(left, right, treeWriter, leaves);
 				left.clone(right);
 				leaves.clear();
 			}
-			// Make sure the left path indicate a valid candidate. 
-			if (leaves.isEmpty())
-				left.forward();
+			// Make sure the left path indicate a valid candidate.
+			if (leaves.isEmpty()) left.forward();
 			right.forward();
 		}
+	}
+
+	public boolean contain(int[] items) {
+		int index = 1;
+		for (int i = 0; i < items.length; ++i) {
+			index = findInChildren(i, index, items[i]);
+			TierTree.scount += 1;
+			if (index < 0) return false;
+		}
+		return true;
+	}
+
+	public boolean checkCandidate(int[] tmp) {
+		if (!bpruning) return true;
+		int[] items = new int[treeDepth - 1];
+		for (int i = 0; i < treeDepth-1; ++i)
+			items[i] = tmp[i+1];
+		if (!contain(items)) return false;
+		for (int i = 0; i < treeDepth-1; ++i) {
+			items[i] = tmp[i];
+			if (!contain(items)) return false;
+		}
+		return true;
 	}
 
 	// Eliminate infrequent item sets.
@@ -306,6 +339,7 @@ public class TierTree {
 				for (int i = 1; i <= treeDepth; ++i)
 					fpWriter.write(get(i, path.pos[i]).id + " ");
 				fpWriter.write("]\tcount=" + get(treeDepth, pos).num + "\n");
+				TierTree.nfp += 1;
 				set(treeDepth, ++lastValidPos[treeDepth], item);
 			}
 			// set segments
@@ -313,15 +347,15 @@ public class TierTree {
 				// println("end of seg " + d);
 				path.item(d - 1).num = lastValidPos[d] + 1;
 				// System.out.println(Arrays.toString(path.pos));
-				if (get(d - 1, path.pos[d-1]).num > get(d - 1, lastValidPos[d - 1]).num)
-					set(d - 1, ++lastValidPos[d - 1], path.item(d - 1));
+				if (get(d - 1, path.pos[d - 1]).num > get(d - 1, lastValidPos[d - 1]).num) set(d - 1,
+						++lastValidPos[d - 1], path.item(d - 1));
 			}
 			// println(Arrays.toString(vpos));
 			// printTree();
 		}
 		// Trim each tier.
 		for (int d = 1; d <= treeDepth; ++d)
-			tiers[d].trimToSize(lastValidPos[d]+1);
+			tiers[d].trimToSize(lastValidPos[d] + 1);
 		return cnt;
 	}
 
@@ -384,6 +418,5 @@ public class TierTree {
 			System.out.println();
 		}
 	}
-
 
 }

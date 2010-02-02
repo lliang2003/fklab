@@ -72,6 +72,8 @@ public class Tree {
 						writer.write(count + "\n");
 						 writer.flush();
 					}
+					 Apriori.nfp += 1;
+					 Apriori.longest = pattern.length;
 					return 1;
 				}
 			}
@@ -79,10 +81,10 @@ public class Tree {
 
 		boolean checkValid(String[] itemArray) {
 			if (Apriori.flag) return true;
-			// µÚdepth+1¸ö±ØÈ»ÊÇµ±Ç°½ÚµãµÄ×Ó½Úµã
+			// ï¿½ï¿½depth+1ï¿½ï¿½ï¿½ï¿½È»ï¿½Çµï¿½Ç°ï¿½Úµï¿½ï¿½ï¿½Ó½Úµï¿½
 			if (!contain(itemArray, depth + 2))
 				return false;
-			// ÒÑ¾­ÊÇ¸ù½Úµã£¬ÒÑ¼ì²éËùÓÐÇé¿ö
+			// ï¿½Ñ¾ï¿½ï¿½Ç¸ï¿½Úµã£¬ï¿½Ñ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if (depth <= 0)
 				return true;
 			itemArray[depth] = item;
@@ -90,6 +92,7 @@ public class Tree {
 		}
 
 		boolean contain(String[] items, int start) {
+			Apriori.scount += 1;
 			if (!children.containsKey(items[start]))
 				return false;
 			if (start == items.length - 1)
@@ -109,7 +112,7 @@ public class Tree {
 				return children.get(items[start]).getCount(items, start + 1);
 		}
 
-		// ¶ÔÓÚ¾ßÓÐÏàÍ¬parentµÄÒ¶½ÚµãÁ½Á½Á¬½ÓÉú³ÉÐÂµÄºòÑ¡Ïî¼¯£¬²¢²âÊÔÐÂºòÑ¡Ïî¼¯µÄ×ÓÏî¼¯ÊÇ·ñ¶¼ÊÇÆµ·±Ïî¼¯
+		// ï¿½ï¿½ï¿½Ú¾ï¿½ï¿½ï¿½ï¿½ï¿½Í¬parentï¿½ï¿½Ò¶ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄºï¿½Ñ¡ï¿½î¼¯ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âºï¿½Ñ¡ï¿½î¼¯ï¿½ï¿½ï¿½ï¿½ï¿½î¼¯ï¿½Ç·ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½î¼¯
 		int grow() throws IOException {
 			int cnt = 0;
 			if (depth < treeDepth - 2) {
@@ -152,6 +155,8 @@ public class Tree {
 				for (String item : toBeDeleted) {
 					children.remove(item);
 				}
+			} else {
+				Apriori.scount += (depth+3)*(depth+2)/2;
 			}
 			return cnt;
 		}
@@ -270,7 +275,7 @@ public class Tree {
 		//System.out.print("depth=" + treeDepth + " checking ...");
 		int cnt = root.checkFrequency(new String[treeDepth], minsup, writer);
 		//System.out.println("\tfrequent node=" + cnt);
-		System.out.print(cnt+" ");
+//		System.out.println("depth="+treeDepth+"\tfreq count="+cnt);
 		return cnt;
 	}
 
@@ -283,7 +288,7 @@ public class Tree {
 		activeNodeCount = root.grow();
 		treeDepth++;
 //		System.out.println("depth=" + treeDepth + "\tcandidate="+ activeNodeCount);
-		System.out.println(activeNodeCount);
+//		System.out.println("depth="+treeDepth+"\tcandidate count="+activeNodeCount);
 		return activeNodeCount;
 	}
 
