@@ -12,11 +12,13 @@ import java.util.TreeMap;
 
 public class TierTreeTest extends util.Util {
 
-	public static void test1() {
+	public static void test1(String db, int minsup) {
+		System.out.println("file="+db+"\tminsup="+minsup);
 		long start = System.currentTimeMillis();
+		int longest = 0;
 		try {
-			int minsup = 3000;
-			String db = "f:/share/dataset/chess.dat";
+			TierTree.scount = 0;
+			TierTree.nfp = 0;
 			Map<Integer, Integer> count = new TreeMap<Integer, Integer>();
 			TierTree t = new TierTree(1);
 			Scanner sc = new Scanner(new FileReader(db));
@@ -43,9 +45,8 @@ public class TierTreeTest extends util.Util {
 			FileWriter fw = new FileWriter("tmptree2.txt");
 			t.grow(fw);
 			fw.close();
-
-			for (int d = 2; d < 15; ++d) {
-				println("depth=" + d);
+			for (int d = 2; d < 999; ++d) {
+	//			println("depth=" + d);
 				FileReader fr = new FileReader("tmptree" + d + ".txt");
 				fw = new FileWriter("tmptree" + (d + 1) + ".txt");
 				Scanner treeScanner = new Scanner(fr);
@@ -55,8 +56,8 @@ public class TierTreeTest extends util.Util {
 					nparts++;
 					t = new TierTree(d);
 					int n = 0;
-					while (n < 5 && treeScanner.hasNext()) {
-						++n;
+					while (treeScanner.hasNext()) {
+						
 						t.expand(new StringReader(treeScanner.nextLine()));
 					}
 					sc = new Scanner(new FileReader(db));
@@ -68,12 +69,12 @@ public class TierTreeTest extends util.Util {
 						t.scan(tr);
 					}
 					ncandidate += t.tiers[d].size();
-					t.printTree();
+					//t.printTree();
 					int nf = t.check(minsup, fpWriter);
 					nfp += nf;
-					if (nf > 0) t.grow(fw);
+					if (nf > 0) {t.grow(fw);longest = d;}
 				}
-				println(nparts + " " + ncandidate + " " + nfp);
+				//println(nparts + " " + ncandidate + " " + nfp);
 				if (nfp == 0)
 					break;
 				fw.close();
@@ -83,6 +84,8 @@ public class TierTreeTest extends util.Util {
 			e.printStackTrace();
 		}
 		println("cost:" + (System.currentTimeMillis() - start));
+		println("fp count:"+TierTree.nfp+"\tlongest:"+longest);
+		println("op cost:"+TierTree.scount);
 	}
 
 	public static void test2() throws IOException {
@@ -113,8 +116,35 @@ public class TierTreeTest extends util.Util {
 
 	public static void main(String[] args) throws IOException {
 		// test2();
-		test1();
+//		test1("d:/desktop/mushroom.dat", 3000);
+//		test1("d:/desktop/mushroom.dat", 2000);
+//		test1("d:/desktop/mushroom.dat", 1000);
+//		test1("d:/desktop/mushroom.dat", 800);
+//		test1("d:/desktop/mushroom.dat", 500);
+//		test1("d:/desktop/T10I4D100K.dat", 100);
+//		test1("d:/desktop/T10I4D100K.dat", 80);
+//		test1("d:/desktop/T10I4D100K.dat", 50);
+//		test1("d:/desktop/T10I4D100K.dat",30);
+		test1("d:/desktop/T10I4D100K.dat",20);
+		test1("d:/desktop/T10I4D100K.dat",15);
+//		test1("d:/desktop/T40I10D100K.dat", 2000);
+//		test1("d:/desktop/T40I10D100K.dat", 1000);
+//		test1("d:/desktop/T40I10D100K.dat", 800);
+		TierTree.apruning = false;
+		TierTree.bpruning = true;
+//		test1("d:/desktop/mushroom.dat", 3000);
+//		test1("d:/desktop/mushroom.dat", 2000);
+//		test1("d:/desktop/mushroom.dat", 1000);
+//		test1("d:/desktop/mushroom.dat", 800);
+//		test1("d:/desktop/mushroom.dat", 500);
+//		test1("d:/desktop/T10I4D100K.dat", 100);
+//		test1("d:/desktop/T10I4D100K.dat", 80);
+//		test1("d:/desktop/T10I4D100K.dat", 50);
+//		test1("d:/desktop/T10I4D100K.dat",30);
+		test1("d:/desktop/T10I4D100K.dat",20);
+		test1("d:/desktop/T10I4D100K.dat",15);
+//		test1("d:/desktop/T40I10D100K.dat", 2000);
+//		test1("d:/desktop/T40I10D100K.dat", 1000);
+//		test1("d:/desktop/T40I10D100K.dat", 800);
 	}
-
-
 }
