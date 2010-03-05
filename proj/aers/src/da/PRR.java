@@ -13,19 +13,27 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 /**
  * Calculate PRR value, using Distributed Apriori to get pattern counts.
+ * 
  * @author fankai
  */
 public class PRR {
-	
+
 	public static String getAggPath(Configuration conf) {
-		return DA.getOutputPath(conf)+"/drugagg";
+		return DA.getOutputPath(conf) + "/drugagg";
 	}
+
 	public static String getPRRPath(Configuration conf) {
-		return DA.getOutputPath(conf)+"/prr";
-	}	
+		return DA.getOutputPath(conf) + "/prr";
+	}
+
 	public static int getReducerNum(Configuration conf) {
 		return conf.getInt("npr", 99);
 	}
+	
+	public static int getTotalCount(Configuration conf) {
+		return conf.getInt("total", 9999);
+	}
+
 	public static void aggDrug(Configuration conf) throws Exception {
 		System.out.println("PRR: Drug Aggregation");
 		Job job = new Job(conf, "PRR: Drug Aggregation");
@@ -39,8 +47,9 @@ public class PRR {
 		job.setNumReduceTasks(getReducerNum(conf));
 		FileSystem fs = FileSystem.get(conf);
 		String output = getAggPath(conf);
-		
-		for (FileStatus status: fs.listStatus(new Path(DA.getOutputPath(conf)))) {
+
+		for (FileStatus status : fs
+				.listStatus(new Path(DA.getOutputPath(conf)))) {
 			if (status.getPath().getName().startsWith("fp-"))
 				FileInputFormat.addInputPath(job, status.getPath());
 		}
@@ -48,7 +57,7 @@ public class PRR {
 		FileOutputFormat.setOutputPath(job, new Path(output));
 		job.waitForCompletion(true);
 	}
-	
+
 	public static void aggReactionAndCalc(Configuration conf) throws Exception {
 		System.out.println("PRR: Reaction Aggregation And PRR Calculation");
 		Job job = new Job(conf, "PRR: Reaction Aggregation And PRR Calculation");
@@ -65,17 +74,22 @@ public class PRR {
 		FileOutputFormat.setOutputPath(job, new Path(output));
 		job.waitForCompletion(true);
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
 		new GenericOptionsParser(conf, args);
 		DA.da(conf);
-		
-		System.out.println("Proportional Report Ratio Calculation.");
-		System.out.println("total cases:\t"+conf.getInt("total", 1));
 
+		System.out.println("Proportional Report Ratio Calculation.");
+		System.out.println("total cases:\t" + conf.getInt("total", 1));
+
+		long start = System.currentTimeMillis();
 		aggDrug(conf);
 		aggReactionAndCalc(conf);
+		long end = System.currentTimeMillis();
+		System.out.printf("cost %f minutes in aggregation and calculation\n",
+				(end - start) / 60000.0);
+
 	}
 
 }

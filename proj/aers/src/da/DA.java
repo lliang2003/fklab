@@ -1,5 +1,6 @@
 package da;
 
+import java.util.Arrays;
 import java.util.Formatter;
 
 import org.apache.commons.logging.Log;
@@ -26,11 +27,11 @@ public class DA {
 	public static Log log = LogFactory.getLog(DA.class);
 
 	public static String getDataPath(Configuration conf) {
-		return conf.get("input", "/dat/vaers.txt");
+		return conf.get("input", "/dat/T40.dat");
 	}
 
 	public static String getOutputPath(Configuration conf) {
-		String root = conf.get("output", "/apriori");
+		String root = conf.get("output", "/da");
 		int minsup = getMinSupport(conf), filter = getFilterSize(conf);
 		int nr = getCountReducerNum(conf);
 		Formatter fmt = new Formatter();
@@ -52,7 +53,7 @@ public class DA {
 	}
 
 	public static int getMinSupport(Configuration conf) {
-		return conf.getInt("minsup", 3);
+		return conf.getInt("minsup", 5);
 	}
 
 	public static int getInitItemSetLength(Configuration conf) {
@@ -60,12 +61,10 @@ public class DA {
 	}
 
 	public static int getMaxItemSetLength(Configuration conf) {
-		return conf.getInt("maxlen", 99);
+		return conf.getInt("maxlen", 3);
 	}
 
 	public static int getCountReducerNum(Configuration conf) {
-		if (getDataStartPoints(conf) == null)
-			return 1;
 		return conf.getInt("ncr", 49);
 	}
 
@@ -85,14 +84,6 @@ public class DA {
 		return conf.getInt("tsplit", 16);
 	}
 
-	public static String getDataStartPoints(Configuration conf) {
-		return conf.get("start");
-	}
-
-	public static String getDataEndPoints(Configuration conf) {
-		return conf.get("end");
-	}
-	
 	public static int getStartRound(Configuration conf) {
 		return conf.getInt("round", 0);
 	}
@@ -117,6 +108,13 @@ public class DA {
 	 */
 	public static void count(Configuration conf) throws Exception {
 		System.out.println("Count and initialization.");
+
+		if (getCountReducerNum(conf) > 1) {
+			int[] points = Sample.sample(conf);
+			conf.set("count.points", new ItemSet(points).toString());
+			System.out.println("Sample done, points:");
+			System.out.println(Arrays.toString(points));
+		} 
 
 		int initLen = getInitItemSetLength(conf);
 		String input = getDataPath(conf);
@@ -181,7 +179,8 @@ public class DA {
 
 		FileInputFormat.addInputPath(job, new Path(input));
 		FileSystem.get(conf).delete(new Path(output), true);
-		FileSystem.get(conf).delete(new Path(getTreePath(conf, depth+1)), true);
+		FileSystem.get(conf).delete(new Path(getTreePath(conf, depth + 1)),
+				true);
 		FileOutputFormat.setOutputPath(job, new Path(output));
 		return job.waitForCompletion(true);
 	}
@@ -201,7 +200,7 @@ public class DA {
 					|| status.getLen() == 0) {
 				fs.delete(status.getPath(), true);
 			} else {
-				fs.setReplication(status.getPath(), (short)1);
+				fs.setReplication(status.getPath(), (short) 1);
 				totalSize += status.getLen();
 			}
 		}
@@ -271,11 +270,8 @@ public class DA {
 		System.out.println("count split size(MB):\t" + getCountSplitSize(conf));
 		System.out
 				.println("count reducer number:\t" + getCountReducerNum(conf));
-		System.out.println("data start points:\t" + getDataStartPoints(conf));
-		System.out.println("data end points:\t" + getDataEndPoints(conf));
 		System.out.println("start round:\t" + getStartRound(conf));
 		System.out.println();
-
 
 		long start = System.currentTimeMillis();
 		if (getStartRound(conf) == 0) {
@@ -284,7 +280,8 @@ public class DA {
 		}
 		System.out.printf("cost %d ms\n", System.currentTimeMillis() - start);
 
-		int depth = Math.max(getInitItemSetLength(conf) + 1, getStartRound(conf));
+		int depth = Math.max(getInitItemSetLength(conf) + 1,
+				getStartRound(conf));
 		for (; depth <= getMaxItemSetLength(conf); ++depth) {
 			long istart = System.currentTimeMillis();
 			boolean success = reorganize(conf, depth) && iterate(conf, depth);
@@ -294,8 +291,8 @@ public class DA {
 				break;
 		}
 		long end = System.currentTimeMillis();
-		System.out
-				.printf("cost %f minutes in total\n", (end - start) / 60000.0);
+		System.out.printf("cost %f minutes in frequent pattern mining\n",
+				(end - start) / 60000.0);
 
 	}
 
