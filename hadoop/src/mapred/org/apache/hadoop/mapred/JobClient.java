@@ -757,6 +757,7 @@ public class JobClient extends Configured implements MRConstants, Tool  {
     JobID jobId = jobSubmitClient.getNewJobId();
     Path submitJobDir = new Path(getSystemDir(), jobId.toString());
     Path submitJarFile = new Path(submitJobDir, "job.jar");
+    System.out.println("JobDir="+submitJobDir);
     Path submitSplitFile = new Path(submitJobDir, "job.split");
     configureCommandLineOptions(job, submitJobDir, submitJarFile);
     Path submitJobFile = new Path(submitJobDir, "job.xml");
@@ -776,8 +777,10 @@ public class JobClient extends Configured implements MRConstants, Tool  {
     LOG.debug("Creating splits at " + fs.makeQualified(submitSplitFile));
     int maps;
     if (job.getUseNewMapper()) {
+        System.out.println("writeNewSplits");
       maps = writeNewSplits(context, submitSplitFile);
     } else {
+        System.out.println("writeOldSplits");
       maps = writeOldSplits(job, submitSplitFile);
     }
     job.set("mapred.job.split.file", submitSplitFile.toString());
@@ -907,6 +910,7 @@ public class JobClient extends Configured implements MRConstants, Tool  {
           rawSplit.setBytes(buffer.getData(), 0, buffer.getLength());
           rawSplit.setLocations(split.getLocations());
           rawSplit.write(out);
+          System.out.printf("file=%s start=%d length=%d",split.file, split.start, split.length);
         }
         serializer.close();
       }
