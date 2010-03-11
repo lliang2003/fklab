@@ -17,7 +17,7 @@
    limitations under the License.
 -->
 
-<project name="Hadoop" default="compile" 
+<project name="Hadoop" default="compile-core" 
    xmlns:ivy="antlib:org.apache.ivy.ant"> 
 
   <!-- Load all the default properties, and any the user wants    -->
@@ -242,7 +242,7 @@
   <!-- ====================================================== -->
   <!-- Stuff needed by all targets                            -->
   <!-- ====================================================== -->
-  <target name="init" depends="ivy-retrieve-common">
+  <target name="init">
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${build.classes}"/>
     <mkdir dir="${build.tools}"/>
@@ -284,6 +284,7 @@
       <mapper type="glob" from="*.template" to="*"/>
     </copy>
 
+    <!--
     <exec executable="sh">
        <arg line="src/saveVersion.sh ${version}"/>
     </exec>
@@ -291,6 +292,7 @@
    <exec executable="sh">
        <arg line="src/fixFontsPath.sh ${src.docs.cn}"/>
    </exec>
+    -->
   </target>
 
   <!-- ====================================================== -->
@@ -487,8 +489,9 @@
 
   </target>
 
+          <!--    depends="clover,compile-core-classes,compile-mapred-classes, -->
   <target name="compile-core"
-          depends="clover,compile-core-classes,compile-mapred-classes,
+          depends="compile-core-classes,compile-mapred-classes,
   	compile-hdfs-classes,compile-core-native,compile-c++" 
   	description="Compile core only">
   </target>
