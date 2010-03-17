@@ -241,7 +241,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
           // Every 3 minutes check for any tasks that are overdue
           Thread.sleep(TASKTRACKER_EXPIRY_INTERVAL/3);
           long now = System.currentTimeMillis();
-          LOG.debug("Starting launching task sweep");
+          // LOG.trace("Starting launching task sweep");
           synchronized (JobTracker.this) {
             synchronized (launchingTasks) {
               Iterator<Map.Entry<TaskAttemptID, Long>> itr =
@@ -2484,11 +2484,13 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
                                                   boolean acceptNewTasks, 
                                                   short responseId) 
     throws IOException {
-    LOG.debug("Got heartbeat from: " + status.getTrackerName() + 
+    /*
+    LOG.trace("Got heartbeat from: " + status.getTrackerName() + 
               " (restarted: " + restarted + 
               " initialContact: " + initialContact + 
               " acceptNewTasks: " + acceptNewTasks + ")" +
               " with responseId: " + responseId);
+              */
 
     // Make sure heartbeat is from a tasktracker allowed by the jobtracker.
     if (!acceptTaskTracker(status)) {
@@ -3029,6 +3031,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
       synchronized (taskScheduler) {
         jobs.put(job.getProfile().getJobID(), job);
         for (JobInProgressListener listener : jobInProgressListeners) {
+            LOG.info("listener:"+listener.getClass());
           try {
             listener.jobAdded(job);
           } catch (IOException ioe) {

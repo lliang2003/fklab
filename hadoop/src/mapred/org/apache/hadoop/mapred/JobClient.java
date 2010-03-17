@@ -910,7 +910,7 @@ public class JobClient extends Configured implements MRConstants, Tool  {
           rawSplit.setBytes(buffer.getData(), 0, buffer.getLength());
           rawSplit.setLocations(split.getLocations());
           rawSplit.write(out);
-          System.out.printf("file=%s start=%d length=%d",split.file, split.start, split.length);
+          System.out.println("split:"+split);
         }
         serializer.close();
       }
