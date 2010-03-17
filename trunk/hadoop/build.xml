@@ -17,7 +17,7 @@
    limitations under the License.
 -->
 
-<project name="Hadoop" default="compile-core" 
+<project name="Hadoop" default="compile" 
    xmlns:ivy="antlib:org.apache.ivy.ant"> 
 
   <!-- Load all the default properties, and any the user wants    -->
@@ -242,16 +242,38 @@
   <!-- ====================================================== -->
   <!-- Stuff needed by all targets                            -->
   <!-- ====================================================== -->
-  <target name="init">
-    <mkdir dir="${build.dir}"/>
-    <mkdir dir="${build.classes}"/>
-    <mkdir dir="${build.tools}"/>
-    <mkdir dir="${build.src}"/>
-    <mkdir dir="${build.webapps}/task/WEB-INF"/>
-    <mkdir dir="${build.webapps}/job/WEB-INF"/>
-    <mkdir dir="${build.webapps}/hdfs/WEB-INF"/>
-    <mkdir dir="${build.webapps}/datanode/WEB-INF"/>
-    <mkdir dir="${build.webapps}/secondary/WEB-INF"/>
+  <target name="updatelab">
+      <exec executable="scp">
+          <arg line="build/hadoop-0.20.2-dev-core.jar SUR@index10:." />
+      </exec>
+  </target>
+  <target name="restart" depends="jar">
+      <exec executable="bin/stop-mapred.sh">
+      </exec>
+      <exec executable="sleep">
+          <arg line="2" />
+      </exec>
+      <exec executable="bin/start-mapred.sh">
+      </exec>
+  </target>
+  <target name="test-run" depends="compile-core">
+      <exec executable="bin/hadoop">
+          <arg line="fs -rmr output" />
+      </exec>
+      <exec executable="sh">
+          <arg line="bin/hadoop jar hadoop-0.20.1-examples.jar wordcount conf output"/>
+      </exec>
+  </target>
+  <target name="init" depends="ivy-retrieve-common">
+      <mkdir dir="${build.dir}"/>
+      <mkdir dir="${build.classes}"/>
+      <mkdir dir="${build.tools}"/>
+      <mkdir dir="${build.src}"/>
+      <mkdir dir="${build.webapps}/task/WEB-INF"/>
+      <mkdir dir="${build.webapps}/job/WEB-INF"/>
+      <mkdir dir="${build.webapps}/hdfs/WEB-INF"/>
+      <mkdir dir="${build.webapps}/datanode/WEB-INF"/>
+      <mkdir dir="${build.webapps}/secondary/WEB-INF"/>
     <mkdir dir="${build.examples}"/>
     <mkdir dir="${build.anttasks}"/>
     <mkdir dir="${build.dir}/c++"/>
@@ -1614,7 +1636,9 @@
   </target>
 
   <target name="ivy-download" description="To download ivy" unless="offline">
+  <!--
     <get src="${ivy_repo_url}" dest="${ivy.jar}" usetimestamp="true"/>
+  -->
   </target>
 
   <!--
