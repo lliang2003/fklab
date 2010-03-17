@@ -471,15 +471,22 @@ class JobInProgress {
           (conf.getFloat("mapred.reduce.slowstart.completed.maps", 
                          DEFAULT_COMPLETED_MAPS_PERCENT_FOR_REDUCE_SLOWSTART) * 
            numMapTasks));
+    LOG.info("complete maps before schedule reduce:"+completedMapsForReduceSlowstart);
+    LOG.info("mapred.reduce.slowstart.completed.maps:"+ conf.get("mapred.reduce.slowstart.completed.maps"));
+    LOG.info("mapred.reduce.slowstart.completed.maps:"+ 
+          conf.getFloat("mapred.reduce.slowstart.completed.maps", 
+                         DEFAULT_COMPLETED_MAPS_PERCENT_FOR_REDUCE_SLOWSTART)); 
 
     // create cleanup two cleanup tips, one map and one reduce.
     cleanup = new TaskInProgress[2];
 
     // cleanup map tip. This map doesn't use any splits. Just assign an empty
     // split.
+    final int cleanupTaskID = 99999;
+    final int setupTaskID = 99998;
     JobClient.RawSplit emptySplit = new JobClient.RawSplit();
     cleanup[0] = new TaskInProgress(jobId, jobFile, emptySplit, 
-            jobtracker, conf, this, numMapTasks);
+            jobtracker, conf, this, cleanupTaskID);
     cleanup[0].setJobCleanupTask();
 
     // cleanup reduce tip.
@@ -493,7 +500,7 @@ class JobInProgress {
     // setup map tip. This map doesn't use any split. Just assign an empty
     // split.
     setup[0] = new TaskInProgress(jobId, jobFile, emptySplit, 
-            jobtracker, conf, this, numMapTasks + 1 );
+            jobtracker, conf, this, setupTaskID );
     setup[0].setJobSetupTask();
 
     // setup reduce tip.

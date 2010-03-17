@@ -1074,11 +1074,13 @@ public class TaskTracker
         }
         
         TaskTrackerAction[] actions = heartbeatResponse.getActions();
+        /*
         if(LOG.isDebugEnabled()) {
           LOG.debug("Got heartbeatResponse from JobTracker with responseId: " + 
                     heartbeatResponse.getResponseId() + " and " + 
                     ((actions != null) ? actions.length : 0) + " actions");
         }
+        */
         if (reinitTaskTracker(actions)) {
           return State.STALE;
         }
