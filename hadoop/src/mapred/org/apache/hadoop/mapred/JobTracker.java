@@ -2485,7 +2485,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
                                                   short responseId) 
     throws IOException {
     /*
-    LOG.trace("Got heartbeat from: " + status.getTrackerName() + 
+    LOG.debug("Got heartbeat from: " + status.getTrackerName() + 
               " (restarted: " + restarted + 
               " initialContact: " + initialContact + 
               " acceptNewTasks: " + acceptNewTasks + ")" +
