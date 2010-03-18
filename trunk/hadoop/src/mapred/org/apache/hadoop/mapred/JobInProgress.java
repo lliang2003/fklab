@@ -73,7 +73,7 @@ class JobInProgress {
   Path localJobFile = null;
   Path localJarFile = null;
 
-  TaskInProgress maps[] = new TaskInProgress[0];
+  List<TaskInProgress> maps;
   TaskInProgress reduces[] = new TaskInProgress[0];
   TaskInProgress cleanup[] = new TaskInProgress[0];
   TaskInProgress setup[] = new TaskInProgress[0];
@@ -329,41 +329,29 @@ class JobInProgress {
     }
   }
 
-  private Map<Node, List<TaskInProgress>> createCache(JobClient.RawSplit[] splits,
-      int maxLevel) {
-    Map<Node, List<TaskInProgress>> cache = new IdentityHashMap<Node, List<TaskInProgress>>(
-        maxLevel);
-
-    for (int i = 0; i < splits.length; i++) {
-      String[] splitLocations = splits[i].getLocations();
-      if (splitLocations.length == 0) {
-        nonLocalMaps.add(maps[i]);
-        continue;
-      }
-
-      for (String host : splitLocations) {
-        Node node = jobtracker.resolveAndAddToTopology(host);
-        LOG.info("tip:" + maps[i].getTIPId() + " has split on node:" + node);
-        for (int j = 0; j < maxLevel; j++) {
-          List<TaskInProgress> hostMaps = cache.get(node);
-          if (hostMaps == null) {
-            hostMaps = new ArrayList<TaskInProgress>();
-            cache.put(node, hostMaps);
-            hostMaps.add(maps[i]);
-          }
-          // check whether the hostMaps already contains an entry for a TIP
-          // This will be true for nodes that are racks and multiple nodes in
-          // the rack contain the input for a tip. Note that if it already
-          // exists in the hostMaps, it must be the last element there since
-          // we process one TIP at a time sequentially in the split-size order
-          if (hostMaps.get(hostMaps.size() - 1) != maps[i]) {
-            hostMaps.add(maps[i]);
-          }
-          node = node.getParent();
+  private void addToCache(Map<Node, List<TaskInProgress>> cache, JobClient.RawSplit split,
+      TaskInProgress map_tip, int maxLevel) {
+    String[] splitLocations = split.getLocations();
+    if (splitLocations.length == 0) {
+      nonLocalMaps.add(map_tip);
+      return;
+    }
+    for (String host : splitLocations) {
+      Node node = jobtracker.resolveAndAddToTopology(host);
+      LOG.info("tip:" + map_tip.getTIPId() + " has split on node:" + node);
+      for (int j = 0; j < maxLevel; j++) {
+        List<TaskInProgress> hostMaps = cache.get(node);
+        if (hostMaps == null) {
+          hostMaps = new ArrayList<TaskInProgress>();
+          cache.put(node, hostMaps);
+          hostMaps.add(map_tip);
         }
+        if (hostMaps.get(hostMaps.size() - 1) != map_tip) {
+          hostMaps.add(map_tip);
+        }
+        node = node.getParent();
       }
     }
-    return cache;
   }
 
   /**
@@ -433,15 +421,17 @@ class JobInProgress {
 
     jobtracker.getInstrumentation().addWaiting(getJobID(), numMapTasks);
 
-    maps = new TaskInProgress[numMapTasks];
+    maps = new ArrayList<TaskInProgress>();
     for (int i = 0; i < numMapTasks; ++i) {
       inputLength += splits[i].getDataLength();
-      maps[i] = new TaskInProgress(jobId, jobFile, splits[i], jobtracker, conf, this, i);
+      maps.add(new TaskInProgress(jobId, jobFile, splits[i], jobtracker, conf, this, i));
     }
     LOG.info("Input size for job " + jobId + " = " + inputLength + ". Number of splits = "
         + splits.length);
     if (numMapTasks > 0) {
-      nonRunningMapCache = createCache(splits, maxLevel);
+      nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
+      for (int i = 0; i < numMapTasks; ++i)
+        addToCache(nonRunningMapCache, splits[i], maps.get(i), maxLevel);
     }
 
     // set the launch time
@@ -591,7 +581,7 @@ class JobInProgress {
    * 
    * @return the raw array of maps for this job
    */
-  TaskInProgress[] getMapTasks() {
+  List<TaskInProgress> getMapTasks() {
     return maps;
   }
 
@@ -667,7 +657,7 @@ class JobInProgress {
     Vector<TaskInProgress> results = new Vector<TaskInProgress>();
     TaskInProgress tips[] = null;
     if (shouldBeMap) {
-      tips = maps;
+      tips = maps.toArray(new TaskInProgress[0]);
     } else {
       tips = reduces;
     }
@@ -844,7 +834,7 @@ class JobInProgress {
       double progressDelta = tip.getProgress() - oldProgress;
       if (tip.isMapTask()) {
         this.status.setMapProgress((float) (this.status.mapProgress() + progressDelta
-            / maps.length));
+            / maps.size()));
       } else {
         this.status
             .setReduceProgress((float) (this.status.reduceProgress() + (progressDelta / reduces.length)));
@@ -865,7 +855,7 @@ class JobInProgress {
    * Returns map phase counters by summing over all map tasks in progress.
    */
   public synchronized Counters getMapCounters() {
-    return incrementTaskCounters(new Counters(), maps);
+    return incrementTaskCounters(new Counters(), maps.toArray(new TaskInProgress[0]));
   }
 
   /**
@@ -882,7 +872,7 @@ class JobInProgress {
   public synchronized Counters getCounters() {
     Counters result = new Counters();
     result.incrAllCounters(getJobCounters());
-    incrementTaskCounters(result, maps);
+    incrementTaskCounters(result, maps.toArray(new TaskInProgress[0]));
     return incrementTaskCounters(result, reduces);
   }
 
@@ -919,9 +909,9 @@ class JobInProgress {
         .mapProgress());
     if (target == -1) { return null; }
 
-    Task result = maps[target].getTaskToRun(tts.getTrackerName());
+    Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
     if (result != null) {
-      addRunningTaskToTIP(maps[target], result.getTaskID(), tts, true);
+      addRunningTaskToTIP(maps.get(target), result.getTaskID(), tts, true);
     }
 
     return result;
@@ -942,7 +932,7 @@ class JobInProgress {
       if (isMapSlot) {
         if (!mapCleanupTasks.isEmpty()) {
           taskid = mapCleanupTasks.remove(0);
-          tip = maps[taskid.getTaskID().getId()];
+          tip = maps.get(taskid.getTaskID().getId());
         }
       } else {
         if (!reduceCleanupTasks.isEmpty()) {
@@ -966,9 +956,9 @@ class JobInProgress {
         .mapProgress());
     if (target == -1) { return null; }
 
-    Task result = maps[target].getTaskToRun(tts.getTrackerName());
+    Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
     if (result != null) {
-      addRunningTaskToTIP(maps[target], result.getTaskID(), tts, true);
+      addRunningTaskToTIP(maps.get(target), result.getTaskID(), tts, true);
     }
 
     return result;
@@ -985,9 +975,9 @@ class JobInProgress {
         status.mapProgress());
     if (target == -1) { return null; }
 
-    Task result = maps[target].getTaskToRun(tts.getTrackerName());
+    Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
     if (result != null) {
-      addRunningTaskToTIP(maps[target], result.getTaskID(), tts, true);
+      addRunningTaskToTIP(maps.get(target), result.getTaskID(), tts, true);
     }
 
     return result;
@@ -1089,7 +1079,8 @@ class JobInProgress {
   public synchronized boolean scheduleReduces() {
     LOG.info(getJobID() + " predecessors:" + predecessors.size() + " finished map:"
         + finishedMapTasks + "/" + numMapTasks);
-//    LOG.info("schedule reduces: "+(predecessors.size() == 0 && finishedMapTasks == numMapTasks));
+    // LOG.info("schedule reduces: "+(predecessors.size() == 0 &&
+    // finishedMapTasks == numMapTasks));
     return predecessors.size() == 0 && finishedMapTasks == numMapTasks;
   }
 
@@ -1221,7 +1212,7 @@ class JobInProgress {
       Node tracker = jobtracker.getNode(tts.getHost());
       int level = this.maxLevel;
       // find the right level across split locations
-      for (String local : maps[tip.getIdWithinJob()].getSplitLocations()) {
+      for (String local : maps.get(tip.getIdWithinJob()).getSplitLocations()) {
         Node datanode = jobtracker.getNode(local);
         int newLevel = this.maxLevel;
         if (tracker != null && datanode != null) {
@@ -1833,8 +1824,6 @@ class JobInProgress {
 
       return -1; // see if a different TIP might work better.
     }
-    
-    LOG.info(getJobID()+" find new reduce task, done check size");
 
     // 1. check for a never-executed reduce tip
     // reducers don't have a cache and so pass -1 to explicitly call that out
@@ -1843,7 +1832,7 @@ class JobInProgress {
       scheduleReduce(tip);
       return tip.getIdWithinJob();
     }
-    LOG.info(getJobID()+" find new reduce task, done check list");
+    LOG.info(getJobID() + " find new reduce task, done check list");
 
     // 2. check for a reduce tip to be speculated
     if (hasSpeculativeReduces) {
@@ -1854,7 +1843,7 @@ class JobInProgress {
         return tip.getIdWithinJob();
       }
     }
-    LOG.info(getJobID()+" find new reduce task, done check speculative tasks");
+    LOG.info(getJobID() + " find new reduce task, done check speculative tasks");
 
     return -1;
   }
@@ -1902,7 +1891,8 @@ class JobInProgress {
       return false;
     }
 
-    LOG.info("Task '" + taskid + "' has completed " + tip.getTIPId() + " successfully.");
+//    LOG.info("Task '" + taskid + "' has completed " + tip.getTIPId() + " successfully.");
+    LOG.info("Task '" + taskid + "' has completed successfully.");
 
     // Mark the TIP as complete
     tip.completed(taskid);
@@ -1967,7 +1957,7 @@ class JobInProgress {
       if ((finishedReduceTasks + failedReduceTIPs) == (numReduceTasks)) {
         this.status.setReduceProgress(1.0f);
       }
-      LOG.info(getJobID()+" finish reduce:"+finishedReduceTasks+"/"+numReduceTasks);
+      LOG.info(getJobID() + " finish reduce:" + finishedReduceTasks + "/" + numReduceTasks);
       // TODO: add map tasks for successive jobs
       if (finishedReduceTasks == numReduceTasks) {
         for (JobID id : successors) {
@@ -1992,7 +1982,7 @@ class JobInProgress {
     if (this.status.getRunState() == JobStatus.RUNNING) {
       this.status.setRunState(JobStatus.SUCCEEDED);
       this.status.setCleanupProgress(1.0f);
-      if (maps.length == 0) {
+      if (maps.size() == 0) {
         this.status.setMapProgress(1.0f);
       }
       if (reduces.length == 0) {
@@ -2064,8 +2054,8 @@ class JobInProgress {
       for (int i = 0; i < setup.length; i++) {
         setup[i].kill();
       }
-      for (int i = 0; i < maps.length; i++) {
-        maps[i].kill();
+      for (int i = 0; i < maps.size(); i++) {
+        maps.get(i).kill();
       }
       for (int i = 0; i < reduces.length; i++) {
         reduces[i].kill();
@@ -2078,7 +2068,7 @@ class JobInProgress {
     TaskInProgress tip = null;
     while (!mapCleanupTasks.isEmpty()) {
       taskid = mapCleanupTasks.remove(0);
-      tip = maps[taskid.getTaskID().getId()];
+      tip = maps.get(taskid.getTaskID().getId());
       updateTaskStatus(tip, tip.getTaskStatus(taskid));
     }
     while (!reduceCleanupTasks.isEmpty()) {
@@ -2105,7 +2095,7 @@ class JobInProgress {
     if (killNow) {
       terminate(JobStatus.KILLED);
     }
-    //TODO: kill successive jobs and remove dependence 
+    // TODO: kill successive jobs and remove dependence
   }
 
   /**
@@ -2115,7 +2105,7 @@ class JobInProgress {
    */
   synchronized void fail() {
     terminate(JobStatus.FAILED);
-    //TODO: kill successive jobs and remove dependence 
+    // TODO: kill successive jobs and remove dependence
   }
 
   /**
@@ -2332,8 +2322,8 @@ class JobInProgress {
       }
 
       // clean up splits
-      for (int i = 0; i < maps.length; i++) {
-        maps[i].clearSplit();
+      for (int i = 0; i < maps.size(); i++) {
+        maps.get(i).clearSplit();
       }
 
       // JobClient always creates a new directory with job files
@@ -2366,8 +2356,8 @@ class JobInProgress {
       if (tipid.equals(setup[0].getTIPId())) { // setup map tip
         return setup[0];
       }
-      for (int i = 0; i < maps.length; i++) {
-        if (tipid.equals(maps[i].getTIPId())) { return maps[i]; }
+      for (int i = 0; i < maps.size(); i++) {
+        if (tipid.equals(maps.get(i).getTIPId())) { return maps.get(i); }
       }
     } else {
       if (tipid.equals(cleanup[1].getTIPId())) { // cleanup reduce tip
@@ -2391,7 +2381,7 @@ class JobInProgress {
    * @return the task status of the completed task
    */
   public synchronized TaskStatus findFinishedMap(int mapId) {
-    TaskInProgress tip = maps[mapId];
+    TaskInProgress tip = maps.get(mapId);
     if (tip.isComplete()) {
       TaskStatus[] statuses = tip.getTaskStatuses();
       for (int i = 0; i < statuses.length; i++) {
