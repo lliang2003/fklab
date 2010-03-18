@@ -458,7 +458,7 @@ public class Job extends JobContext {
   public void addDepend(JobID jid) {
     Configuration conf = getConfiguration();
     String depends = conf.get("mapred.depends");
-    conf.set("mapred.depends", depends == null ? ""+jid : depends + "," + jid.id);
+    conf.set("mapred.depends", depends == null ? ""+jid.id : depends + "," + jid.id);
   }
   
 }
