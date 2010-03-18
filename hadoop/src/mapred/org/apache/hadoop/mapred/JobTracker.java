@@ -1966,7 +1966,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
     if (markedTaskSet != null) {
       for (TaskAttemptID taskid : markedTaskSet) {
         removeTaskEntry(taskid);
-        LOG.info("Removed completed task '" + taskid + "' from '" + taskTracker + "'");
+//        LOG.info("Removed completed task '" + taskid + "' from '" + taskTracker + "'");
       }
       // Clear
       trackerToMarkedTasksMap.remove(taskTracker);
@@ -2499,7 +2499,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
         if (tasks != null) {
           for (Task task : tasks) {
             expireLaunchingTasks.addNewTask(task.getTaskID());
-            LOG.debug(trackerName + " -> LaunchTask: " + task.getTaskID());
+//            LOG.debug(trackerName + " -> LaunchTask: " + task.getTaskID());
             actions.add(new LaunchTaskAction(task));
           }
         }
@@ -2700,7 +2700,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
           //
           if (!tip.getJob().isComplete()) {
             killList.add(new KillTaskAction(killTaskId));
-            LOG.debug(taskTracker + " -> KillTaskAction: " + killTaskId);
+//            LOG.debug(taskTracker + " -> KillTaskAction: " + killTaskId);
           }
         }
       }
@@ -2723,7 +2723,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
    */
   private void addJobForCleanup(JobID id) {
     for (String taskTracker : taskTrackers.keySet()) {
-      LOG.debug("Marking job " + id + " for cleanup by tracker " + taskTracker);
+//      LOG.debug("Marking job " + id + " for cleanup by tracker " + taskTracker);
       synchronized (trackerToJobsToCleanup) {
         Set<JobID> jobsToKill = trackerToJobsToCleanup.get(taskTracker);
         if (jobsToKill == null) {
