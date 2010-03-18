@@ -425,12 +425,13 @@ public class Job extends JobContext {
    * Submit the job to the cluster and return immediately.
    * @throws IOException
    */
-  public void submit() throws IOException, InterruptedException, 
+  public JobID submit() throws IOException, InterruptedException, 
                               ClassNotFoundException {
     ensureState(JobState.DEFINE);
     setUseNewAPI();
     info = jobClient.submitJobInternal(conf);
     state = JobState.RUNNING;
+    return info.getID();
    }
   
   /**
@@ -452,6 +453,12 @@ public class Job extends JobContext {
       info.waitForCompletion();
     }
     return isSuccessful();
+  }
+  
+  public void addDepend(JobID jid) {
+    Configuration conf = getConfiguration();
+    String depends = conf.get("mapred.depends");
+    conf.set("mapred.depends", depends == null ? depends : depends + "," + jid);
   }
   
 }
