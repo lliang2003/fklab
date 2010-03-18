@@ -1954,7 +1954,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
     // taskid --> TIP
     taskidToTIPMap.remove(taskid);
         
-    LOG.debug("Removing task '" + taskid + "'");
+//    LOG.debug("Removing task '" + taskid + "'");
   }
     
   /**
@@ -1973,7 +1973,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
     }
     taskset.add(taskid);
       
-    LOG.debug("Marked '" + taskid + "' from '" + taskTracker + "'");
+//    LOG.debug("Marked '" + taskid + "' from '" + taskTracker + "'");
   }
 
   /**
@@ -2858,8 +2858,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
           }
           if (tip.shouldCommit(taskId)) {
             saveList.add(new CommitTaskAction(taskId));
-            LOG.debug(tts.getTrackerName() + 
-                      " -> CommitTaskAction: " + taskId);
+//            LOG.debug(tts.getTrackerName() +  " -> CommitTaskAction: " + taskId);
           }
         }
       }

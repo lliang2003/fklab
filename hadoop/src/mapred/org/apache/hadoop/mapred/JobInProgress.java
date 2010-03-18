@@ -1087,8 +1087,9 @@ class JobInProgress {
   }
 
   public synchronized boolean scheduleReduces() {
-    LOG.info(getJobID() + "predecessors:" + predecessors.size() + " finished map:"
+    LOG.info(getJobID() + " predecessors:" + predecessors.size() + " finished map:"
         + finishedMapTasks + "/" + numMapTasks);
+//    LOG.info("schedule reduces: "+(predecessors.size() == 0 && finishedMapTasks == numMapTasks));
     return predecessors.size() == 0 && finishedMapTasks == numMapTasks;
   }
 
@@ -1832,6 +1833,8 @@ class JobInProgress {
 
       return -1; // see if a different TIP might work better.
     }
+    
+    LOG.info(getJobID()+" find new reduce task, done check size");
 
     // 1. check for a never-executed reduce tip
     // reducers don't have a cache and so pass -1 to explicitly call that out
@@ -1840,6 +1843,7 @@ class JobInProgress {
       scheduleReduce(tip);
       return tip.getIdWithinJob();
     }
+    LOG.info(getJobID()+" find new reduce task, done check list");
 
     // 2. check for a reduce tip to be speculated
     if (hasSpeculativeReduces) {
@@ -1850,6 +1854,7 @@ class JobInProgress {
         return tip.getIdWithinJob();
       }
     }
+    LOG.info(getJobID()+" find new reduce task, done check speculative tasks");
 
     return -1;
   }
@@ -1962,11 +1967,13 @@ class JobInProgress {
       if ((finishedReduceTasks + failedReduceTIPs) == (numReduceTasks)) {
         this.status.setReduceProgress(1.0f);
       }
+      LOG.info(getJobID()+" finish reduce:"+finishedReduceTasks+"/"+numReduceTasks);
       // TODO: add map tasks for successive jobs
       if (finishedReduceTasks == numReduceTasks) {
-        for (JobInProgress jip : successors) {
-          jip.delPredecessor(this);
+        for (JobID id : successors) {
+          tracker.jobs.get(id).delPredecessor(this.getJobID());
         }
+        successors.clear();
       }
     }
 
@@ -2098,12 +2105,7 @@ class JobInProgress {
     if (killNow) {
       terminate(JobStatus.KILLED);
     }
-    for (JobInProgress jip : successors) {
-      jip.kill();
-    }
-    for (JobInProgress jip : predecessors) {
-      jip.delSuccessor(this);
-    }
+    //TODO: kill successive jobs and remove dependence 
   }
 
   /**
@@ -2113,12 +2115,7 @@ class JobInProgress {
    */
   synchronized void fail() {
     terminate(JobStatus.FAILED);
-    for (JobInProgress jip : successors) {
-      jip.kill();
-    }
-    for (JobInProgress jip : predecessors) {
-      jip.delSuccessor(this);
-    }
+    //TODO: kill successive jobs and remove dependence 
   }
 
   /**
@@ -2490,30 +2487,31 @@ class JobInProgress {
     }
   }
 
-  public synchronized void addPredecessor(JobInProgress jip) {
-    LOG.info(getJobID() + " add predecessor:" + jip.getJobID());
-    predecessors.add(jip);
-    LOG.info(getJobID() + "size of precessors:" + predecessors.size());
+  public synchronized void addPredecessor(JobID jid) {
+    LOG.info(getJobID() + " add predecessor:" + jid);
+    predecessors.add(jid);
+    LOG.info(getJobID() + " size of precessors:" + predecessors.size());
   }
 
-  public synchronized void addSuccessor(JobInProgress jip) {
-    LOG.info(getJobID() + "add successor:" + jip.getJobID());
-    successors.add(jip);
-    LOG.info(getJobID() + "size of successor:" + successors.size());
+  public synchronized void addSuccessor(JobID jid) {
+    LOG.info(getJobID() + " add successor:" + jid);
+    successors.add(jid);
+    LOG.info(getJobID() + " size of successor:" + successors.size());
   }
 
-  public synchronized void delPredecessor(JobInProgress jip) {
-    LOG.info(getJobID() + "del predecessor:" + jip.getJobID());
-    predecessors.remove(jip);
-    LOG.info(getJobID() + "size of precessors:" + predecessors.size());
-  }
-
-  public synchronized void delSuccessor(JobInProgress jip) {
-    LOG.info(getJobID() + "del successor:" + jip.getJobID());
-    successors.remove(jip);
-    LOG.info(getJobID() + "size of successor:" + successors.size());
+  public synchronized void delPredecessor(JobID jid) {
+    LOG.info(getJobID() + " del predecessor:" + jid);
+    predecessors.remove(jid);
+    LOG.info(getJobID() + " size of precessors:" + predecessors.size());
     if (predecessors.size() == 0)
       initReduceTasks();
+  }
+
+  public synchronized void delSuccessor(JobID jid) {
+    LOG.info(getJobID() + " del successor:" + jid);
+    successors.remove(jid);
+    LOG.info(getJobID() + " size of successor:" + successors.size());
+
   }
 
   public synchronized void initDepends() {
@@ -2524,12 +2522,12 @@ class JobInProgress {
     for (String idstr : ids) {
       JobID jid = new JobID(this.jobId.getJtIdentifier(), Integer.parseInt(idstr));
       JobInProgress jip = tracker.jobs.get(jid);
-      addPredecessor(jip);
-      jip.addSuccessor(this);
+      addPredecessor(jid);
+      jip.addSuccessor(this.getJobID());
     }
   }
 
   JobTracker tracker = null;
-  Set<JobInProgress> predecessors = new HashSet<JobInProgress>();
-  Set<JobInProgress> successors = new HashSet<JobInProgress>();
+  Set<JobID> predecessors = new HashSet<JobID>();
+  Set<JobID> successors = new HashSet<JobID>();
 }
