@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -382,7 +383,40 @@ class JobInProgress {
   boolean hasRestarted() {
     return restartCount > 0;
   }
+  
+  Set<JobInProgress> predecessors = new HashSet<JobInProgress>(); 
+  Set<JobInProgress> successors = new HashSet<JobInProgress>(); 
+  
+  public synchronized void addPredecessor() {
+    
+  }
+  
+  public synchronized void delPredecessor() {
+    
+  }
+  
+  public synchronized void initReduceTasks() 
+  throws IOException, KillInterruptedException {
+    if (tasksInited.get() || isComplete()) {
+      return;
+    }
+    LOG.info("Initializing " + jobId + " for reduce");
+    String jobFile = profile.getJobFile();
 
+    //
+    // Create reduce tasks
+    //
+    this.reduces = new TaskInProgress[numReduceTasks];
+    for (int i = 0; i < numReduceTasks; i++) {
+      reduces[i] = new TaskInProgress(jobId, jobFile, 
+                                      numMapTasks, i, 
+                                      jobtracker, conf, this);
+      nonRunningReduces.add(reduces[i]);
+    }
+
+    tasksInited.set(true);
+
+  }
   /**
    * Construct the splits, etc.  This is invoked from an async
    * thread so that split-computation doesn't block anyone.
@@ -424,18 +458,7 @@ class JobInProgress {
     }
     numMapTasks = splits.length;
 
-
-    // if the number of splits is larger than a configured value
-    // then fail the job.
-    int maxTasks = jobtracker.getMaxTasksPerJob();
-    if (maxTasks > 0 && numMapTasks + numReduceTasks > maxTasks) {
-      throw new IOException(
-                "The number of tasks for this job " + 
-                (numMapTasks + numReduceTasks) +
-                " exceeds the configured limit " + maxTasks);
-    }
-    jobtracker.getInstrumentation().addWaiting(
-        getJobID(), numMapTasks + numReduceTasks);
+    jobtracker.getInstrumentation().addWaiting(getJobID(), numMapTasks);
 
     maps = new TaskInProgress[numMapTasks];
     for(int i=0; i < numMapTasks; ++i) {
@@ -453,40 +476,16 @@ class JobInProgress {
     // set the launch time
     this.launchTime = System.currentTimeMillis();
 
-    //
-    // Create reduce tasks
-    //
-    this.reduces = new TaskInProgress[numReduceTasks];
-    for (int i = 0; i < numReduceTasks; i++) {
-      reduces[i] = new TaskInProgress(jobId, jobFile, 
-                                      numMapTasks, i, 
-                                      jobtracker, conf, this);
-      nonRunningReduces.add(reduces[i]);
-    }
-
-    // Calculate the minimum number of maps to be complete before 
-    // we should start scheduling reduces
-    completedMapsForReduceSlowstart = 
-      (int)Math.ceil(
-          (conf.getFloat("mapred.reduce.slowstart.completed.maps", 
-                         DEFAULT_COMPLETED_MAPS_PERCENT_FOR_REDUCE_SLOWSTART) * 
-           numMapTasks));
-    LOG.info("complete maps before schedule reduce:"+completedMapsForReduceSlowstart);
-    LOG.info("mapred.reduce.slowstart.completed.maps:"+ conf.get("mapred.reduce.slowstart.completed.maps"));
-    LOG.info("mapred.reduce.slowstart.completed.maps:"+ 
-          conf.getFloat("mapred.reduce.slowstart.completed.maps", 
-                         DEFAULT_COMPLETED_MAPS_PERCENT_FOR_REDUCE_SLOWSTART)); 
-
     // create cleanup two cleanup tips, one map and one reduce.
     cleanup = new TaskInProgress[2];
 
     // cleanup map tip. This map doesn't use any splits. Just assign an empty
     // split.
-    final int cleanupTaskID = 99999;
-    final int setupTaskID = 99998;
+    final int mapCleanupTaskID = 99999;
+    final int mapSetupTaskID = 99998;
     JobClient.RawSplit emptySplit = new JobClient.RawSplit();
     cleanup[0] = new TaskInProgress(jobId, jobFile, emptySplit, 
-            jobtracker, conf, this, cleanupTaskID);
+            jobtracker, conf, this, mapCleanupTaskID);
     cleanup[0].setJobCleanupTask();
 
     // cleanup reduce tip.
@@ -500,7 +499,7 @@ class JobInProgress {
     // setup map tip. This map doesn't use any split. Just assign an empty
     // split.
     setup[0] = new TaskInProgress(jobId, jobFile, emptySplit, 
-            jobtracker, conf, this, setupTaskID );
+            jobtracker, conf, this, mapSetupTaskID );
     setup[0].setJobSetupTask();
 
     // setup reduce tip.
@@ -508,16 +507,6 @@ class JobInProgress {
                        numReduceTasks + 1, jobtracker, conf, this);
     setup[1].setJobSetupTask();
     
-    synchronized(jobInitKillStatus){
-      jobInitKillStatus.initDone = true;
-      if(jobInitKillStatus.killed) {
-        throw new KillInterruptedException("Job " + jobId + " killed in init");
-      }
-    }
-    
-    tasksInited.set(true);
-    JobHistory.JobInfo.logInited(profile.getJobID(), this.launchTime, 
-                                 numMapTasks, numReduceTasks);
   }
 
   /////////////////////////////////////////////////////
