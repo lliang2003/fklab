@@ -3147,6 +3147,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
     try {
       JobStatus prevStatus = (JobStatus)job.getStatus().clone();
       LOG.info("Initializing " + job.getJobID());
+      job.initDepends();
       job.initTasks();
       // Inform the listeners if the job state has changed
       // Note : that the job will be in PREP state.

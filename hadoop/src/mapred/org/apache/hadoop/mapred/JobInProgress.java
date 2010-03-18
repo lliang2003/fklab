@@ -237,6 +237,7 @@ class JobInProgress {
   
   public JobInProgress(JobID jobid, JobTracker jobtracker, 
                        JobConf default_conf, int rCount) throws IOException {
+    this.tracker = jobtracker;
     this.restartCount = rCount;
     this.jobId = jobid;
     String url = "http://" + jobtracker.getJobTrackerMachine() + ":" 
@@ -382,17 +383,6 @@ class JobInProgress {
   
   boolean hasRestarted() {
     return restartCount > 0;
-  }
-  
-  Set<JobInProgress> predecessors = new HashSet<JobInProgress>(); 
-  Set<JobInProgress> successors = new HashSet<JobInProgress>(); 
-  
-  public synchronized void addPredecessor() {
-    
-  }
-  
-  public synchronized void delPredecessor() {
-    
   }
   
   public synchronized void initReduceTasks() 
@@ -1167,7 +1157,7 @@ class JobInProgress {
   }
   
   public synchronized boolean scheduleReduces() {
-    return finishedMapTasks >= completedMapsForReduceSlowstart;
+    return predecessors.size() == 0 && finishedMapTasks == numMapTasks;
   }
   
   /**
@@ -2651,4 +2641,43 @@ class JobInProgress {
       return Values.REDUCE.name();
     }
   }
+  
+  public synchronized void addPredecessor(JobInProgress jip) {
+    LOG.info("add predecessor:"+jip.getJobID());
+    predecessors.add(jip);
+    LOG.info("size of precessors:"+predecessors.size());
+  }
+  
+  public synchronized void addSuccessor(JobInProgress jip) {
+    LOG.info("add successor:"+jip.getJobID());
+    successors.add(jip);
+    LOG.info("size of successor:"+successors.size());
+  }
+  
+  public synchronized void delPredecessor(JobInProgress jip) {
+    LOG.info("del predecessor:"+jip.getJobID());
+    predecessors.remove(jip);
+    LOG.info("size of precessors:"+predecessors.size());
+  }
+  
+  public synchronized void delSuccessor(JobInProgress jip) {
+    LOG.info("del successor:"+jip.getJobID());
+    successors.remove(jip);
+    LOG.info("size of successor:"+successors.size());
+  }
+  
+  public synchronized void initDepends() {
+    String depends = conf.get("mapred.depends");
+    if (depends == null) return;
+    String[] ids = depends.split(",");
+    for (String idstr:ids) {
+      JobID jid = new JobID(this.jobId.getJtIdentifier(), Integer.parseInt(idstr));
+      JobInProgress jip = tracker.jobs.get(jid);
+      addPredecessor(jip);
+      jip.addSuccessor(this);
+    }
+  }
+  JobTracker tracker = null;
+  Set<JobInProgress> predecessors = new HashSet<JobInProgress>(); 
+  Set<JobInProgress> successors = new HashSet<JobInProgress>(); 
 }
