@@ -56,9 +56,9 @@ class ResourceEstimator {
       completedMapsInputSize+=(tip.getMapInputSize()+1);
       completedMapsOutputSize+=ts.getOutputSize();
 
-      LOG.info("completedMapsUpdates:"+completedMapsUpdates+"  "+
-          "completedMapsInputSize:"+completedMapsInputSize+"  " +
-        "completedMapsOutputSize:"+completedMapsOutputSize);
+//      LOG.info("completedMapsUpdates:"+completedMapsUpdates+"  "+
+//          "completedMapsInputSize:"+completedMapsInputSize+"  " +
+//        "completedMapsOutputSize:"+completedMapsOutputSize);
     }
   }
 
