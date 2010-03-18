@@ -1976,38 +1976,7 @@ class JobInProgress {
     // Mark the TIP as complete
     tip.completed(taskid);
     resourceEstimator.updateWithCompletedTask(status, tip);
-
-    // Update jobhistory 
-    TaskTrackerStatus ttStatus = 
-      this.jobtracker.getTaskTracker(status.getTaskTracker());
-    String trackerHostname = jobtracker.getNode(ttStatus.getHost()).toString();
-    String taskType = getTaskType(tip);
-    if (status.getIsMap()){
-      JobHistory.MapAttempt.logStarted(status.getTaskID(), status.getStartTime(), 
-                                       status.getTaskTracker(), 
-                                       ttStatus.getHttpPort(), 
-                                       taskType); 
-      JobHistory.MapAttempt.logFinished(status.getTaskID(), status.getFinishTime(), 
-                                        trackerHostname, taskType,
-                                        status.getStateString(), 
-                                        status.getCounters()); 
-    }else{
-      JobHistory.ReduceAttempt.logStarted( status.getTaskID(), status.getStartTime(), 
-                                          status.getTaskTracker(),
-                                          ttStatus.getHttpPort(), 
-                                          taskType); 
-      JobHistory.ReduceAttempt.logFinished(status.getTaskID(), status.getShuffleFinishTime(),
-                                           status.getSortFinishTime(), status.getFinishTime(), 
-                                           trackerHostname, 
-                                           taskType,
-                                           status.getStateString(), 
-                                           status.getCounters()); 
-    }
-    JobHistory.Task.logFinished(tip.getTIPId(), 
-                                taskType,
-                                tip.getExecFinishTime(),
-                                status.getCounters()); 
-        
+       
     int newNumAttempts = tip.getActiveTasks().size();
     if (tip.isJobSetupTask()) {
       // setup task has finished. kill the extra setup tip
@@ -2068,6 +2037,12 @@ class JobInProgress {
       if ((finishedReduceTasks + failedReduceTIPs) == (numReduceTasks)) {
         this.status.setReduceProgress(1.0f);
       }
+      // TODO: add map tasks for successing jobs
+      if (finishedReduceTasks == numReduceTasks) {
+        for (JobInProgress jip: successors) {
+          jip.delPredecessor(this);
+        }
+      }
     }
     
     return true;
@@ -2094,10 +2069,6 @@ class JobInProgress {
       this.finishTime = System.currentTimeMillis();
       LOG.info("Job " + this.status.getJobID() + 
                " has completed successfully.");
-      JobHistory.JobInfo.logFinished(this.status.getJobID(), finishTime, 
-                                     this.finishedMapTasks, 
-                                     this.finishedReduceTasks, failedMapTasks, 
-                                     failedReduceTasks, getCounters());
       // Note that finalize will close the job history handles which garbage collect
       // might try to finalize
       garbageCollect();
@@ -2114,18 +2085,12 @@ class JobInProgress {
                                     1.0f, 1.0f, 1.0f, JobStatus.FAILED,
                                     status.getJobPriority());
         this.finishTime = System.currentTimeMillis();
-        JobHistory.JobInfo.logFailed(this.status.getJobID(), finishTime, 
-                                     this.finishedMapTasks, 
-                                     this.finishedReduceTasks);
       } else {
         this.status = new JobStatus(status.getJobID(),
                                     1.0f, 1.0f, 1.0f, JobStatus.KILLED,
                                     status.getJobPriority());
         this.finishTime = System.currentTimeMillis();
-        JobHistory.JobInfo.logKilled(this.status.getJobID(), finishTime, 
-                                     this.finishedMapTasks, 
-                                     this.finishedReduceTasks);
-      }
+       }
       garbageCollect();
       jobtracker.getInstrumentation().terminateJob(
           this.conf, this.status.getJobID());
@@ -2210,6 +2175,12 @@ class JobInProgress {
     if(killNow) {
       terminate(JobStatus.KILLED);
     }
+    for (JobInProgress jip: successors) {
+      jip.kill();
+    }
+    for (JobInProgress jip: predecessors) {
+      jip.delSuccessor(this);
+    }
   }
   
   /**
@@ -2219,6 +2190,12 @@ class JobInProgress {
    */
   synchronized void fail() {
     terminate(JobStatus.FAILED);
+    for (JobInProgress jip: successors) {
+      jip.kill();
+    }
+    for (JobInProgress jip: predecessors) {
+      jip.delSuccessor(this);
+    }
   }
   
   /**
@@ -2304,27 +2281,6 @@ class JobInProgress {
     String diagInfo = taskDiagnosticInfo == null ? "" :
       StringUtils.arrayToString(taskDiagnosticInfo.toArray(new String[0]));
     String taskType = getTaskType(tip);
-    if (taskStatus.getIsMap()) {
-      JobHistory.MapAttempt.logStarted(taskid, startTime, 
-        taskTrackerName, taskTrackerPort, taskType);
-      if (taskStatus.getRunState() == TaskStatus.State.FAILED) {
-        JobHistory.MapAttempt.logFailed(taskid, finishTime,
-          taskTrackerHostName, diagInfo, taskType);
-      } else {
-        JobHistory.MapAttempt.logKilled(taskid, finishTime,
-          taskTrackerHostName, diagInfo, taskType);
-      }
-    } else {
-      JobHistory.ReduceAttempt.logStarted(taskid, startTime, 
-        taskTrackerName, taskTrackerPort, taskType);
-      if (taskStatus.getRunState() == TaskStatus.State.FAILED) {
-        JobHistory.ReduceAttempt.logFailed(taskid, finishTime,
-          taskTrackerHostName, diagInfo, taskType);
-      } else {
-        JobHistory.ReduceAttempt.logKilled(taskid, finishTime,
-          taskTrackerHostName, diagInfo, taskType);
-      }
-    }
         
     // After this, try to assign tasks with the one after this, so that
     // the failed task goes to the end of the list.
@@ -2365,10 +2321,6 @@ class JobInProgress {
       
       if (killJob) {
         LOG.info("Aborting job " + profile.getJobID());
-        JobHistory.Task.logFailed(tip.getTIPId(), 
-                                  taskType,  
-                                  finishTime, 
-                                  diagInfo);
         if (tip.isJobCleanupTask()) {
           // kill the other tip
           if (tip.isMapTask()) {
@@ -2443,14 +2395,7 @@ class JobInProgress {
                      : oldStatus.getStartTime();
     status.setStartTime(startTime);
     status.setFinishTime(System.currentTimeMillis());
-    boolean wasComplete = tip.isComplete();
     updateTaskStatus(tip, status);
-    boolean isComplete = tip.isComplete();
-    if (wasComplete && !isComplete) { // mark a successful tip as failed
-      String taskType = getTaskType(tip);
-      JobHistory.Task.logFailed(tip.getTIPId(), taskType, 
-                                tip.getExecFinishTime(), reason, taskid);
-    }
   }
        
                            
