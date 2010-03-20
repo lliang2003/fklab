@@ -17,11 +17,21 @@ handlers:
 - url: /notes
   script: notes.py
 
-- url: /memo
+- url: /memo.*
   script: /memo.py
+
+- url: /word.*
+  script: /word.py
+
+- url: /test
+  script: /test.py
+
+- url: /pic
+  static_dir: pic
 
 - url: /.*
   script: hello.py
+
 
     
 
