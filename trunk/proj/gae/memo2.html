@@ -39,10 +39,15 @@
             judge.alt="wrong"
             fail(id)
         }
-        function pass(id) {
-            qbox=document.getElementById("question-"+id);
-            passed_items.push(id);
-        }
+    }
+    function pass(id) {
+        passed_items.push(id);
+        fbutton = document.getElementById("finish-button")
+        fbutton.href+="?id="+id;
+    }
+    function finish() {
+        if (passed_items.length>0)
+            window.location="memo?action=finish&r"+passed_items.join("=pass&r")+"=pass"
     }
 
 {% endblock %}
@@ -52,7 +57,6 @@
 <a href="/memo">Memo</a> <a href="/memo?action=export">Export</a>
 <br>
 
-<form method="get" action="/memo">
 {% for item in items %}
     <br>
     <div class="question" id="question-{{item.id}}" ><pre>{{item.question}}</pre></div>
@@ -62,9 +66,7 @@
     <img id="judge-{{item.id}}" src="pic/wrong.jpg" alt="todo" />
     <br>
 {% endfor %}
-<input type="hidden" name="action" value="finish" />
-<input type="submit" value="Finish this round" />
-</form>
+<a id="finish_button" href="javascript:finish()">Finish This Round</a>
 
 <div style="display:none">
 {% for item in allitems %}
