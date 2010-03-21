@@ -61,9 +61,12 @@ class MemoPage(webapp.RequestHandler):
         else:
             for item in items:
                 if item.round < len(intervals) and today - item.lastpass >= intervals[item.round]:
-                    item.word = item.answer.split()[0]
-                    item.answer = " ".join(item.answer.split(" ")[1:])
+                    parts = item.answer.split()
+                    if parts: item.word = parts[0]
+                    else: item.word = "none"
+                    item.answer = " ".join(item.answer.split(" ")[1:]).strip()
                     item.question = re.sub("%s[a-zA-Z]*"%item.word[:-1], "*", item.question.lower())
+                    item.tip = "%s\n%s"%(item.answer, item.question)
                     ritems.append(item)
             path = os.path.join(os.path.dirname(__file__), 'memo2.html')
             dat = {"allitems":items, "items":ritems[:10]}

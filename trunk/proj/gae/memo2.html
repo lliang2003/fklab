@@ -10,7 +10,7 @@
     padding: 2px;
     border: 1px solid blue;
     width: 500px;
-    display: inline-block;
+    display: block;
 }
 .hidden{
     display: none;
@@ -19,7 +19,7 @@
     margin: 0px 0px 0px 0px;
     border: 1px solid green;
     width: 500px;
-    display: block;
+    display: none;
 }
 {% endblock %}
 
@@ -40,6 +40,15 @@
             fail(id)
         }
     }
+
+    function toggle_answer(id) {
+        abox=document.getElementById("answer-"+id);
+        if (abox.style.display=="block")
+            abox.style.display="none";
+        else
+            abox.style.display="block";
+    }
+ 
     function pass(id) {
         passed_items.push(id);
         fbutton = document.getElementById("finish-button")
@@ -59,8 +68,8 @@
 
 {% for item in items %}
     <br>
-    <div class="question" id="question-{{item.id}}" ><pre>{{item.question}}</pre></div>
-    <div class="answer" id="answer-{{item.id}}" ><pre>{{item.answer}}</pre></div>
+    <div class="question" id="question-{{item.id}}" onMouseOut="toggle_answer({{item.id}})" onMouseOver="toggle_answer({{item.id}})"><pre>{{item.tip}}</pre></div>
+    <div class="answer" id="answer-{{item.id}}" ><pre>{{item.word}}</pre></div>
     round={{item.round}}
     <input type="text" id="input-{{item.id}}" onkeyup="check({{item.id}}, '{{item.word}}')" />
     <img id="judge-{{item.id}}" src="pic/wrong.jpg" alt="todo" />
