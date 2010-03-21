@@ -55,8 +55,12 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
  * on the split size can be set via 
  * <a href="{@docRoot} blocksize of the input files is
  * treated as an upper bound for input splits. A lower bound on the split size
- * can be set via <a href="{@docRoot}
- * /../mapred-default.html#mapred.min.split.size"> mapred.min.split.size</a>.
+ * can be set via <a href="{@docRoot} blocksize of the input files is
+ * treated as an upper bound for input splits. A lower bound on the split size
+ * can be set via <a href="{@docRoot} blocksize of the input files is treated as
+ * an upper bound for input splits. A lower bound on the split size can be set
+ * via <a href="{@docRoot} /../mapred-default.html#mapred.min.split.size">
+ * mapred.min.split.size</a>.
  * </p>
  * 
  * <p>
@@ -109,4 +113,11 @@ public abstract class InputFormat<K, V> {
   public abstract RecordReader<K, V> createRecordReader(InputSplit split,
       TaskAttemptContext context) throws IOException, InterruptedException;
 
+  public List<InputSplit> getSplits(JobContext context, String file) throws IOException,
+      InterruptedException {
+    Configuration conf = new Configuration(context.getConfiguration());
+    conf.set("mapred.input.dir", file);
+    JobContext newContext = new JobContext(conf, context.getJobID());
+    return getSplits(newContext);
+  }
 }
