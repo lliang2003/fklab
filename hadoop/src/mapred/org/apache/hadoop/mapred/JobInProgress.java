@@ -2515,7 +2515,7 @@ class JobInProgress {
       addPredecessor(jid);
       jip.addSuccessor(this.getJobID());
     }
-  }
+  } 
 
   JobTracker tracker = null;
   Set<JobID> predecessors = new HashSet<JobID>();
