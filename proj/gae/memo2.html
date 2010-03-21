@@ -75,13 +75,8 @@
     <img id="judge-{{item.id}}" src="pic/wrong.jpg" alt="todo" />
     <br>
 {% endfor %}
-<a id="finish_button" href="javascript:finish()">Finish This Round</a>
 
-<div style="display:none">
-{% for item in allitems %}
-round={{item.round}} lastpass={{item.lastpass}} id={{item.id}} <br>
-{% endfor %}
-</div>
+<button onclick="finish()">Finish this round</button>
 
 <form method="post" action="/memo">
     Question:<br>
@@ -91,9 +86,4 @@ round={{item.round}} lastpass={{item.lastpass}} id={{item.id}} <br>
     <input type="submit" value="Add item"/>
 </form>
 
-Import 
-<form method="post" action="/memo_import" enctype="multipart/form-data">
-    <input type="file" name="mfile" size="40"> 
-    <input type="submit" value="Upload">
-</form>
 {% endblock %}
