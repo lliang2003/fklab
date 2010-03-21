@@ -1,5 +1,5 @@
 application: fankaicn
-version: 1
+version: 2
 runtime: python
 api_version: 1
 
@@ -32,6 +32,6 @@ handlers:
 - url: /.*
   script: hello.py
 
-
+# version 2, add word spelling check in memo
     
 
