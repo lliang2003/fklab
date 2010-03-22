@@ -58,7 +58,7 @@ class TaskInProgress {
   private String jobFile = null;
   private RawSplit rawSplit;
   private int numMaps;
-  private int partition;
+  public int partition;
   private JobTracker jobtracker;
   private TaskID id;
   private JobInProgress job;

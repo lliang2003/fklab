@@ -150,9 +150,9 @@ class JobQueueTaskScheduler extends TaskScheduler {
       synchronized (jobQueue) {
         for (JobInProgress job : jobQueue) {
           if (job.getStatus().getRunState() != JobStatus.RUNNING) {
+            LOG.info(job.getJobID()+" "+job.getStatus().getRunState());
             continue;
           }
-
           Task t = null;
 
           // Try to schedule a node-local or rack-local Map task
