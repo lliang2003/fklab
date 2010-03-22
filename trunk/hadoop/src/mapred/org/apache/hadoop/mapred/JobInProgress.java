@@ -346,18 +346,18 @@ class JobInProgress {
     }
     for (String host : splitLocations) {
       Node node = jobtracker.resolveAndAddToTopology(host);
-      LOG.info("tip:" + map_tip.getTIPId() + " has split on node:" + node);
+      LOG.info(this.getJobID()+" tip:" + map_tip.getTIPId() + " has split on node:" + node);
       for (int j = 0; j < maxLevel; j++) {
         List<TaskInProgress> hostMaps = cache.get(node);
         if (hostMaps == null) {
           hostMaps = new ArrayList<TaskInProgress>();
           cache.put(node, hostMaps);
           hostMaps.add(map_tip);
-          LOG.info("added cache host="+host+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
+          LOG.info(getJobID() + " added new cache node="+node+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
         }
         if (hostMaps.size()==0 || hostMaps.get(hostMaps.size() - 1) != map_tip) {
           hostMaps.add(map_tip);
-          LOG.info("added cache host="+host+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
+          LOG.info(getJobID() + " added cache node="+node+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
         }
         node = node.getParent();
       }
@@ -977,7 +977,7 @@ class JobInProgress {
 
   public synchronized Task obtainNewNonLocalMapTask(TaskTrackerStatus tts, int clusterSize,
       int numUniqueHosts) throws IOException {
-    LOG.info("obtain new non-local map task");
+//    LOG.info("obtain new non-local map task");
     if (!tasksInited.get()) {
       LOG.info("Cannot create task split for " + profile.getJobID());
       return null;
@@ -1052,7 +1052,7 @@ class JobInProgress {
     if (launchCleanupTask) {
       launchCleanupTask = ((finishedReduceTasks + failedReduceTIPs) == numReduceTasks);
     }
-    return launchCleanupTask;
+    return launchCleanupTask && predecessors.size() == 0;
   }
 
   /**
@@ -1089,8 +1089,8 @@ class JobInProgress {
   }
 
   public synchronized boolean scheduleReduces() {
-    LOG.info(getJobID() + " predecessors:" + predecessors.size() + " finished map:"
-        + finishedMapTasks + "/" + numMapTasks);
+//    LOG.info(getJobID() + " predecessors:" + predecessors.size() + " finished map:"
+//        + finishedMapTasks + "/" + numMapTasks);
     // LOG.info("schedule reduces: "+(predecessors.size() == 0 &&
     // finishedMapTasks == numMapTasks));
     return predecessors.size() == 0 && finishedMapTasks == numMapTasks;
@@ -1731,7 +1731,7 @@ class JobInProgress {
       }
     }
     
-    LOG.info("checked max level tips");
+//    LOG.info("checked max level tips");
     
     // 3. Search non-local tips for a new task
     tip = findTaskFromList(nonLocalMaps, tts, numUniqueHosts, false);
@@ -1742,7 +1742,7 @@ class JobInProgress {
       LOG.info("Choosing a non-local task " + tip.getTIPId());
       return tip.getIdWithinJob();
     }
-    LOG.info("checked non-local tips");
+//    LOG.info("checked non-local tips");
     //
     // II) Running TIP :
     // 
@@ -1973,14 +1973,6 @@ class JobInProgress {
         this.status.setReduceProgress(1.0f);
       }
       addSuccessiveMaps();
-
-      LOG.info(getJobID() + " finish reduce:" + finishedReduceTasks + "/" + numReduceTasks);
-      if (finishedReduceTasks == numReduceTasks) {
-        for (JobID id : successors.keySet()) {
-          tracker.jobs.get(id).delPredecessor(this.getJobID());
-        }
-        successors.clear();
-      }
     }
     return true;
   }
@@ -1989,16 +1981,16 @@ class JobInProgress {
     // Add map input for successive tasks
     try {
       Path outputDir = new Path(conf.get("mapred.output.dir"));
-      LOG.info("test dir "+outputDir);
+//      LOG.info("test dir "+outputDir);
       FileSystem fs = outputDir.getFileSystem(conf);
       for (FileStatus fileStatus : fs.listStatus(outputDir)) {
         String ofile = fileStatus.getPath().toString();
-        LOG.info("test for path "+ofile);
+//        LOG.info("test for path "+ofile);
         if (!fileStatus.getPath().getName().startsWith("part"))
           continue;
         for (JobID id : successors.keySet()) {
           Set<String> mapInputs = successors.get(id);
-          LOG.info("add input path " + ofile + " for " + id);
+          LOG.info("add map input path " + ofile + " for " + id);
           if (mapInputs.contains(id))
             continue;
           tracker.jobs.get(id).addMapInput(ofile);
@@ -2036,6 +2028,12 @@ class JobInProgress {
       garbageCollect();
 
       metrics.completeJob(this.conf, this.status.getJobID());
+      
+      for (JobID id : successors.keySet()) {
+        tracker.jobs.get(id).delPredecessor(this.getJobID());
+      }
+      successors.clear();
+
     }
   }
 
@@ -2548,11 +2546,13 @@ class JobInProgress {
     try {
       String jobFile = profile.getJobFile();
       List<RawSplit> splits = getSplits(file);
-      LOG.info("get "+splits.size()+" for file "+file);
+      LOG.info("get "+splits.size()+" splits for file "+file);
       for (int i = 0; i < splits.size(); ++i) {
         inputLength += splits.get(i).getDataLength();
         maps.add(new TaskInProgress(jobId, jobFile, splits.get(i), jobtracker, conf, this,
             numMapTasks+i));
+        if (nonRunningMapCache == null)
+            nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
         addToCache(nonRunningMapCache, splits.get(i), maps.get(numMapTasks+i), maxLevel);
       }
       numMapTasks += splits.size();
