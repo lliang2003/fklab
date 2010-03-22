@@ -182,10 +182,10 @@ public abstract class FileInputFormat<K, V> extends InputFormat<K, V> {
                                         ) throws IOException {
     List<FileStatus> result = new ArrayList<FileStatus>();
     Path[] dirs = getInputPaths(job);
-    if (dirs.length == 0) {
-      throw new IOException("No input paths specified in job");
-    }
-
+//    if (dirs.length == 0) {
+//      throw new IOException("No input paths specified in job");
+//    }
+    if (dirs.length == 0) return result;
     List<IOException> errors = new ArrayList<IOException>();
     
     // creates a MultiPathFilter with the hiddenFileFilter and the

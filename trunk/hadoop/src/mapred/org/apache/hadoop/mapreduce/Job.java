@@ -460,5 +460,10 @@ public class Job extends JobContext {
     String depends = conf.get("mapred.depends");
     conf.set("mapred.depends", depends == null ? ""+jid.id : depends + "," + jid.id);
   }
-  
+
+  public void addMerge(JobID jid) {
+    Configuration conf = getConfiguration();
+    String depends = conf.get("mapred.merges");
+    conf.set("mapred.merges", depends == null ? ""+jid.id : depends + "," + jid.id);
+  }
 }
