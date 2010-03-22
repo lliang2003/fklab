@@ -591,8 +591,8 @@ class JobInProgress {
    * 
    * @return the raw array of maps for this job
    */
-  List<TaskInProgress> getMapTasks() {
-    return maps;
+  TaskInProgress[] getMapTasks() {
+    return maps.toArray(new TaskInProgress[0]);
   }
 
   /**
@@ -964,7 +964,7 @@ class JobInProgress {
 
     int target = findNewMapTask(tts, clusterSize, numUniqueHosts, maxLevel, status
         .mapProgress());
-    LOG.info(this.getJobID()+ " found new map "+target);
+//    LOG.info(this.getJobID()+ " found new map "+target);
     if (target == -1) { return null; }
 
     Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
@@ -1612,7 +1612,7 @@ class JobInProgress {
       final int clusterSize, final int numUniqueHosts, final int maxCacheLevel,
       final double avgProgress) {
     if (numMapTasks == 0) {
-      LOG.info("No maps to schedule for " + profile.getJobID());
+//      LOG.info("No maps to schedule for " + profile.getJobID());
       return -1;
     }
 
@@ -1674,7 +1674,7 @@ class JobInProgress {
       for (level = 0; level < maxLevelToSchedule; ++level) {
         List<TaskInProgress> cacheForLevel = nonRunningMapCache.get(key);
         if (cacheForLevel != null) {
-          LOG.info(this.getJobID() +" check cache for node:"+key+" size:"+cacheForLevel.size());
+//          LOG.info(this.getJobID() +" check cache for node:"+key+" size:"+cacheForLevel.size());
           tip = findTaskFromList(cacheForLevel, tts, numUniqueHosts, level == 0);
           if (tip != null) {
             // Add to running cache
@@ -1846,7 +1846,7 @@ class JobInProgress {
       scheduleReduce(tip);
       return tip.getIdWithinJob();
     }
-    LOG.info(getJobID() + " find new reduce task, done check list");
+//    LOG.info(getJobID() + " find new reduce task, done check list");
 
     // 2. check for a reduce tip to be speculated
     if (hasSpeculativeReduces) {
@@ -1857,7 +1857,7 @@ class JobInProgress {
         return tip.getIdWithinJob();
       }
     }
-    LOG.info(getJobID() + " find new reduce task, done check speculative tasks");
+//    LOG.info(getJobID() + " find new reduce task, done check speculative tasks");
 
     return -1;
   }
@@ -1990,9 +1990,9 @@ class JobInProgress {
           continue;
         for (JobID id : successors.keySet()) {
           Set<String> mapInputs = successors.get(id);
-          LOG.info("add map input path " + ofile + " for " + id);
-          if (mapInputs.contains(id))
+          if (mapInputs.contains(ofile))
             continue;
+          LOG.info("add map input path " + ofile + " for " + id);
           tracker.jobs.get(id).addMapInput(ofile);
           mapInputs.add(ofile);
         }
@@ -2516,30 +2516,25 @@ class JobInProgress {
   }
 
   public synchronized void addPredecessor(JobID jid) {
-    LOG.info(getJobID() + " add predecessor:" + jid);
     predecessors.add(jid);
-    LOG.info(getJobID() + " size of precessors:" + predecessors.size());
+    LOG.info(getJobID() + " add predecessor:" + jid + " size:" + predecessors.size());
   }
 
   public synchronized void addSuccessor(JobID jid) {
-    LOG.info(getJobID() + " add successor:" + jid);
     successors.put(jid, new HashSet<String>() );
-    LOG.info(getJobID() + " size of successor:" + successors.size());
+    LOG.info(getJobID() + " add successor:" + jid + " size:" + successors.size());
   }
 
   public synchronized void delPredecessor(JobID jid) {
-    LOG.info(getJobID() + " del predecessor:" + jid);
     predecessors.remove(jid);
-    LOG.info(getJobID() + " size of precessors:" + predecessors.size());
+    LOG.info(getJobID() + " del predecessor:" + jid + " size:" + predecessors.size());
     if (predecessors.size() == 0)
       initReduceTasks();
   }
 
   public synchronized void delSuccessor(JobID jid) {
-    LOG.info(getJobID() + " del successor:" + jid);
     successors.remove(jid);
-    LOG.info(getJobID() + " size of successor:" + successors.size());
-
+    LOG.info(getJobID() + " del successor:" + jid + " size:" + successors.size());
   }
   
   public synchronized void addMapInput(String file) {
