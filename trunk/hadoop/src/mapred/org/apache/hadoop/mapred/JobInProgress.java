@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -35,16 +36,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.serializer.SerializationFactory;
+import org.apache.hadoop.io.serializer.Serializer;
+import org.apache.hadoop.mapred.JobClient.RawSplit;
 import org.apache.hadoop.mapred.JobHistory.Values;
+import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.metrics.MetricsContext;
 import org.apache.hadoop.metrics.MetricsRecord;
 import org.apache.hadoop.metrics.MetricsUtil;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.net.NetworkTopology;
 import org.apache.hadoop.net.Node;
+import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.hadoop.util.StringUtils;
 
 /*************************************************************
@@ -345,9 +353,11 @@ class JobInProgress {
           hostMaps = new ArrayList<TaskInProgress>();
           cache.put(node, hostMaps);
           hostMaps.add(map_tip);
+          LOG.info("added cache host="+host+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
         }
-        if (hostMaps.get(hostMaps.size() - 1) != map_tip) {
+        if (hostMaps.size()==0 || hostMaps.get(hostMaps.size() - 1) != map_tip) {
           hostMaps.add(map_tip);
+          LOG.info("added cache host="+host+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
         }
         node = node.getParent();
       }
@@ -954,6 +964,7 @@ class JobInProgress {
 
     int target = findNewMapTask(tts, clusterSize, numUniqueHosts, maxLevel, status
         .mapProgress());
+    LOG.info(this.getJobID()+ " found new map "+target);
     if (target == -1) { return null; }
 
     Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
@@ -966,6 +977,7 @@ class JobInProgress {
 
   public synchronized Task obtainNewNonLocalMapTask(TaskTrackerStatus tts, int clusterSize,
       int numUniqueHosts) throws IOException {
+    LOG.info("obtain new non-local map task");
     if (!tasksInited.get()) {
       LOG.info("Cannot create task split for " + profile.getJobID());
       return null;
@@ -1662,6 +1674,7 @@ class JobInProgress {
       for (level = 0; level < maxLevelToSchedule; ++level) {
         List<TaskInProgress> cacheForLevel = nonRunningMapCache.get(key);
         if (cacheForLevel != null) {
+          LOG.info(this.getJobID() +" check cache for node:"+key+" size:"+cacheForLevel.size());
           tip = findTaskFromList(cacheForLevel, tts, numUniqueHosts, level == 0);
           if (tip != null) {
             // Add to running cache
@@ -1681,7 +1694,6 @@ class JobInProgress {
       // Check if we need to only schedule a local task (node-local/rack-local)
       if (level == maxCacheLevel) { return -1; }
     }
-
     // 2. Search breadth-wise across parents at max level for non-running
     // TIP if
     // - cache exists and there is a cache miss
@@ -1718,7 +1730,9 @@ class JobInProgress {
         }
       }
     }
-
+    
+    LOG.info("checked max level tips");
+    
     // 3. Search non-local tips for a new task
     tip = findTaskFromList(nonLocalMaps, tts, numUniqueHosts, false);
     if (tip != null) {
@@ -1728,7 +1742,7 @@ class JobInProgress {
       LOG.info("Choosing a non-local task " + tip.getTIPId());
       return tip.getIdWithinJob();
     }
-
+    LOG.info("checked non-local tips");
     //
     // II) Running TIP :
     // 
@@ -1942,6 +1956,7 @@ class JobInProgress {
       metrics.completeMap(taskid);
       // remove the completed map from the resp running caches
       retireMap(tip);
+      addSuccessiveMaps();
       if ((finishedMapTasks + failedMapTIPs) == (numMapTasks)) {
         this.status.setMapProgress(1.0f);
       }
@@ -1957,17 +1972,42 @@ class JobInProgress {
       if ((finishedReduceTasks + failedReduceTIPs) == (numReduceTasks)) {
         this.status.setReduceProgress(1.0f);
       }
+      addSuccessiveMaps();
+
       LOG.info(getJobID() + " finish reduce:" + finishedReduceTasks + "/" + numReduceTasks);
-      // TODO: add map tasks for successive jobs
       if (finishedReduceTasks == numReduceTasks) {
-        for (JobID id : successors) {
+        for (JobID id : successors.keySet()) {
           tracker.jobs.get(id).delPredecessor(this.getJobID());
         }
         successors.clear();
       }
     }
-
     return true;
+  }
+
+  public void addSuccessiveMaps() {
+    // Add map input for successive tasks
+    try {
+      Path outputDir = new Path(conf.get("mapred.output.dir"));
+      LOG.info("test dir "+outputDir);
+      FileSystem fs = outputDir.getFileSystem(conf);
+      for (FileStatus fileStatus : fs.listStatus(outputDir)) {
+        String ofile = fileStatus.getPath().toString();
+        LOG.info("test for path "+ofile);
+        if (!fileStatus.getPath().getName().startsWith("part"))
+          continue;
+        for (JobID id : successors.keySet()) {
+          Set<String> mapInputs = successors.get(id);
+          LOG.info("add input path " + ofile + " for " + id);
+          if (mapInputs.contains(id))
+            continue;
+          tracker.jobs.get(id).addMapInput(ofile);
+          mapInputs.add(ofile);
+        }
+      }
+    } catch (Exception e) {
+      LOG.info(e.getMessage());
+    }
   }
 
   /**
@@ -2485,7 +2525,7 @@ class JobInProgress {
 
   public synchronized void addSuccessor(JobID jid) {
     LOG.info(getJobID() + " add successor:" + jid);
-    successors.add(jid);
+    successors.put(jid, new HashSet<String>() );
     LOG.info(getJobID() + " size of successor:" + successors.size());
   }
 
@@ -2503,8 +2543,30 @@ class JobInProgress {
     LOG.info(getJobID() + " size of successor:" + successors.size());
 
   }
+  
+  public synchronized void addMapInput(String file) {
+    try {
+      String jobFile = profile.getJobFile();
+      List<RawSplit> splits = getSplits(file);
+      LOG.info("get "+splits.size()+" for file "+file);
+      for (int i = 0; i < splits.size(); ++i) {
+        inputLength += splits.get(i).getDataLength();
+        maps.add(new TaskInProgress(jobId, jobFile, splits.get(i), jobtracker, conf, this,
+            numMapTasks+i));
+        addToCache(nonRunningMapCache, splits.get(i), maps.get(numMapTasks+i), maxLevel);
+      }
+      numMapTasks += splits.size();
+      LOG.info("Input size for job " + jobId + " = " + inputLength
+          + ". Number of map = " + numMapTasks);
+    } catch (Exception e) {
+      LOG.error(e);
+      for (Object o:e.getStackTrace()) {
+        LOG.error(o);
+      }
+    }
+  }
 
-  public synchronized void initDepends() {
+  public void initDepends() {
     String depends = conf.get("mapred.depends");
     if (depends == null)
       return;
@@ -2515,9 +2577,36 @@ class JobInProgress {
       addPredecessor(jid);
       jip.addSuccessor(this.getJobID());
     }
-  } 
+  }
+  
+  // mainly copied from JobClient.writeNewSplits()
+  @SuppressWarnings("unchecked")
+  public <T extends org.apache.hadoop.mapreduce.InputSplit> List<RawSplit> getSplits(
+      String file) throws Exception {
+    JobContext context = new JobContext(conf, jobId);
+    org.apache.hadoop.mapreduce.InputFormat<?, ?> input = ReflectionUtils.newInstance(
+        context.getInputFormatClass(), conf);
+    List<InputSplit> splits = input.getSplits(context, file);
+    T[] array = (T[]) splits.toArray(new org.apache.hadoop.mapreduce.InputSplit[splits
+        .size()]);
+    List<RawSplit> rsplits = new ArrayList<RawSplit>();
+    DataOutputBuffer buffer = new DataOutputBuffer();
+    SerializationFactory factory = new SerializationFactory(conf);
+    Serializer<T> serializer = factory.getSerializer((Class<T>) array[0].getClass());
+    serializer.open(buffer);
+    for (T split : array) {
+      RawSplit rawSplit = new RawSplit();
+      rawSplit.setClassName(split.getClass().getName());
+      serializer.serialize(split);
+      rawSplit.setDataLength(split.getLength());
+      rawSplit.setBytes(buffer.getData(), 0, buffer.getLength());
+      rawSplit.setLocations(split.getLocations());
+      rsplits.add(rawSplit);
+    }
+    return rsplits;
+  }
 
   JobTracker tracker = null;
   Set<JobID> predecessors = new HashSet<JobID>();
-  Set<JobID> successors = new HashSet<JobID>();
+  Map<JobID, Set<String>> successors = new HashMap<JobID, Set<String> >();
 }
