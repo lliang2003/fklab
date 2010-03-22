@@ -1854,7 +1854,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
   // /////////////////////////////////////////////////////
   void createTaskEntry(TaskAttemptID taskid, String taskTracker, TaskInProgress tip) {
     LOG.info("Adding task " + (tip.isCleanupAttempt(taskid) ? "(cleanup)" : "") + "'"
-        + taskid + "' to tip " + tip.getTIPId() + ", for tracker '" + taskTracker + "'");
+        + taskid + " for tracker '" + taskTracker + "'");
 
     // taskid --> tracker
     taskidToTrackerMap.put(taskid, taskTracker);
