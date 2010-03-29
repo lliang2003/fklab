@@ -30,10 +30,15 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.DataInputBuffer;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.serializer.Deserializer;
+import org.apache.hadoop.io.serializer.SerializationFactory;
+import org.apache.hadoop.io.serializer.Serializer;
 import org.apache.hadoop.mapred.JobClient.RawSplit;
 import org.apache.hadoop.mapred.SortedRanges.Range;
 import org.apache.hadoop.net.Node;
-
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 /*************************************************************
  * TaskInProgress maintains all the info needed for a Task in the lifetime of
  * its owning Job. A given Task might be speculatively executed or reexecuted,
@@ -1141,5 +1146,39 @@ class TaskInProgress {
 
   TreeMap<TaskAttemptID, String> getActiveTasks() {
     return activeTasks;
+  }
+  
+  public RawSplit[] getSplitParts(int numParts) throws IOException {
+    if (jobSetup || jobCleanup || ! isMapTask()) return null;
+    RawSplit[] rsplits = new RawSplit[numParts];
+    
+    FileSplit fsplit = new FileSplit(null, 0, 0, null);
+    DataInputBuffer splitBuffer = new DataInputBuffer();
+    splitBuffer.reset(rawSplit.getBytes().getBytes(), 0, rawSplit.getBytes().getLength());
+    fsplit.readFields(splitBuffer);
+    long len = rawSplit.getDataLength()/numParts;
+    FileSplit psplit;
+    LOG.info("get split part from:"+fsplit.getPath()+" "+fsplit.getStart()+" "+fsplit.getLength());
+
+    DataOutputBuffer buffer = new DataOutputBuffer();
+    SerializationFactory factory = new SerializationFactory(conf);
+    Serializer<FileSplit> serializer = factory.getSerializer(FileSplit.class);
+    serializer.open(buffer);
+    for (int i = 0; i < numParts; ++i) {
+      if (i == numParts-1)
+        psplit = new FileSplit(fsplit.getPath(), fsplit.getStart()+len*i, rawSplit.getDataLength()-len*i, null);
+      else
+        psplit = new FileSplit(fsplit.getPath(), fsplit.getStart()+len*i, len, null);
+      LOG.info("get split part:"+psplit.getPath()+" "+psplit.getStart()+" "+psplit.getLength());
+      RawSplit rsplit = new RawSplit();
+      rsplit.setClassName(psplit.getClass().getName());
+      buffer.reset();
+      serializer.serialize(psplit);
+      rsplit.setDataLength(psplit.getLength());
+      rsplit.setBytes(buffer.getData(), 0, buffer.getLength());
+      rsplit.setLocations(psplit.getLocations());
+      rsplits[i] = rsplit;
+    }
+    return rsplits;
   }
 }
