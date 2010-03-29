@@ -40,7 +40,9 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.serializer.Deserializer;
 import org.apache.hadoop.io.serializer.SerializationFactory;
 import org.apache.hadoop.io.serializer.Serializer;
 import org.apache.hadoop.mapred.JobClient.RawSplit;
@@ -1974,9 +1976,24 @@ class JobInProgress {
       }
       addSuccessiveMaps();
     }
+//    if (subTasks.contains(tip) || dynamicTaskMap.containsKey(tip)) {
+//      checkSubTasks(tip);
+//    }
     return true;
   }
 
+//  // decide whether one tip is successful
+//  public void checkSubTasks(TaskInProgress tip) {
+//    if (dynamicTaskMap.containsKey(tip)) {
+//      Set<TaskInProgress> subTips = dynamicTaskMap.get(tip);
+//      for (TaskInProgress stip: subTips) {
+//        //TODO fail stip;
+//      }
+//    } else {
+//      //TODO
+//    }
+//  }
+  
   public void addSuccessiveMaps() {
     // Add map input for successive tasks
     try {
@@ -2537,20 +2554,25 @@ class JobInProgress {
     LOG.info(getJobID() + " del successor:" + jid + " size:" + successors.size());
   }
   
+  public TaskInProgress createMap(RawSplit split) {
+    String jobFile = profile.getJobFile();
+    inputLength += split.getDataLength();
+    TaskInProgress tip = new TaskInProgress(jobId, jobFile, split, jobtracker, conf, this, numMapTasks);
+    maps.add(tip);
+    if (nonRunningMapCache == null)
+        nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
+    addToCache(nonRunningMapCache, split, tip, maxLevel);
+    numMapTasks ++;
+    return tip;
+  }
+  
   public synchronized void addMapInput(String file) {
     try {
-      String jobFile = profile.getJobFile();
       List<RawSplit> splits = getSplits(file);
       LOG.info("get "+splits.size()+" splits for file "+file);
       for (int i = 0; i < splits.size(); ++i) {
-        inputLength += splits.get(i).getDataLength();
-        maps.add(new TaskInProgress(jobId, jobFile, splits.get(i), jobtracker, conf, this,
-            numMapTasks+i));
-        if (nonRunningMapCache == null)
-            nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
-        addToCache(nonRunningMapCache, splits.get(i), maps.get(numMapTasks+i), maxLevel);
+        createMap(splits.get(i));
       }
-      numMapTasks += splits.size();
       LOG.info("Input size for job " + jobId + " = " + inputLength
           + ". Number of map = " + numMapTasks);
     } catch (Exception e) {
@@ -2592,6 +2614,7 @@ class JobInProgress {
     for (T split : array) {
       RawSplit rawSplit = new RawSplit();
       rawSplit.setClassName(split.getClass().getName());
+      buffer.reset();
       serializer.serialize(split);
       rawSplit.setDataLength(split.getLength());
       rawSplit.setBytes(buffer.getData(), 0, buffer.getLength());
@@ -2600,8 +2623,26 @@ class JobInProgress {
     }
     return rsplits;
   }
-
+  
+//  public void createDynamicTasks(TaskInProgress tip, int numParts) {
+//    Set<TaskInProgress> subTips = new HashSet<TaskInProgress>();
+//    RawSplit[] splits;
+//    try {
+//      splits = tip.getSplitParts(numParts);
+//      for (RawSplit split : splits) {
+//        TaskInProgress subTip = createMap(split);
+//        subTips.add(subTip);
+//        subTasks.add(subTip);
+//      }
+//      dynamicTaskMap.put(tip, subTips);
+//    } catch (IOException e) {
+//      // TODO Auto-generated catch block
+//      LOG.error(e);
+//    }
+//  }
   JobTracker tracker = null;
   Set<JobID> predecessors = new HashSet<JobID>();
-  Map<JobID, Set<String>> successors = new HashMap<JobID, Set<String> >();
+  Map<JobID, Set<String>> successors = new HashMap<JobID, Set<String>>();
+  Map<TaskInProgress, Set<TaskInProgress>> dynamicTaskMap = new HashMap<TaskInProgress, Set<TaskInProgress>>();
+  Set<TaskInProgress> subTasks = new HashSet<TaskInProgress>();
 }
