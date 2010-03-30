@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 
-intervals=[1, 1, 2, 4, 8, 16, 32, 64, 128]
+intervals=[1, 0, 2, 0, 4, 0, 3, 0, 1, 0, 36, 0, 2, 0, 1, 0, 64]
 
 #secondsPerDay = 2
 secondsPerDay = 24*3600
@@ -31,9 +31,10 @@ class MemoPage(webapp.RequestHandler):
                 if r.name == "action": continue
                 id = int(r.name[1:])
                 item = MemoStore.all().filter("id =", id).get()
+                #if not item: continue
                 if r.value == "pass":
                     current = int(time.time())/secondsPerDay
-                    if item.lastpass < current:
+                    if current-item.lastpass>=intervals[item.round]:
                         item.lastpass = current
                         item.round += 1 
                 elif r.value == "done":
@@ -52,7 +53,9 @@ class MemoPage(webapp.RequestHandler):
         items = MemoStore.all()
         today = int(time.time())/secondsPerDay
         for item in items:
-            if item.round < len(intervals) and today - item.lastpass >= intervals[item.round] and item.round%2 > 0:
+            if len(ritems)>=10:break
+            if item.round < len(intervals) and today - item.lastpass >= intervals[item.round] and item.round%2 == 0:
+                item.answer = "<br>".join(item.answer.split("\n")).strip()
                 ritems.append(item)
         if len(ritems) > 0:
             path = os.path.join(os.path.dirname(__file__), 'memo.html')
@@ -60,16 +63,21 @@ class MemoPage(webapp.RequestHandler):
             self.response.out.write(template.render(path, dat))
         else:
             for item in items:
+                if len(ritems)>=10:break
                 if item.round < len(intervals) and today - item.lastpass >= intervals[item.round]:
-                    parts = item.answer.split()
-                    if parts: item.word = parts[0]
-                    else: item.word = "none"
-                    item.answer = " ".join(item.answer.split(" ")[1:]).strip()
-                    item.question = re.sub("%s[a-zA-Z]*"%item.word[:-1], "*", item.question.lower())
-                    item.tip = "%s\n%s"%(item.answer, item.question)
+                    line = item.answer.split("\n")[0]
+                    sindex = line.find("[")
+                    if sindex < 0: sindex = line.find("/")
+                    if sindex < 0: sindex = len(line)
+                    item.word = line[:sindex].lower().strip().replace("'"," ")
+                    item.phonetic = line[sindex:]
+                    item.answer = "<br>".join(item.answer.split("\n")[1:]).strip()
+                    for token in item.word.split():
+                        if len(token)<4: continue
+                        item.question = re.sub(token[1:-1], "*", item.question.lower())
                     ritems.append(item)
             path = os.path.join(os.path.dirname(__file__), 'memo2.html')
-            dat = {"allitems":items, "items":ritems[:10]}
+            dat = {"allitems":items, "items":ritems}
             self.response.out.write(template.render(path, dat))
 
     def post(self):
@@ -79,7 +87,8 @@ class MemoPage(webapp.RequestHandler):
         n.answer = self.request.get('answer')
         n.round = 0
         n.lastpass = -1
-        n.put()
+        if len(n.question)>0 and len(n.answer)>0:
+            n.put()
         self.redirect('/memo')
 
 class MemoImportPage(webapp.RequestHandler):
