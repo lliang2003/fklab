@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Word{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block content %}
+
+<form method="post" action="/word">
+    Text<br>
+    <textarea name="text" rows=18 cols=80></textarea> <br>
+    <input type="submit" value="Check"/>
+</form>
+
+Import 
+<form method="post" action="/word/import" enctype="multipart/form-data">
+    <input type="file" name="mfile" size="40"> 
+    <input type="submit" value="Upload">
+</form>
+
+{% endblock %}
