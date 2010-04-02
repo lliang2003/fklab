@@ -7,7 +7,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 
-intervals=[1, 0, 2, 0, 4, 0, 3, 0, 1, 0, 36, 0, 2, 0, 1, 0, 64]
+intervals=[1, 0, 2, 4, 3, 0, 1, 0, 9]
 
 #secondsPerDay = 2
 secondsPerDay = 24*3600
