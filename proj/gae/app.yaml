@@ -18,13 +18,13 @@ handlers:
   script: notes.py
 
 - url: /memo.*
-  script: /memo.py
+  script: memo.py
 
 - url: /word.*
-  script: /word.py
+  script: word/word.py
 
 - url: /test
-  script: /test.py
+  script: test.py
 
 - url: /pic
   static_dir: pic

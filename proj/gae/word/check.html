@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Word{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block style%}
+
+.unknown{
+    border: 1px solid red;
+}
+.known{
+    border: 1px solid green;
+}
+
+{% endblock %}
+
+{% block script%}
+    var known_words = new Array();
+
+    function know(w) {
+        known_words.push(w);
+        box=document.getElementById(w);
+        box.style.borderColor="gray";
+    }
+
+    function commit() {
+        addr="/word/import?";
+        if (known_words.length>0)
+            addr+="known="+known_words.join(",");
+        window.location=addr;
+    }
+{% endblock %}
+
+{% block content %}
+
+{{txt}}
+
+<button onclick="commit()">Commit</button>
+
+{% endblock %}
