@@ -12,7 +12,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 
-class WordStore(db.Model):
+class UnknownWord(db.Model):
     word = db.StringProperty()
 
 class WordPage(webapp.RequestHandler):
@@ -25,17 +25,26 @@ class WordPage(webapp.RequestHandler):
         txt = self.request.get('text')
         kw = set()
         wpath = os.path.join(os.path.dirname(__file__), 'w.w')
-        for item in WordStore.all():
+        for item in UnknownWord.all():
             kw.add(item.word)
         for token in open(wpath).read().split():
             kw.add(token)
+        uw = set()
         for line in txt.split("\n"):
             for rtoken in line.split():
-                token = rtoken.strip(",.\"'").lower()
-                if "'" in token or token in kw:
-                    html += token+" "
+                token = rtoken.strip(",.\"'!?").lower()
+                flag = True
+                for letter in token:
+                    if letter not in string.ascii_letters:
+                        flag = False
+                        break
+                if token in kw or token in uw:
+                    flag = False
+                if flag:
+                    html+="<a href='javascript:know(\"%s\")'>%s</a> "%(token, rtoken)
+                    uw.add(token)
                 else:
-                    html+="<span id='%s' class='unknown' onclick='know(\"%s\")'>%s</span> "%(rtoken, rtoken,rtoken)
+                    html += rtoken+" "
             html+="<br>\n"
 
         path = os.path.join(os.path.dirname(__file__), 'check.html')
@@ -54,7 +63,7 @@ class WordImport(webapp.RequestHandler):
         kw = form.getvalue("known")
         if kw:
             for token in kw.split(","):
-                w = WordStore()
+                w = UnknownWord()
                 w.word = token.lower()
                 w.put()
         self.redirect("/word")
@@ -67,7 +76,7 @@ class WordImport(webapp.RequestHandler):
             content = form.getvalue('mfile')
             for record in content.split():
                 record = record.strip()
-                n = WordStore();
+                n = UnknownWord();
                 n.word = record
                 n.put()
                 break
