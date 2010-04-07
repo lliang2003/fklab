@@ -853,6 +853,7 @@ class TaskInProgress {
         && !isOnlyCommitPending()) { return true; }
     return false;
   }
+ 
 
   /**
    * Return a Task that can be sent to a TaskTracker for execution.
@@ -1187,4 +1188,10 @@ class TaskInProgress {
     return rsplits;
   }
 
+  public void completedVirtual() {
+    LOG.info(this.getTIPId()+" complete virtually");
+    this.completes++;
+    this.execFinishTime = System.currentTimeMillis();
+    this.progress = 1;
+  }
 }
