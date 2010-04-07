@@ -2002,6 +2002,44 @@ class JobInProgress {
     return true;
   }
 
+  public void checkSubTasks(TaskInProgress tip) {
+    if (subTaskMap.containsKey(tip)) {
+      Set<TaskInProgress> stips = subTaskMap.get(tip);
+      LOG.info("annul all subtasks of " + tip.getTIPId());
+      for (TaskInProgress stip : stips) {
+        abandonedTips.add(stip.getIdWithinJob());
+        if (stip.isComplete()) {
+          LOG.info(stip+" has completed");
+        } else if (stip.isRunning()) {
+          stip.maxTaskAttempts = 1;
+          stip.killAllTasks();
+        } else {
+          stip.completedVirtual();
+          numMapTasks--;
+        }
+        parentTaskMap.remove(stip);
+      }
+      subTaskMap.remove(tip);
+    } else {
+      TaskInProgress ptip = parentTaskMap.get(tip);
+      boolean flag = true;
+      LOG.info("parent tip:"+ptip.getTIPId());
+      for (TaskInProgress stip : subTaskMap.get(ptip)) {
+        if (!stip.isComplete()) {
+          flag = false;
+          break;
+        }
+      }
+      if (flag) {
+        LOG.info("all subtasks of " + tip.getTIPId() + " completed, kill this tip");
+        ptip.killAllTasks();
+        for (TaskInProgress stip : subTaskMap.get(ptip)) {
+          parentTaskMap.remove(stip);
+        }
+        subTaskMap.remove(ptip);
+      }
+    }
+  }
 
   public void addSuccessiveMaps() {
     // Add map input for successive tasks
