@@ -1194,4 +1194,25 @@ class TaskInProgress {
     this.execFinishTime = System.currentTimeMillis();
     this.progress = 1;
   }
+  
+  public void killAllTasks() {
+    LOG.info(this.getTIPId() + " kill all task attempts");
+    for (TaskAttemptID taskid : tasks) {
+      killTask(taskid, true);
+    }
+  }
+
+  static boolean flag = true;
+  boolean hasSpeculativeTask2(long currentTime, double averageProgress) {
+    if ((currentTime - startTime >= 10000) && completes == 0 && !isOnlyCommitPending()) {
+      if (flag) {
+        flag = false;
+        return true;
+      }
+    } else {
+      flag = true;
+    }
+    return false;
+ }
+  
 }
