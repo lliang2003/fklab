@@ -136,12 +136,21 @@ class JobQueueTaskScheduler extends TaskScheduler {
     // with the highest priority.
     //
 
-    final int trackerCurrentMapCapacity = Math.min((int) Math.ceil(mapLoadFactor
+    int trackerCurrentMapCapacity = Math.min((int) Math.ceil(mapLoadFactor
         * trackerMapCapacity), trackerMapCapacity);
+    trackerCurrentMapCapacity = 3;
     int availableMapSlots = trackerCurrentMapCapacity - trackerRunningMaps;
     boolean exceededMapPadding = false;
     if (availableMapSlots > 0) {
       exceededMapPadding = exceededPadding(true, clusterStatus, trackerMapCapacity);
+    }
+    int numMapTasks = 0;
+    for (JobInProgress job: jobQueue) {
+      numMapTasks += job.numMapTasks - job.finishedMapTasks - job.failedMapTIPs;
+    }
+    if (numMapTasks == 1) {
+//      LOG.info("try create dynamic tasks");
+      jobQueue.iterator().next().createDynamicTasks(3);
     }
 
     int numLocalMaps = 0;
