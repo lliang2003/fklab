@@ -47,6 +47,7 @@ import org.apache.hadoop.io.serializer.SerializationFactory;
 import org.apache.hadoop.io.serializer.Serializer;
 import org.apache.hadoop.mapred.JobClient.RawSplit;
 import org.apache.hadoop.mapred.JobHistory.Values;
+import org.apache.hadoop.mapred.JobTracker.State;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.metrics.MetricsContext;
 import org.apache.hadoop.metrics.MetricsRecord;
@@ -348,18 +349,21 @@ class JobInProgress {
     }
     for (String host : splitLocations) {
       Node node = jobtracker.resolveAndAddToTopology(host);
-      LOG.info(this.getJobID()+" tip:" + map_tip.getTIPId() + " has split on node:" + node);
+      LOG.info(this.getJobID() + " tip:" + map_tip.getTIPId() + " has split on node:"
+          + node);
       for (int j = 0; j < maxLevel; j++) {
         List<TaskInProgress> hostMaps = cache.get(node);
         if (hostMaps == null) {
           hostMaps = new ArrayList<TaskInProgress>();
           cache.put(node, hostMaps);
           hostMaps.add(map_tip);
-          LOG.info(getJobID() + " added new cache node="+node+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
+//          LOG.info(getJobID() + " added new cache node=" + node + " tip="
+//              + map_tip.getIdWithinJob() + " size=" + hostMaps.size());
         }
-        if (hostMaps.size()==0 || hostMaps.get(hostMaps.size() - 1) != map_tip) {
+        if (hostMaps.size() == 0 || hostMaps.get(hostMaps.size() - 1) != map_tip) {
           hostMaps.add(map_tip);
-          LOG.info(getJobID() + " added cache node="+node+" tip="+map_tip.getIdWithinJob()+" size="+hostMaps.size());
+//          LOG.info(getJobID() + " added cache node=" + node + " tip="
+//              + map_tip.getIdWithinJob() + " size=" + hostMaps.size());
         }
         node = node.getParent();
       }
@@ -380,6 +384,7 @@ class JobInProgress {
     return restartCount > 0;
   }
 
+  boolean reduceInited = false;
   public synchronized void initReduceTasks() {
     if (isComplete()) { return; }
     LOG.info("Initializing " + jobId + " for reduce");
@@ -394,6 +399,7 @@ class JobInProgress {
           this);
       nonRunningReduces.add(reduces[i]);
     }
+    reduceInited = true;
   }
 
   /**
@@ -480,8 +486,8 @@ class JobInProgress {
         jobtracker, conf, this);
     setup[1].setJobSetupTask();
 
-    if (predecessors.size() == 0)
-      initReduceTasks();
+//    if (predecessors.size() == 0)
+//      initReduceTasks();
 
     tasksInited.set(true);
 
@@ -717,6 +723,8 @@ class JobInProgress {
    * Assuming {@link JobTracker} is locked on entry.
    */
   public synchronized void updateTaskStatus(TaskInProgress tip, TaskStatus status) {
+    if (status.getRunState() != TaskStatus.State.RUNNING)
+      LOG.info("update task status:"+status.getTaskID()+" "+status.getRunState());
 
     double oldProgress = tip.getProgress(); // save old progress
     boolean wasRunning = tip.isRunning();
@@ -966,7 +974,7 @@ class JobInProgress {
 
     int target = findNewMapTask(tts, clusterSize, numUniqueHosts, maxLevel, status
         .mapProgress());
-//    LOG.info(this.getJobID()+ " found new map "+target);
+    // LOG.info(this.getJobID()+ " found new map "+target);
     if (target == -1) { return null; }
 
     Task result = maps.get(target).getTaskToRun(tts.getTrackerName());
@@ -979,7 +987,7 @@ class JobInProgress {
 
   public synchronized Task obtainNewNonLocalMapTask(TaskTrackerStatus tts, int clusterSize,
       int numUniqueHosts) throws IOException {
-//    LOG.info("obtain new non-local map task");
+    // LOG.info("obtain new non-local map task");
     if (!tasksInited.get()) {
       LOG.info("Cannot create task split for " + profile.getJobID());
       return null;
@@ -1092,10 +1100,14 @@ class JobInProgress {
 
   public synchronized boolean scheduleReduces() {
 //    LOG.info(getJobID() + " predecessors:" + predecessors.size() + " finished map:"
-//        + finishedMapTasks + "/" + numMapTasks);
+//        + finishedMapTasks + " " + this.failedMapTIPs + " "
+//        + numMapTasks);
     // LOG.info("schedule reduces: "+(predecessors.size() == 0 &&
     // finishedMapTasks == numMapTasks));
-    return predecessors.size() == 0 && finishedMapTasks == numMapTasks;
+    boolean flag = (predecessors.size() == 0 && (finishedMapTasks + failedMapTIPs) == (numMapTasks));
+    if (flag && !reduceInited)
+      initReduceTasks();
+    return flag;
   }
 
   /**
@@ -1587,6 +1599,10 @@ class JobInProgress {
           iter.remove();
         }
       }
+      if (!subTaskMap.containsKey(tip) && !subTips.contains(tip) && tip.hasSpeculativeTask2(currentTime, avgProgress)) {
+        createDynamicTasks(tip, 4);
+        return null;
+      }
     }
     return null;
   }
@@ -1614,7 +1630,7 @@ class JobInProgress {
       final int clusterSize, final int numUniqueHosts, final int maxCacheLevel,
       final double avgProgress) {
     if (numMapTasks == 0) {
-//      LOG.info("No maps to schedule for " + profile.getJobID());
+      // LOG.info("No maps to schedule for " + profile.getJobID());
       return -1;
     }
 
@@ -1676,7 +1692,8 @@ class JobInProgress {
       for (level = 0; level < maxLevelToSchedule; ++level) {
         List<TaskInProgress> cacheForLevel = nonRunningMapCache.get(key);
         if (cacheForLevel != null) {
-//          LOG.info(this.getJobID() +" check cache for node:"+key+" size:"+cacheForLevel.size());
+          // LOG.info(this.getJobID()
+          // +" check cache for node:"+key+" size:"+cacheForLevel.size());
           tip = findTaskFromList(cacheForLevel, tts, numUniqueHosts, level == 0);
           if (tip != null) {
             // Add to running cache
@@ -1732,9 +1749,9 @@ class JobInProgress {
         }
       }
     }
-    
-//    LOG.info("checked max level tips");
-    
+
+    // LOG.info("checked max level tips");
+
     // 3. Search non-local tips for a new task
     tip = findTaskFromList(nonLocalMaps, tts, numUniqueHosts, false);
     if (tip != null) {
@@ -1744,11 +1761,12 @@ class JobInProgress {
       LOG.info("Choosing a non-local task " + tip.getTIPId());
       return tip.getIdWithinJob();
     }
-//    LOG.info("checked non-local tips");
+    // LOG.info("checked non-local tips");
     //
     // II) Running TIP :
     // 
 
+    // LOG.info("find speculative maps");
     if (hasSpeculativeMaps) {
       long currentTime = System.currentTimeMillis();
 
@@ -1848,7 +1866,7 @@ class JobInProgress {
       scheduleReduce(tip);
       return tip.getIdWithinJob();
     }
-//    LOG.info(getJobID() + " find new reduce task, done check list");
+    // LOG.info(getJobID() + " find new reduce task, done check list");
 
     // 2. check for a reduce tip to be speculated
     if (hasSpeculativeReduces) {
@@ -1859,7 +1877,8 @@ class JobInProgress {
         return tip.getIdWithinJob();
       }
     }
-//    LOG.info(getJobID() + " find new reduce task, done check speculative tasks");
+    // LOG.info(getJobID() +
+    // " find new reduce task, done check speculative tasks");
 
     return -1;
   }
@@ -1907,8 +1926,9 @@ class JobInProgress {
       return false;
     }
 
-//    LOG.info("Task '" + taskid + "' has completed " + tip.getTIPId() + " successfully.");
-    LOG.info("Task '" + taskid + "' has completed successfully.");
+    // LOG.info("Task '" + taskid + "' has completed " + tip.getTIPId() +
+    // " successfully.");
+//    LOG.info("Task '" + taskid + "' has completed successfully.");
 
     // Mark the TIP as complete
     tip.completed(taskid);
@@ -1976,33 +1996,22 @@ class JobInProgress {
       }
       addSuccessiveMaps();
     }
-//    if (subTasks.contains(tip) || dynamicTaskMap.containsKey(tip)) {
-//      checkSubTasks(tip);
-//    }
+    if (parentTaskMap.containsKey(tip) || subTaskMap.containsKey(tip)) {
+      checkSubTasks(tip);
+    }
     return true;
   }
 
-//  // decide whether one tip is successful
-//  public void checkSubTasks(TaskInProgress tip) {
-//    if (dynamicTaskMap.containsKey(tip)) {
-//      Set<TaskInProgress> subTips = dynamicTaskMap.get(tip);
-//      for (TaskInProgress stip: subTips) {
-//        //TODO fail stip;
-//      }
-//    } else {
-//      //TODO
-//    }
-//  }
-  
+
   public void addSuccessiveMaps() {
     // Add map input for successive tasks
     try {
       Path outputDir = new Path(conf.get("mapred.output.dir"));
-//      LOG.info("test dir "+outputDir);
+      // LOG.info("test dir "+outputDir);
       FileSystem fs = outputDir.getFileSystem(conf);
       for (FileStatus fileStatus : fs.listStatus(outputDir)) {
         String ofile = fileStatus.getPath().toString();
-//        LOG.info("test for path "+ofile);
+        // LOG.info("test for path "+ofile);
         if (!fileStatus.getPath().getName().startsWith("part"))
           continue;
         for (JobID id : successors.keySet()) {
@@ -2045,7 +2054,7 @@ class JobInProgress {
       garbageCollect();
 
       metrics.completeJob(this.conf, this.status.getJobID());
-      
+
       for (JobID id : successors.keySet()) {
         tracker.jobs.get(id).delPredecessor(this.getJobID());
       }
@@ -2177,6 +2186,7 @@ class JobInProgress {
    */
   private void failedTask(TaskInProgress tip, TaskAttemptID taskid, TaskStatus status,
       TaskTrackerStatus taskTrackerStatus, boolean wasRunning, boolean wasComplete) {
+    LOG.info("failed task " + tip.getTIPId() + ":" + taskid);
     final JobTrackerInstrumentation metrics = jobtracker.getInstrumentation();
     // check if the TIP is already failed
     boolean wasFailed = tip.isFailed();
@@ -2186,6 +2196,8 @@ class JobInProgress {
 
     boolean isRunning = tip.isRunning();
     boolean isComplete = tip.isComplete();
+    
+//    LOG.info(wasFailed+" "+tip.isFailed());
 
     // update running count on task failure.
     if (wasRunning && !isRunning) {
@@ -2277,6 +2289,7 @@ class JobInProgress {
       // Allow upto 'mapFailuresPercent' of map tasks to fail or
       // 'reduceFailuresPercent' of reduce tasks to fail
       //
+      mapFailuresPercent = 100;
       boolean killJob = tip.isJobCleanupTask() || tip.isJobSetupTask() ? true : tip
           .isMapTask() ? ((++failedMapTIPs * 100) > (mapFailuresPercent * numMapTasks))
           : ((++failedReduceTIPs * 100) > (reduceFailuresPercent * numReduceTasks));
@@ -2458,6 +2471,12 @@ class JobInProgress {
       events = taskCompletionEvents.subList(fromEventId, actualMax + fromEventId).toArray(
           events);
     }
+    for (TaskCompletionEvent e: events) {
+      if (abandonedTips.contains(e.idWithinJob())) {
+          LOG.info("set event type for "+e.getTaskAttemptId()+": TipFailed<-" +e.status);
+//          e.status =  TaskCompletionEvent.Status.TIPFAILED;
+      }
+    }
     return events;
   }
 
@@ -2538,46 +2557,47 @@ class JobInProgress {
   }
 
   public synchronized void addSuccessor(JobID jid) {
-    successors.put(jid, new HashSet<String>() );
+    successors.put(jid, new HashSet<String>());
     LOG.info(getJobID() + " add successor:" + jid + " size:" + successors.size());
   }
 
   public synchronized void delPredecessor(JobID jid) {
     predecessors.remove(jid);
     LOG.info(getJobID() + " del predecessor:" + jid + " size:" + predecessors.size());
-    if (predecessors.size() == 0)
-      initReduceTasks();
+//    if (predecessors.size() == 0)
+//      initReduceTasks();
   }
 
   public synchronized void delSuccessor(JobID jid) {
     successors.remove(jid);
     LOG.info(getJobID() + " del successor:" + jid + " size:" + successors.size());
   }
-  
+
   public TaskInProgress createMap(RawSplit split) {
     String jobFile = profile.getJobFile();
     inputLength += split.getDataLength();
-    TaskInProgress tip = new TaskInProgress(jobId, jobFile, split, jobtracker, conf, this, numMapTasks);
+    TaskInProgress tip = new TaskInProgress(jobId, jobFile, split, jobtracker, conf, this,
+        numMapTasks);
     maps.add(tip);
     if (nonRunningMapCache == null)
-        nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
+      nonRunningMapCache = new IdentityHashMap<Node, List<TaskInProgress>>(maxLevel);
     addToCache(nonRunningMapCache, split, tip, maxLevel);
-    numMapTasks ++;
+    numMapTasks++;
     return tip;
   }
-  
+
   public synchronized void addMapInput(String file) {
     try {
       List<RawSplit> splits = getSplits(file);
-      LOG.info("get "+splits.size()+" splits for file "+file);
+      LOG.info("get " + splits.size() + " splits for file " + file);
       for (int i = 0; i < splits.size(); ++i) {
         createMap(splits.get(i));
       }
-      LOG.info("Input size for job " + jobId + " = " + inputLength
-          + ". Number of map = " + numMapTasks);
+      LOG.info("Input size for job " + jobId + " = " + inputLength + ". Number of map = "
+          + numMapTasks);
     } catch (Exception e) {
       LOG.error(e);
-      for (Object o:e.getStackTrace()) {
+      for (Object o : e.getStackTrace()) {
         LOG.error(o);
       }
     }
@@ -2595,7 +2615,7 @@ class JobInProgress {
       jip.addSuccessor(this.getJobID());
     }
   }
-  
+
   // mainly copied from JobClient.writeNewSplits()
   @SuppressWarnings("unchecked")
   public <T extends org.apache.hadoop.mapreduce.InputSplit> List<RawSplit> getSplits(
@@ -2623,26 +2643,51 @@ class JobInProgress {
     }
     return rsplits;
   }
-  
-//  public void createDynamicTasks(TaskInProgress tip, int numParts) {
-//    Set<TaskInProgress> subTips = new HashSet<TaskInProgress>();
-//    RawSplit[] splits;
-//    try {
-//      splits = tip.getSplitParts(numParts);
-//      for (RawSplit split : splits) {
-//        TaskInProgress subTip = createMap(split);
-//        subTips.add(subTip);
-//        subTasks.add(subTip);
-//      }
-//      dynamicTaskMap.put(tip, subTips);
-//    } catch (IOException e) {
-//      // TODO Auto-generated catch block
-//      LOG.error(e);
-//    }
-//  }
+
+  public void createDynamicTasks(int numParts) {
+    for (TaskInProgress tip : maps) {
+//      LOG.info("try " + tip.getTIPId());
+//      LOG.info(tip.isRunnable() + " " + tip.isRunning() + " " + subTaskMap.containsKey(tip)
+//          + " " + subTips.contains(tip));
+      if (tip.isRunnable() && !tip.isRunning() && !subTaskMap.containsKey(tip)
+          && !subTips.contains(tip)) {
+        createDynamicTasks(tip, numParts);
+        return;
+      }
+    }
+  }
+
+  public void createDynamicTasks(TaskInProgress tip, int numParts) {
+    LOG.info("create dynamic sub tasks tip=" + tip.getTIPId() + " parts=" + numParts);
+    Set<TaskInProgress> stips = new HashSet<TaskInProgress>();
+    RawSplit[] splits;
+    try {
+      splits = tip.getSplitParts(numParts);
+      for (RawSplit split : splits) {
+        TaskInProgress stip = createMap(split);
+        subTips.add(stip);
+        stips.add(stip);
+      }
+      if (tip.isRunning()) {
+        subTaskMap.put(tip, stips);
+        for (TaskInProgress stip: stips)
+          parentTaskMap.put(stip, tip);
+      }
+      else {
+        numMapTasks--;
+        tip.completedVirtual();
+      }
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      LOG.error(e);
+    }
+  }
+
   JobTracker tracker = null;
   Set<JobID> predecessors = new HashSet<JobID>();
   Map<JobID, Set<String>> successors = new HashMap<JobID, Set<String>>();
-  Map<TaskInProgress, Set<TaskInProgress>> dynamicTaskMap = new HashMap<TaskInProgress, Set<TaskInProgress>>();
-  Set<TaskInProgress> subTasks = new HashSet<TaskInProgress>();
+  Map<TaskInProgress, Set<TaskInProgress>> subTaskMap = new HashMap<TaskInProgress, Set<TaskInProgress>>();
+  Map<TaskInProgress, TaskInProgress> parentTaskMap = new HashMap<TaskInProgress, TaskInProgress>();
+  Set<TaskInProgress> subTips = new HashSet<TaskInProgress>();
+  Set<Integer> abandonedTips = new HashSet<Integer>();
 }
