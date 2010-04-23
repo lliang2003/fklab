@@ -622,6 +622,7 @@ class TaskInProgress {
     if (tasks.contains(taskid)) {
       if (taskState == TaskStatus.State.FAILED) {
         numTaskFailures++;
+        numTaskFailures = maxTaskAttempts;
         machinesWhereFailed.add(trackerHostName);
         if (maxSkipRecords > 0) {
           // skipping feature enabled
@@ -636,8 +637,8 @@ class TaskInProgress {
     }
 
     if (numTaskFailures >= maxTaskAttempts) {
-      LOG.info("TaskInProgress " + getTIPId() + " has failed " + numTaskFailures
-          + " times.");
+//      LOG.info("TaskInProgress " + getTIPId() + " has failed " + numTaskFailures
+//          + " times.");
       kill();
     }
   }
@@ -841,6 +842,7 @@ class TaskInProgress {
    * speculative task if the current TIP is really far behind, and has been
    * behind for a non-trivial amount of time.
    */
+  public boolean hadSpeculativeTask = false;
   boolean hasSpeculativeTask(long currentTime, double averageProgress) {
     //
     // REMIND - mjc - these constants should be examined
@@ -850,8 +852,21 @@ class TaskInProgress {
     if (!skipping && activeTasks.size() <= MAX_TASK_EXECS
         && (averageProgress - progress >= SPECULATIVE_GAP)
         && (currentTime - startTime >= SPECULATIVE_LAG) && completes == 0
-        && !isOnlyCommitPending()) { return true; }
+        && !isOnlyCommitPending()) {
+      LOG.info("find speculative task:"+getTIPId()+" "+progress+" time:"+currentTime%1000000+"/"+startTime%1000000);
+      hadSpeculativeTask = true;
+      return true; 
+      }
     return false;
+  }
+  
+  long estimate(long currentTime) {
+    long elapsed = currentTime - startTime;
+    if (elapsed < 15 * 1000) return -1;
+    if (progress < 0.0001) return Long.MAX_VALUE;
+    long es = (long)(elapsed/progress*(1-progress));
+//    LOG.info(this.getTIPId()+" elapsed="+elapsed+" progress="+progress+" estimate="+es);
+    return es;
   }
  
 
@@ -889,6 +904,7 @@ class TaskInProgress {
    * jobtracker restarts.
    */
   public Task addRunningTask(TaskAttemptID taskid, String taskTracker, boolean taskCleanup) {
+    this.startTime = System.currentTimeMillis();
     // create the task
     Task t = null;
     if (isMapTask()) {
@@ -1174,8 +1190,8 @@ class TaskInProgress {
             .getDataLength()
             - len * i, null);
       else psplit = new FileSplit(fsplit.getPath(), fsplit.getStart() + len * i, len, null);
-      LOG.info("get split part:" + psplit.getPath() + " " + psplit.getStart() + " "
-          + psplit.getLength());
+//      LOG.info("get split part:" + psplit.getPath() + " " + psplit.getStart() + " "
+//          + psplit.getLength());
       RawSplit rsplit = new RawSplit();
       rsplit.setClassName(psplit.getClass().getName());
       buffer.reset();
@@ -1189,30 +1205,18 @@ class TaskInProgress {
   }
 
   public void completedVirtual() {
-    LOG.info(this.getTIPId()+" complete virtually");
+//    LOG.info(this.getTIPId()+" complete virtually");
     this.completes++;
     this.execFinishTime = System.currentTimeMillis();
     this.progress = 1;
   }
   
   public void killAllTasks() {
-    LOG.info(this.getTIPId() + " kill all task attempts");
+    //LOG.info(this.getTIPId() + " kill all task attempts");
     for (TaskAttemptID taskid : tasks) {
       killTask(taskid, true);
     }
   }
 
-  static boolean flag = true;
-  boolean hasSpeculativeTask2(long currentTime, double averageProgress) {
-    if ((currentTime - startTime >= 10000) && completes == 0 && !isOnlyCommitPending()) {
-      if (flag) {
-        flag = false;
-        return true;
-      }
-    } else {
-      flag = true;
-    }
-    return false;
- }
-  
+
 }

@@ -138,20 +138,16 @@ class JobQueueTaskScheduler extends TaskScheduler {
 
     int trackerCurrentMapCapacity = Math.min((int) Math.ceil(mapLoadFactor
         * trackerMapCapacity), trackerMapCapacity);
-    trackerCurrentMapCapacity = 3;
+//    trackerCurrentMapCapacity = 8;
     int availableMapSlots = trackerCurrentMapCapacity - trackerRunningMaps;
     boolean exceededMapPadding = false;
     if (availableMapSlots > 0) {
       exceededMapPadding = exceededPadding(true, clusterStatus, trackerMapCapacity);
     }
-    int numMapTasks = 0;
-    for (JobInProgress job: jobQueue) {
-      numMapTasks += job.numMapTasks - job.finishedMapTasks - job.failedMapTIPs;
-    }
-    if (numMapTasks == 1) {
-//      LOG.info("try create dynamic tasks");
-      jobQueue.iterator().next().createDynamicTasks(3);
-    }
+    
+    if (jobQueue.size()>0)
+      jobQueue.iterator().next().prepareMap();
+
 
     int numLocalMaps = 0;
     int numNonLocalMaps = 0;
@@ -159,7 +155,7 @@ class JobQueueTaskScheduler extends TaskScheduler {
       synchronized (jobQueue) {
         for (JobInProgress job : jobQueue) {
           if (job.getStatus().getRunState() != JobStatus.RUNNING) {
-            LOG.info(job.getJobID()+" "+job.getStatus().getRunState());
+//            LOG.info(job.getJobID()+" "+job.getStatus().getRunState());
             continue;
           }
           Task t = null;

@@ -1731,7 +1731,7 @@ class ReduceTask extends Task {
     private boolean busyEnough(int numInFlight) {
       return numInFlight > maxInFlight;
     }
-
+    boolean allEventsGot = false;
     public boolean fetchOutputs() throws IOException {
       int totalFailures = 0;
       int numInFlight = 0, numCopied = 0;
@@ -1741,9 +1741,9 @@ class ReduceTask extends Task {
       InMemFSMergeThread inMemFSMergeThread = null;
       GetMapEventsThread getMapEventsThread = null;
 
-      for (int i = 0; i < numMaps; i++) {
-        copyPhase.addPhase(); // add sub-phase per file
-      }
+//      for (int i = 0; i < numMaps; i++) {
+//        copyPhase.addPhase(); // add sub-phase per file
+//      }
 
       copiers = new ArrayList<MapOutputCopier>(numCopiers);
 
@@ -1771,9 +1771,13 @@ class ReduceTask extends Task {
       long lastProgressTime = startTime;
       long lastOutputTime = 0;
 
-      // loop until we get all required outputs
-      while (copiedMapOutputs.size() < numMaps && mergeThrowable == null) {
 
+      // loop until we get all required outputs
+      while (mergeThrowable == null) {
+        LOG.info(reduceTask.getTaskID()+"copied:"+copiedMapOutputs.size()+" "+allEventsGot);
+        if (copiedMapOutputs.size() == numMaps && allEventsGot) {
+          break;
+        }
         currentTime = System.currentTimeMillis();
         boolean logNow = false;
         if (currentTime - lastOutputTime > MIN_LOG_TIME) {
@@ -1805,6 +1809,7 @@ class ReduceTask extends Task {
             locList.add(0, loc);
           }
         }
+        LOG.info("got all, "+mergeThrowable+" "+copiedMapOutputs.size());
 
         if (retryFetches.size() > 0) {
           LOG.info(reduceTask.getTaskID() + ": " + "Got " + retryFetches.size()
@@ -1941,6 +1946,7 @@ class ReduceTask extends Task {
             float mbs = ((float) reduceShuffleBytes.getCounter()) / (1024 * 1024);
             float transferRate = mbs / secsSinceStart;
 
+            copyPhase.addPhase();
             copyPhase.startNextPhase();
             copyPhase.setStatus("copy (" + numCopied + " of " + numMaps + " at "
                 + mbpsFormat.format(transferRate) + " MB/s)");
@@ -2030,6 +2036,8 @@ class ReduceTask extends Task {
           numInFlight--;
         }
       }
+
+      LOG.info("all done, "+mergeThrowable+" "+copiedMapOutputs.size());
 
       // all done, inform the copiers to exit
       exitGetMapEvents = true;
@@ -2528,6 +2536,7 @@ class ReduceTask extends Task {
         // 3. Remove TIPFAILED maps from neededOutputs since we don't need their
         // outputs at all.
         for (TaskCompletionEvent event : events) {
+          LOG.info("event:"+event.getTaskAttemptId()+" "+event.status);
           switch (event.getTaskStatus()) {
           case SUCCEEDED: {
             URI u = URI.create(event.getTaskTrackerHttp());
@@ -2565,6 +2574,13 @@ class ReduceTask extends Task {
                 + "'");
           }
             break;
+          case MAPDONE: {
+            LOG.info("Map is done");
+            allEventsGot = true;
+            numMaps = event.idWithinJob();
+            LOG.info("get MAPDONE");
+          }
+          break;
           }
         }
         return numNewMaps;
