@@ -247,7 +247,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
                 Map.Entry<TaskAttemptID, Long> pair = itr.next();
                 TaskAttemptID taskId = pair.getKey();
                 long age = now - (pair.getValue()).longValue();
-                LOG.info(taskId + " is " + age + " ms debug.");
+//                LOG.info(taskId + " is " + age + " ms debug.");
                 if (age > TASKTRACKER_EXPIRY_INTERVAL) {
                   LOG.info("Launching task " + taskId + " timed out.");
                   TaskInProgress tip = null;
@@ -1349,7 +1349,7 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
   private String trackerIdentifier;
   long startTime;
   int totalSubmissions = 0;
-  private int totalMapTaskCapacity;
+  int totalMapTaskCapacity;
   private int totalReduceTaskCapacity;
   private HostsFileReader hostsReader;
 
@@ -1853,8 +1853,8 @@ public class JobTracker implements MRConstants, InterTrackerProtocol,
   // and TaskInProgress
   // /////////////////////////////////////////////////////
   void createTaskEntry(TaskAttemptID taskid, String taskTracker, TaskInProgress tip) {
-    LOG.info("Adding task " + (tip.isCleanupAttempt(taskid) ? "(cleanup)" : "") + "'"
-        + taskid + " for tracker '" + taskTracker + "'");
+//    LOG.info("Adding task " + (tip.isCleanupAttempt(taskid) ? "(cleanup)" : "") + "'"
+//        + taskid + " for tracker '" + taskTracker + "'");
 
     // taskid --> tracker
     taskidToTrackerMap.put(taskid, taskTracker);

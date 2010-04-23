@@ -902,6 +902,7 @@ public class TaskTracker
                   "mapred.tasktracker.map.tasks.maximum", 2);
     maxCurrentReduceTasks = conf.getInt(
                   "mapred.tasktracker.reduce.tasks.maximum", 2);
+    LOG.info("maxCurrenMapTasks:"+maxCurrentMapTasks);
     this.jobTrackAddr = JobTracker.getAddress(conf);
     String infoAddr = 
       NetUtils.getServerAddress(conf,
@@ -2636,6 +2637,9 @@ public class TaskTracker
           FetchStatus f = rjob.getFetchStatus();
           if (f != null) {
             mapEvents = f.getMapEvents(fromEventId, maxLocs);
+            for (TaskCompletionEvent e: mapEvents) {
+              LOG.info("event:"+e.getTaskAttemptId()+" "+e.status);
+            }
           }
         }
       }
