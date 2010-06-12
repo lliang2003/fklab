@@ -11,6 +11,7 @@
 #define  DEBBYMANAGER_FILE_HEADER_INC
 
 #include "DataManager.hpp"
+#include <set>
 
 namespace debby {
 

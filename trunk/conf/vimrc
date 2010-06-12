@@ -75,6 +75,7 @@ ca makes make %:t:r
 ca runs !./%:t:r
 ca makesr !make %:t:r;./%:t:r
 ca sets set makeprg=make\ %:t:r
+ca setx set makeprg=ant
 
 nmap <Tab> :bn<CR>
 nmap <S-Tab> :bp<CR>
@@ -107,6 +108,7 @@ au BufEnter *.tex   call TexMode()
 au BufEnter *.tcl   call TclMode()
 au BufEnter *.erl   call ErlMode()
 au BufEnter *.java  call JavaMode()
+au BufEnter *.xml   call XmlMode()
 
 function! NMode()
     let g:CommentStr = '#'
@@ -140,6 +142,12 @@ function! JavaMode()
     set makeprg=./vimant
     set efm=\ %#[javac]\ %#%f:%l:%c:%*\\d:%*\\d:\ %t%[%^:]%#:%m,
            \%A\ %#[javac]\ %f:%l:\ %m,%-Z\ %#[javac]\ %p^,%-C%.%#
+    set makeprg=ant
+endfunction
+
+
+function! XmlMode() 
+    set makeprg=ant
 endfunction
 
 function! TclMode() 
