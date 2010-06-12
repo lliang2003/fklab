@@ -77,6 +77,7 @@ fi
 alias lman='man -M local/man'
 alias labftp='lftp ftp://162.105.146.3 -u netlab,netcs'
 alias setlabproxy='export http_proxy="http://fankai:123123@162.105.146.2:3128"'
+alias setnetproxy='export http_proxy="http://162.105.203.25:6791"'
 alias unsetproxy='export http_proxy=""'
 alias starttomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
 alias stoptomcat='sudo /usr/share/tomcat5.5/bin/startup.sh'
@@ -92,3 +93,5 @@ export JAVA_HOME=/usr/lib/jvm/java-6-sun
 #export CATALINA_HOME=/usr/share/tomcat5.5
 export PATH=~/fklab/script:$PATH
 
+alias setantproxy='export ANT_OPTS="-Dhttp.proxyHost=162.105.203.25 -Dhttp.proxyPort=3129"'
+TZ='Asia/Shanghai'; export TZ 

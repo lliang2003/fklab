@@ -1,0 +1,9 @@
+<project name="subtest" default="task1">
+    <target name="task1">
+        <echo>sub project1 task 1</echo>
+    </target>
+    <target name="task2">
+        <echo>sub project2 task 2</echo>
+    </target>
+
+</project>

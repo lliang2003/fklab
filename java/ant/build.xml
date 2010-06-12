@@ -1,0 +1,195 @@
+<project name="test-ant" basedir="." default="test-echo">
+    <description>
+        test ant usage
+    </description>
+
+    <property name="src" location="src" />
+    <property name="build" location="build" />
+    <property name="dist" location="dist" />
+    <property name="var" value="value1" />
+
+    <target name="test-echo" depends="init">
+        <echo>arg="${arg}"</echo>
+        <echo>var="${var}"</echo>
+        <echo>stamp="${DSTAMP}"</echo>
+
+        <echo>basedir=${basedir}</echo>
+        <echo>ant.file=${ant.file}</echo>
+        <echo>ant.version=${ant.version}</echo>
+        <echo>ant.project.name=${ant.project.name}</echo>
+        <echo>ant.java.version=${ant.java.version}</echo>
+
+        <echo>os.name=${os.name}</echo>
+        <echo>os.version=${os.version}</echo>
+        <echo>user.name=${user.name}</echo>
+        <echo>user.home=${user.home}</echo>
+        <echo>user.dir=${user.dir}</echo>
+        <echo>java.version=${java.version}</echo>
+        <echo>java.home=${java.home}</echo>
+
+        <basename property="test.basename" file="noexist/Hello.java" suffix=".java"/>
+        <echo>basename=${test.basename}</echo>
+    </target>
+
+    <target name="init">
+        <tstamp/>
+        <!-- create dir -->
+        <mkdir dir="${build}" />
+    </target>
+        
+    <target name="compile" depends="init" description="compile">
+        <javac srcdir="${src}" destdir="${build}" />
+        <path id="buildpath" location="${build}" />
+        <java classname="Hello" classpathref="buildpath" >
+            <arg value="arg1" />
+            <arg value="arg2" />
+        </java>
+    </target>
+
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist}/lib" />
+        <jar jarfile="${dist}/lib/${ant.project.name}-${DSTAMP}.jar" basedir="${build}"/>
+    </target>
+
+    <target name="clean">
+        <echo message="clean"/>
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+    </target>
+
+    <target name="echo">
+        <echo message="echo:${arg}" />
+    </target>
+
+    <target name="test-ant">
+        <ant dir="sub" />
+        <ant antfile="build2.xml" dir="sub" target="task2" />
+        <antcall target="echo">
+            <param name="arg" value="called from test-ant"/>
+        </antcall>
+    </target>
+
+    <target name="echo-true" if="econd" >
+        <echo>is true</echo>
+    </target>
+    <target name="echo-false" unless="econd">
+        <echo>is false</echo>
+    </target>
+    <target name="test-cond">
+        <condition property="econd">
+            <istrue value="true" />
+        </condition>
+        <antcall target="echo-true" />
+        <antcall target="echo-false" />
+
+        <condition property="cond2">
+            <and>
+                <available file="src" />
+                <xor>
+                    <available file="doc" />
+                    <available file="build" />
+                    <not>
+                        <os family="unix" />
+                    </not>
+                </xor>
+                <equals arg1="ok" arg2="OK" casesensitive="false" />
+                <not>
+                    <isset property="unset"/>
+                </not>
+                <isfalse value="false" />
+                <istrue value="true" />
+            </and>
+        </condition>
+        <echo>cond2 is ${cond2}</echo>
+
+        <condition property="econd">
+            <filesmatch file1="sub/build.xml" file2="sub/build2.xml" />
+        </condition>
+        <antcall target="echo-true" />
+        <antcall target="echo-false" />
+
+    </target>
+
+    <target name="test-available">
+        <available file="${src}/Hello.java" property="present.hello" />
+        <echo>${present.hello}</echo>
+        <available file="${src}/World.java" property="present.world" />
+        <echo>${present.world}</echo>
+
+        <path id="buildpath" location="${build}" />
+        <available classname="Hello" classpathref="buildpath" property="present.helloc" />
+        <echo>${present.helloc}</echo>
+        
+        <available resource="Hello.class" property="present.hellor">
+            <classpath>
+                <pathelement location="${build}" />
+            </classpath>
+        </available>
+        <echo>${present.hellor}</echo>
+    </target>
+
+    <target name="test-">
+    </target>
+
+    <target name="test-exec">
+        <exec executable="ls">
+            <arg value="sub" />
+        </exec>
+        <echo>sleep 2 seconds</echo>
+        <sleep seconds="2" />
+    </target>
+
+    <target name="test-file">
+        <defaultexcludes add="**/*.bak" />
+        <defaultexcludes echo="true" />
+
+        <chmod file="build.xml" perm="777" />
+        <chmod file="build.xml" perm="go-w" />
+        <chmod file="build.xml" perm="-x" />
+
+        <mkdir dir="tmp" />
+        <copy file="build.xml" tofile="b.xml" />
+        <move file="b.xml" tofile="tmp/b.xml" />
+        <copy todir="tmp">
+            <fileset dir="${src}" />
+            <fileset dir="sub" >
+                <include name="*.xml"/>
+                <exclude name="*2.xml"/>
+            </fileset>
+        </copy>
+
+        <touch file="newfile" />
+        <delete file="newfile" />
+        <delete verbose="true" includeemptydirs="true" >
+            <fileset dir="tmp">
+                <include name="**/*" />
+            </fileset>
+            <fileset dir="tmp" />
+        </delete>
+    </target>
+
+    <target name="test-tar">
+        <tar destfile="sub.tar" basedir="sub" excludes="*.test" />
+        <gzip src="sub.tar" destfile="sub.tar.gz" />
+        <gunzip src="sub.tar.gz" dest="sub2.tar" />
+        <untar src="sub2.tar" dest="sub2" />
+        <bzip2 src="sub.tar" destfile="sub.tar.bz2" />
+        <bunzip2 src="sub.tar.bz2" dest="sub3.tar" />
+        <untar src="sub3.tar" dest="sub3" />
+        <delete verbose="true" includeemptydirs="true" >
+            <fileset dir=".">
+                <include name="*tar*" />
+            </fileset>
+            <fileset dir="sub2" />
+            <fileset dir="sub3" />
+        </delete>
+    </target>
+
+    <target name="test-fail">
+        <fail message="test fail" />
+    </target>
+
+    <target name="test" depends="test-cond">
+    </target>
+
+</project>

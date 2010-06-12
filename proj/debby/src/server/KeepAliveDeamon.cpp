@@ -17,8 +17,7 @@ void KeepAliveDeamon::run() {
     event.type = slice::ENothing;
     while (!_done) {
         _pdm->replyTimeoutKA();
-        _pdm->removeExpiredSessions();
-
+        _pdm->removeExpiredSessions(60);
         _monitor.timedWait(IceUtil::Time::seconds(1));
     }
 }
