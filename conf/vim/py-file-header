@@ -2,4 +2,9 @@
 # @author   FAN Kai (fankai@net.pku.edu.cn), Peking University  
 # @date     |DATE|
 
+import optparse
+parser = optparse.OptionParser(usage="%prog [options] [args]")
+parser.add_option('-v', '--verbose', action='store_true', dest='verbose', default=False, help='make lots of noise')
+options, args = parser.parse_args()
+
 |CURSOR|
