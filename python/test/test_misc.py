@@ -87,7 +87,7 @@ def test_optparse():
     parser.add_option_group(g)
     options, args = parser.parse_args()
     print options
-test_optparse()
+#test_optparse()
 
 def test_getopt():
     print '-'*48, '\nFunc:', sys._getframe().f_code.co_name
@@ -95,7 +95,7 @@ def test_getopt():
     opts, args = getopt.getopt(sys.argv[1:], 'ab:', ['c=','bb=','d'])
     print 'opts:', opts
     print 'args:', args
-#test_getopt()
+test_getopt()
 
 def test_tempfile():
     print '-'*48, '\nFunc:', sys._getframe().f_code.co_name
