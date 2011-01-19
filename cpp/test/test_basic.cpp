@@ -17,7 +17,14 @@ int f(T &t) {
     return 0;
 }
 
-class CLS {
+class Base {
+    public:
+        Base() {
+            cout <<"base" <<endl;
+        }
+};
+
+class CLS: public Base {
 public:
     static const CLS & instance() {
         static CLS c;
@@ -30,6 +37,7 @@ public:
 private:
     CLS() {
         cout <<"construct " <<endl;
+        //Base();
     }
 
 };
