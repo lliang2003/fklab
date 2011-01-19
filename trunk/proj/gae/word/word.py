@@ -32,10 +32,10 @@ class WordPage(webapp.RequestHandler):
         uw = set()
         for line in txt.split("\n"):
             for rtoken in line.split():
-                token = rtoken.strip(",.\"'!?").lower()
+                token = rtoken.strip(",.\"'!?:*()[]~|/")
                 flag = True
                 for letter in token:
-                    if letter not in string.ascii_letters:
+                    if letter not in string.ascii_lowercase:
                         flag = False
                         break
                 if token in kw or token in uw:
