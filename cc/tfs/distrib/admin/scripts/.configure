@@ -1,5 +1,0 @@
-SYSTEMHOME=.
-LIBHOME=./scripts
-CONFHOME=./conf
-BINHOME=./bin
-USERHOME=./../user
