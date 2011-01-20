@@ -1,1 +1,0 @@
-killall debby_server
