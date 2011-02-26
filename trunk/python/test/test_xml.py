@@ -85,10 +85,89 @@ def test_minidom_gen():
 test_minidom_gen()
 
 
+test_news_xml="""
+<NEWS>
+<DOC>
+<DOCNO> NYT19990101.0001 </DOCNO>
+<DOCTYPE> NEWS STORY </DOCTYPE>
+<DATE_TIME> 1999-01-01 00:01 </DATE_TIME>
+<HEADER>
+</HEADER>
+<BODY>
+<SLUG> BC-MONEY-SAVING-LADN </SLUG>
+<HEADLINE>
+TWENTY SIMPLE STEPS TOWARD PERSONAL UDGET SURPLUS
+</HEADLINE>
+ (For use by NYTimes News Service clients) 
+By DEBORAH ADAMSON  
+ c.1999 Los Angeles Daily News  
+<TEXT>
+<P>
+   LOS ANGELES -- Every year, millions of Americans pledge to put
+their financial house in order. This year, they say to themselves,
+it will be different.
+</P>
+<P>
+   They'll save and invest more. They'll even stick to a budget.
+</P>
+<P>
+   Indeed, the second-most popular New Year's resolution is to
+achieve financial goals, according to Citibank. The first? Lose
+weight and live more healthfully.
+</P>
+<P>
+   XXX
+</P>
+</TEXT>
+</BODY>
+<TRAILER>
+</TRAILER>
+</DOC>
+<DOC>
+<DOCNO> NYT19990101.0002 </DOCNO>
+<DOCTYPE> NEWS STORY </DOCTYPE>
+<DATE_TIME> 1999-01-01 00:11 </DATE_TIME>
+<BODY>
+<TEXT>
+<P>
+    hello
+</P>
+</TEXT>
+</BODY>
+</DOC>
+</NEWS>
+"""
 
 
 
+def test_minidom_news():
+    print '-'*48, '\nFunc:', sys._getframe().f_code.co_name
+    try:
+        recordDelim = "###"
+        dom = minidom.parseString(test_news_xml)
+        for doc in dom.getElementsByTagName("DOC"):
+            docno_xml = doc.getElementsByTagName("DOCNO")[0]
+            docno = docno_xml.childNodes[0].data.strip()
+            print "id=%s"%(docno)
+            print "time=%s"%(docno[:8])
+            body = doc.getElementsByTagName("BODY")[0]
+            if doc.getElementsByTagName("HEADLINE") != []:
+                headline_xml = doc.getElementsByTagName("HEADLINE")[0]
+                title = headline_xml.childNodes[0].data.strip()
+            else:
+                title = docno
+            print "title=%s"%(title)
+            print "body=",
+            textxml = body.getElementsByTagName("TEXT")[0]
+            for para_xml in textxml.getElementsByTagName("P"):
+                print para_xml.childNodes[0].data.strip()
+            print recordDelim
 
 
+        dom.unlink()
+    except Exception, e:
+        print e
+
+test_minidom_news()
 
 
