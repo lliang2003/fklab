@@ -19,4 +19,7 @@ $cmd
 cmd='rm Makefile -f'
 echo $cmd
 $cmd
+cmd='rm cmake_install.cmake -f'
+echo $cmd
+$cmd
 
