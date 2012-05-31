@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Notes{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+{% for note in notes %}
+    <a href={{note.content}}>Go</a> 
+    <a href=/notes?action=delete&id={{note.id}}>Delete</a> 
+    <br>
+    <div id="content-text">
+        <pre>{{note.content}}</pre>
+    </div>
+{% endfor %}
+
+<form method="post" action="/notes">
+    <textarea name="note" rows=8 cols=60></textarea> <br>
+    <input type="submit" value="Add Note">
+</form>
+{% endblock %}

@@ -1,0 +1,22 @@
+application: fankaicn
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /data
+  static_dir: data
+
+- url: /admin/.*
+  script: $PYTHON_LIB/google/appengine/ext/admin
+  login: required
+
+- url: /store
+  script: store.py
+
+- url: /notes
+  script: notes.py
+
+- url: /.*
+  script: hello.py
+

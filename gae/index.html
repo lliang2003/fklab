@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>{% block title %}Hello{% endblock title%}</title>
+    </head>
+    <body>
+        <div id="sidebar">
+        {% block sidebar %}
+        <ul>
+            <li><a href="/store"> Store </a> <br>
+            <li><a href="/notes"> Notes </a> <br>
+        </ul>
+        {% endblock sidebar%}
+    </div>
+
+    <div id="content">
+        {% block content %}
+        {{a.b|lower|escape|linebreaks}}
+        {% endblock content %}
+    </div>
+    </body>
+</html>
